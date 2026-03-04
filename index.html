@@ -111,9 +111,18 @@ body {
   color:var(--nr-smoke); text-transform:uppercase; letter-spacing:1px;
 }
 .today-progress {
-  width:26px; height:26px; position:relative;
+  width:36px; height:36px; position:relative; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
 }
 .today-progress svg { width:100%; height:100%; }
+.today-progress svg circle:last-child {
+  transition:stroke-dasharray 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.today-progress-count {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-family:var(--font-mono); font-size:8px; font-weight:600;
+  color:var(--nr-smoke); letter-spacing:-0.3px; pointer-events:none;
+}
 .today-tabs {
   display:flex; gap:20px; height:34px; align-items:center;
 }
@@ -739,19 +748,18 @@ body {
       <span class="today-logo">newsreel</span>
       <div class="today-right">
         <span class="today-date" id="todayDate">MAR 3</span>
-        <div class="today-progress">
-          <svg viewBox="0 0 26 26"><circle cx="13" cy="13" r="11" fill="none" stroke="var(--nr-iron)" stroke-width="2.5"/><circle cx="13" cy="13" r="11" fill="none" stroke="var(--nr-red)" stroke-width="2.5" stroke-dasharray="46 23" stroke-linecap="round" transform="rotate(-90 13 13)"/></svg>
+        <div class="today-progress" id="todayProgress" onclick="openBriefing()">
+          <svg viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15" fill="none" stroke="var(--nr-iron)" stroke-width="2.5"/>
+            <circle id="progressRing" cx="18" cy="18" r="15" fill="none" stroke="var(--nr-red)" stroke-width="2.5" stroke-dasharray="0 94.25" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+          </svg>
+          <span class="today-progress-count" id="progressCount">0/3</span>
         </div>
       </div>
     </div>
     <div class="today-tabs">
       <button class="today-tab active">Stack</button>
       <button class="today-tab">Premium</button>
-      <div class="briefing-pill" id="briefingCard" onclick="openBriefing()">
-        <span class="briefing-pill-dot" id="briefingDot"></span>
-        <span class="briefing-pill-text" id="briefingCardMeta">0/3</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px;color:var(--nr-smoke)"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
     </div>
   </div>
 
@@ -809,20 +817,6 @@ body {
   <button class="xp-btn" onclick="closeXP()">CLAIM XP</button>
 </div>
 
-<!-- CELEBRATION OVERLAY -->
-<div class="celebrate" id="celebrateScreen">
-  <div class="cel-confetti" id="celConfetti"></div>
-  <div class="cel-ring">
-    <svg viewBox="0 0 100 100">
-      <circle class="cel-ring-bg" cx="50" cy="50" r="42"/>
-      <circle class="cel-ring-fill" id="celRingFill" cx="50" cy="50" r="42"/>
-    </svg>
-    <div class="cel-ring-check" id="celCheck">✅</div>
-  </div>
-  <div class="cel-xp-badge">+50 XP</div>
-  <div class="cel-msg">Story completed!</div>
-</div>
-
 <!-- BOTTOM NAV -->
 <nav class="bottomnav">
   <button class="navbtn on" data-tab="today"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span class="lbl">Today</span></button>
@@ -842,29 +836,6 @@ body {
   <div class="briefing-list" id="briefingList"></div>
 </div>
 
-<!-- IN-APP BROWSER -->
-<div class="inapp-browser" id="inappBrowser">
-  <div class="inapp-browser-progress"><div class="inapp-browser-progress-bar" id="browserProgress"></div></div>
-  <div class="inapp-browser-bar">
-    <button class="inapp-browser-close" onclick="closeBrowser()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
-    <div class="inapp-browser-url">
-      <svg class="inapp-browser-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-      <span class="inapp-browser-domain" id="browserDomain">theatlantic.com</span>
-    </div>
-    <div class="inapp-browser-actions">
-      <button class="inapp-browser-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
-      <button class="inapp-browser-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.2"/></svg></button>
-    </div>
-  </div>
-  <div class="inapp-browser-content" id="browserContent">
-    <div class="inapp-browser-loading">
-      <div class="inapp-browser-spinner"></div>
-      <span>Loading article...</span>
-    </div>
-  </div>
-</div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -1005,7 +976,6 @@ function renderFeed() {
           <button class="card-expand-btn" onclick="event.stopPropagation();openCarousel(${i})">${ICONS.expand}</button>
         </div>
         <div class="card-actions">
-          <button class="card-action" onclick="event.stopPropagation();openBrowserFor(${i})" title="Read"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></button>
           <button class="card-action" onclick="event.stopPropagation();openCarousel(${i})" title="Quiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
           <button class="card-action" onclick="event.stopPropagation();openPoll(${i})" title="Poll">${ICONS.poll}</button>
           <button class="card-action" id="bm-${i}" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark">${ICONS.bookmark}</button>
@@ -1346,109 +1316,13 @@ function closeXP() { document.getElementById('xpScreen').classList.remove('on');
 /* ═══════════════════════════════════════════════
    IN-APP BROWSER
    ═══════════════════════════════════════════════ */
+/* openBrowserFor — opens the source article in a real browser tab */
 function openBrowserFor(idx) {
   const story = STORIES[idx];
   const rm = story.readMore;
-  const domain = (rm.url || 'newsreel.co').replace(/https?:\/\//, '').split('/')[0];
-  document.getElementById('browserDomain').textContent = domain;
-
-  // Reset progress bar animation
-  const prog = document.getElementById('browserProgress');
-  prog.style.animation = 'none';
-  prog.offsetHeight; // trigger reflow
-  prog.style.animation = 'browserLoad 2s cubic-bezier(0.4,0,0.2,1) forwards';
-
-  // Show loading state
-  document.getElementById('browserContent').innerHTML = `
-    <div class="inapp-browser-loading">
-      <div class="inapp-browser-spinner"></div>
-      <span>Loading article...</span>
-    </div>`;
-
-  // Close carousel behind the scenes so you don't return to it
-  closeCarousel();
-
-  // Slide up browser
-  document.getElementById('inappBrowser').classList.add('on');
-
-  // Simulate page load after delay
-  setTimeout(() => {
-    document.getElementById('browserContent').innerHTML = `
-      <div style="width:100%;height:100%;background:var(--nr-white);padding:24px;overflow-y:auto">
-        <div style="font-family:Georgia,serif;color:#111">
-          <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">${rm.source}</div>
-          <div style="font-size:26px;font-weight:700;line-height:1.2;margin-bottom:16px;color:#111">${rm.title}</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #e5e5e5">
-            <div style="width:32px;height:32px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#666">${story.author.initials}</div>
-            <div><div style="font-size:13px;font-weight:600;color:#111">${story.author.name}</div><div style="font-size:12px;color:#888">Published today</div></div>
-          </div>
-          <div style="font-size:17px;line-height:1.7;color:#333">
-            <p style="margin-bottom:16px">${story.slides[0].text}</p>
-            <p style="margin-bottom:16px;color:#666;font-style:italic">This is a preview of the full article. In the real app, the complete source article would load here from ${rm.source}.</p>
-          </div>
-        </div>
-      </div>`;
-  }, 1800);
-}
-
-function closeBrowser() {
-  document.getElementById('inappBrowser').classList.remove('on');
-  cameFromBrowser = true;
-
-  // Mark this story as read in the briefing
-  briefingRead.add(currentStoryIdx);
-  updateBriefingCard();
-
-  // === Celebration sequence ===
-  // 1. Show celebration overlay
-  const cel = document.getElementById('celebrateScreen');
-  cel.classList.add('on');
-
-  // 2. Spawn confetti particles
-  spawnConfetti();
-
-  // 3. Animate the big ring from 0 → full (circumference = 2π×42 ≈ 264)
-  requestAnimationFrame(() => {
-    document.getElementById('celRingFill').style.strokeDasharray = '264 0';
-  });
-
-  // 4. Animate the header progress ring (small one, top-right)
-  const headerRing = document.querySelector('.today-progress svg circle:last-child');
-  if (headerRing) {
-    headerRing.style.strokeDasharray = '69 0'; // full circle
-  }
-
-  // 5. After 2s, dismiss celebration → show XP screen
-  setTimeout(() => {
-    cel.classList.remove('on');
-    // Reset celebration for next time
-    document.getElementById('celRingFill').style.strokeDasharray = '0 264';
-    document.getElementById('celConfetti').innerHTML = '';
-    openXP();
-  }, 2200);
-}
-
-function spawnConfetti() {
-  const container = document.getElementById('celConfetti');
-  container.innerHTML = '';
-  const colors = ['#FF6343','#EDBD1F','#FF3377','#C566FF','#9081FF','#00BDB3','#1AAD17','#1264F2'];
-  for (let i = 0; i < 40; i++) {
-    const p = document.createElement('div');
-    p.className = 'cel-particle';
-    const angle = (Math.PI * 2 * i) / 40;
-    const dist = 80 + Math.random() * 120;
-    const cx = Math.cos(angle) * dist;
-    const cy = Math.sin(angle) * dist - 40; // bias upward
-    p.style.setProperty('--cx', cx + 'px');
-    p.style.setProperty('--cy', cy + 'px');
-    p.style.setProperty('--cr', (Math.random() * 720 - 360) + 'deg');
-    p.style.background = colors[i % colors.length];
-    p.style.animationDelay = (0.3 + Math.random() * 0.3) + 's';
-    p.style.width = (4 + Math.random() * 6) + 'px';
-    p.style.height = (4 + Math.random() * 6) + 'px';
-    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-    container.appendChild(p);
-  }
+  // In production, rm.url would be a real URL. For prototype, open a placeholder.
+  const url = rm.url && rm.url !== '#' ? rm.url : 'https://www.reuters.com';
+  window.open(url, '_blank');
 }
 
 /* ═══════════════════════════════════════════════
@@ -1491,13 +1365,16 @@ function openFromBriefing(idx) {
 function updateBriefingCard() {
   const count = Math.min(STORIES.length, 4);
   const done = briefingRead.size;
-  const meta = document.getElementById('briefingCardMeta');
-  const dot = document.getElementById('briefingDot');
-  if (meta) {
-    meta.textContent = done >= count ? '✓' : `${done}/${count}`;
-  }
-  if (dot) {
-    dot.classList.toggle('done', done >= count);
+  // Update circle counter
+  const label = document.getElementById('progressCount');
+  if (label) label.textContent = done >= count ? '✓' : `${done}/${count}`;
+  // Fill ring proportionally (circumference = 2π×15 ≈ 94.25)
+  const ring = document.getElementById('progressRing');
+  if (ring) {
+    const fill = (done / count) * 94.25;
+    ring.style.strokeDasharray = `${fill} ${94.25 - fill}`;
+    // Turn green when complete
+    ring.style.stroke = done >= count ? 'var(--nr-green)' : 'var(--nr-red)';
   }
 }
 
