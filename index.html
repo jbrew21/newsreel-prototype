@@ -373,6 +373,69 @@ body {
 }
 .xp-btn:active { opacity:0.9; transform:scale(0.97); }
 
+/* ═══════════════════════════════════════════════
+   CELEBRATION — Post-article reward animation
+   ═══════════════════════════════════════════════ */
+.celebrate {
+  position:fixed; inset:0; width:393px; height:852px;
+  left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,0.92); z-index:3500;
+  display:none; flex-direction:column;
+  align-items:center; justify-content:center;
+  opacity:0;
+}
+.celebrate.on { display:flex; animation:xpFadeIn 0.3s ease forwards; }
+
+/* Big progress ring */
+.cel-ring {
+  width:140px; height:140px; position:relative;
+  margin-bottom:24px;
+  animation:xpPop 0.6s cubic-bezier(0.175,0.885,0.32,1.275) 0.1s both;
+}
+.cel-ring svg { width:100%; height:100%; }
+.cel-ring-bg { fill:none; stroke:var(--nr-iron); stroke-width:6; }
+.cel-ring-fill {
+  fill:none; stroke:var(--nr-red); stroke-width:6;
+  stroke-linecap:round; transform:rotate(-90deg); transform-origin:center;
+  stroke-dasharray:0 314; /* starts empty, animated via JS */
+  transition:stroke-dasharray 1s cubic-bezier(0.4,0,0.2,1);
+}
+.cel-ring-check {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-size:48px; opacity:0;
+  animation:xpPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.7s both;
+}
+.cel-xp-badge {
+  font-family:var(--font-headline); font-size:32px; color:var(--nr-red);
+  opacity:0; animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 0.9s both;
+}
+.cel-msg {
+  font-family:var(--font-body); font-size:15px; color:var(--nr-ash);
+  margin-top:6px; opacity:0;
+  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1.05s both;
+}
+
+/* Confetti particles */
+.cel-confetti {
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  pointer-events:none; overflow:hidden;
+}
+.cel-particle {
+  position:absolute; width:8px; height:8px; border-radius:2px;
+  top:50%; left:50%; opacity:0;
+  animation:confettiShoot 1.2s cubic-bezier(0.2,0,0.2,1) forwards;
+}
+@keyframes confettiShoot {
+  0%   { opacity:1; transform:translate(0,0) rotate(0deg) scale(1); }
+  70%  { opacity:1; }
+  100% { opacity:0; transform:translate(var(--cx), var(--cy)) rotate(var(--cr)) scale(0.3); }
+}
+
+/* Header ring animation */
+.today-progress svg circle:last-child {
+  transition:stroke-dasharray 1s cubic-bezier(0.4,0,0.2,1);
+}
+
 /* Continue reading card inside XP screen */
 .readmore-divider {
   font-family:var(--font-body); font-size:13px; font-weight:500;
@@ -567,6 +630,92 @@ body {
 .scr { flex:1; overflow-y:auto; overflow-x:hidden; padding-top:var(--safe-top); padding-bottom:var(--nav-h); -webkit-overflow-scrolling:touch; }
 .scr::-webkit-scrollbar { display:none; }
 
+/* ═══════════════════════════════════════════════
+   BRIEFING OVERLAY
+   ═══════════════════════════════════════════════ */
+.briefing-overlay {
+  position:fixed; inset:0; width:393px; height:852px;
+  left:50%; transform:translateX(-50%) translateY(100%);
+  background:var(--nr-black); z-index:2500;
+  display:flex; flex-direction:column;
+  transition:transform 0.35s cubic-bezier(0.2,0,0.2,1);
+}
+.briefing-overlay.on { transform:translateX(-50%) translateY(0); }
+.briefing-top {
+  padding:60px 20px 20px; flex-shrink:0;
+}
+.briefing-back {
+  display:flex; align-items:center; gap:4px; background:none; border:none;
+  color:var(--nr-red); font-family:var(--font-body); font-size:15px;
+  font-weight:500; cursor:pointer; margin-bottom:20px; padding:0;
+}
+.briefing-back svg { width:20px; height:20px; color:var(--nr-red); }
+.briefing-h {
+  font-family:var(--font-headline); font-size:28px; color:var(--nr-white);
+  margin-bottom:4px;
+}
+.briefing-date {
+  font-family:var(--font-mono); font-size:12px; color:var(--nr-ash);
+  text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px;
+}
+.briefing-prog {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-steel);
+}
+.briefing-list {
+  flex:1; overflow-y:auto; padding:0 20px 40px;
+  -webkit-overflow-scrolling:touch;
+}
+.briefing-list::-webkit-scrollbar { display:none; }
+.briefing-item {
+  display:flex; align-items:center; gap:14px;
+  padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.06);
+  cursor:pointer; transition:background 0.15s;
+}
+.briefing-item:active { background:rgba(255,255,255,0.04); }
+.briefing-num {
+  width:32px; height:32px; border-radius:50%;
+  background:var(--nr-lead); display:flex; align-items:center;
+  justify-content:center; font-family:var(--font-mono);
+  font-size:13px; font-weight:600; color:var(--nr-smoke);
+  flex-shrink:0;
+}
+.briefing-num.done {
+  background:var(--nr-green); color:var(--nr-white); font-size:14px;
+}
+.briefing-thumb {
+  width:56px; height:56px; border-radius:var(--radius-sm);
+  overflow:hidden; background:var(--nr-lead); flex-shrink:0;
+}
+.briefing-thumb img { width:100%; height:100%; object-fit:cover; }
+.briefing-iinfo { flex:1; min-width:0; }
+.briefing-ititle {
+  font-family:var(--font-headline); font-size:15px; color:var(--nr-white);
+  line-height:1.3; margin-bottom:3px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.briefing-imeta {
+  font-family:var(--font-body); font-size:12px; color:var(--nr-ash);
+}
+
+/* Briefing pill — small, right-aligned in tabs row */
+.briefing-pill {
+  margin-left:auto; display:flex; align-items:center; gap:5px;
+  padding:4px 8px 4px 6px; background:var(--nr-lead);
+  border-radius:20px; cursor:pointer;
+  transition:background 0.15s ease;
+  font-family:var(--font-mono); font-size:11px;
+  color:var(--nr-smoke); letter-spacing:0.3px;
+}
+.briefing-pill:active { background:var(--nr-iron); }
+.briefing-pill-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--nr-red); flex-shrink:0;
+  animation:pulse 2s ease-in-out infinite;
+}
+.briefing-pill-dot.done { background:var(--nr-green); animation:none; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
 </style>
 </head>
 <body>
@@ -598,6 +747,11 @@ body {
     <div class="today-tabs">
       <button class="today-tab active">Stack</button>
       <button class="today-tab">Premium</button>
+      <div class="briefing-pill" id="briefingCard" onclick="openBriefing()">
+        <span class="briefing-pill-dot" id="briefingDot"></span>
+        <span class="briefing-pill-text" id="briefingCardMeta">0/3</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px;color:var(--nr-smoke)"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
     </div>
   </div>
 
@@ -655,6 +809,20 @@ body {
   <button class="xp-btn" onclick="closeXP()">CLAIM XP</button>
 </div>
 
+<!-- CELEBRATION OVERLAY -->
+<div class="celebrate" id="celebrateScreen">
+  <div class="cel-confetti" id="celConfetti"></div>
+  <div class="cel-ring">
+    <svg viewBox="0 0 100 100">
+      <circle class="cel-ring-bg" cx="50" cy="50" r="42"/>
+      <circle class="cel-ring-fill" id="celRingFill" cx="50" cy="50" r="42"/>
+    </svg>
+    <div class="cel-ring-check" id="celCheck">✅</div>
+  </div>
+  <div class="cel-xp-badge">+50 XP</div>
+  <div class="cel-msg">Story completed!</div>
+</div>
+
 <!-- BOTTOM NAV -->
 <nav class="bottomnav">
   <button class="navbtn on" data-tab="today"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span class="lbl">Today</span></button>
@@ -668,7 +836,7 @@ body {
   <div class="briefing-top">
     <button class="briefing-back" onclick="closeBriefing()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
     <div class="briefing-h">Today's Briefing</div>
-    <div class="briefing-date">February 28, 2026</div>
+    <div class="briefing-date">March 3, 2026</div>
     <div class="briefing-prog" id="briefingProg">0/4 completed</div>
   </div>
   <div class="briefing-list" id="briefingList"></div>
@@ -1225,9 +1393,62 @@ function openBrowserFor(idx) {
 
 function closeBrowser() {
   document.getElementById('inappBrowser').classList.remove('on');
-  // They already read the article — skip "continue reading" on XP screen
   cameFromBrowser = true;
-  setTimeout(() => openXP(), 500);
+
+  // Mark this story as read in the briefing
+  briefingRead.add(currentStoryIdx);
+  updateBriefingCard();
+
+  // === Celebration sequence ===
+  // 1. Show celebration overlay
+  const cel = document.getElementById('celebrateScreen');
+  cel.classList.add('on');
+
+  // 2. Spawn confetti particles
+  spawnConfetti();
+
+  // 3. Animate the big ring from 0 → full (circumference = 2π×42 ≈ 264)
+  requestAnimationFrame(() => {
+    document.getElementById('celRingFill').style.strokeDasharray = '264 0';
+  });
+
+  // 4. Animate the header progress ring (small one, top-right)
+  const headerRing = document.querySelector('.today-progress svg circle:last-child');
+  if (headerRing) {
+    headerRing.style.strokeDasharray = '69 0'; // full circle
+  }
+
+  // 5. After 2s, dismiss celebration → show XP screen
+  setTimeout(() => {
+    cel.classList.remove('on');
+    // Reset celebration for next time
+    document.getElementById('celRingFill').style.strokeDasharray = '0 264';
+    document.getElementById('celConfetti').innerHTML = '';
+    openXP();
+  }, 2200);
+}
+
+function spawnConfetti() {
+  const container = document.getElementById('celConfetti');
+  container.innerHTML = '';
+  const colors = ['#FF6343','#EDBD1F','#FF3377','#C566FF','#9081FF','#00BDB3','#1AAD17','#1264F2'];
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'cel-particle';
+    const angle = (Math.PI * 2 * i) / 40;
+    const dist = 80 + Math.random() * 120;
+    const cx = Math.cos(angle) * dist;
+    const cy = Math.sin(angle) * dist - 40; // bias upward
+    p.style.setProperty('--cx', cx + 'px');
+    p.style.setProperty('--cy', cy + 'px');
+    p.style.setProperty('--cr', (Math.random() * 720 - 360) + 'deg');
+    p.style.background = colors[i % colors.length];
+    p.style.animationDelay = (0.3 + Math.random() * 0.3) + 's';
+    p.style.width = (4 + Math.random() * 6) + 'px';
+    p.style.height = (4 + Math.random() * 6) + 'px';
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    container.appendChild(p);
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -1263,8 +1484,21 @@ function openFromBriefing(idx) {
   briefingRead.add(idx);
   closeBriefing();
   openCarousel(idx);
-  // Update briefing card in feed
+  updateBriefingCard();
   renderFeed();
+}
+
+function updateBriefingCard() {
+  const count = Math.min(STORIES.length, 4);
+  const done = briefingRead.size;
+  const meta = document.getElementById('briefingCardMeta');
+  const dot = document.getElementById('briefingDot');
+  if (meta) {
+    meta.textContent = done >= count ? '✓' : `${done}/${count}`;
+  }
+  if (dot) {
+    dot.classList.toggle('done', done >= count);
+  }
 }
 
 /* ═══════════════════════════════════════════════
