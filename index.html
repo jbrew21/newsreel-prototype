@@ -284,7 +284,7 @@ body {
    STORY CAROUSEL — Opens when you tap expand
    ═══════════════════════════════════════════════ */
 .carousel {
-  position:absolute; top:0; left:0; width:393px; height:852px;
+  position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
   background:var(--nr-black); z-index:2000; display:none; flex-direction:column;
   opacity:0;
 }
@@ -345,7 +345,7 @@ body {
    POLL
    ═══════════════════════════════════════════════ */
 .poll {
-  position:absolute; top:0; left:0; width:393px; height:852px;
+  position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
   background:var(--nr-black); z-index:3000; display:none; flex-direction:column;
   align-items:center; justify-content:center; padding:40px 24px;
   opacity:0;
@@ -369,11 +369,11 @@ body {
    DISCUSSION — Structured takes, not comments
    ═══════════════════════════════════════════════ */
 .discuss {
-  position:absolute; top:0; left:0; width:393px; height:852px;
+  position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
   background:var(--nr-black); z-index:3000; display:none; flex-direction:column;
   opacity:0;
 }
-.discuss.on { display:flex; animation:overlayIn 0.3s cubic-bezier(0.2,0,0.2,1) forwards; }
+.discuss.on { display:flex; opacity:1; animation:overlayIn 0.3s cubic-bezier(0.2,0,0.2,1) forwards; }
 .discuss-x { position:absolute; top:56px; right:20px; background:none; border:none; color:var(--nr-white); font-size:26px; cursor:pointer; z-index:1; }
 
 /* Input state */
@@ -495,7 +495,7 @@ body {
    XP REWARD — Ring-centric, Duolingo-inspired
    ═══════════════════════════════════════════════ */
 .xp {
-  position:absolute; top:0; left:0; width:393px; height:852px;
+  position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
   background:var(--nr-black); z-index:3000; display:none; flex-direction:column;
   align-items:center; justify-content:center; padding:0 32px;
   opacity:0;
@@ -552,7 +552,7 @@ body {
    CELEBRATION — Post-article reward animation
    ═══════════════════════════════════════════════ */
 .celebrate {
-  position:absolute; top:0; left:0; width:393px; height:852px;
+  position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
   background:rgba(0,0,0,0.92); z-index:3500;
   display:none; flex-direction:column;
   align-items:center; justify-content:center;
@@ -681,7 +681,7 @@ body {
 
 .inapp-browser-bar {
   display:flex; align-items:center; gap:10px;
-  padding:52px 14px 10px; background:var(--nr-charcoal);
+  padding:12px 14px 10px; background:var(--nr-charcoal);
   border-bottom:1px solid var(--nr-iron); flex-shrink:0;
 }
 .inapp-browser-close {
@@ -808,13 +808,14 @@ body {
    BRIEFING OVERLAY
    ═══════════════════════════════════════════════ */
 .briefing-overlay {
-  position:absolute; top:0; left:0; width:393px; height:852px;
-  transform:translateY(100%);
+  position:fixed; inset:0; width:393px; height:852px;
+  left:50%; transform:translateX(-50%) translateY(100%);
   background:var(--nr-black); z-index:2500;
-  display:flex; flex-direction:column;
+  display:none; flex-direction:column;
   transition:transform 0.35s cubic-bezier(0.2,0,0.2,1);
 }
-.briefing-overlay.on { transform:translateY(0); }
+.briefing-overlay.on { display:flex; transform:translateX(-50%) translateY(0); }
+.briefing-overlay.on { transform:translateX(-50%) translateY(0); }
 .briefing-top {
   padding:60px 20px 20px; flex-shrink:0;
 }
