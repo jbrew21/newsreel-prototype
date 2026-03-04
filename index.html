@@ -41,6 +41,7 @@
 }
 
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { height:100%; background:#000; }
 body {
   font-family: var(--font-body);
   background: var(--nr-black);
@@ -50,6 +51,7 @@ body {
   overflow: hidden;
   position: relative;
   margin: 0 auto;
+  transform-origin: top center;
 }
 @media (min-width:500px) {
   body { border-radius:44px; margin-top:16px; border:1px solid var(--nr-iron); box-shadow:0 0 60px rgba(255,99,67,0.06); overflow:hidden; }
@@ -411,6 +413,74 @@ body {
   justify-content:center; flex-shrink:0;
 }
 .readmore-arrow svg { width:16px; height:16px; color:var(--nr-steel); }
+
+/* ═══════════════════════════════════════════════
+   IN-APP BROWSER — Opens source articles
+   ═══════════════════════════════════════════════ */
+.inapp-browser {
+  position:fixed; inset:0; width:393px; height:852px;
+  left:50%; transform:translateX(-50%) translateY(100%);
+  background:var(--nr-white); z-index:4000;
+  display:flex; flex-direction:column;
+  transition:transform 0.35s cubic-bezier(0.2,0,0.2,1);
+}
+.inapp-browser.on { transform:translateX(-50%) translateY(0); }
+
+.inapp-browser-progress {
+  position:absolute; top:0; left:0; right:0; height:3px; z-index:1;
+  background:transparent;
+}
+.inapp-browser-progress-bar {
+  height:100%; width:0; background:var(--nr-red);
+  border-radius:0 2px 2px 0;
+}
+@keyframes browserLoad {
+  0%   { width:0; }
+  30%  { width:55%; }
+  60%  { width:75%; }
+  90%  { width:92%; }
+  100% { width:100%; opacity:0; }
+}
+
+.inapp-browser-bar {
+  display:flex; align-items:center; gap:10px;
+  padding:52px 14px 10px; background:var(--nr-charcoal);
+  border-bottom:1px solid var(--nr-iron); flex-shrink:0;
+}
+.inapp-browser-close {
+  width:32px; height:32px; display:flex; align-items:center;
+  justify-content:center; background:none; border:none; cursor:pointer;
+  flex-shrink:0;
+}
+.inapp-browser-close svg { width:20px; height:20px; color:var(--nr-white); }
+.inapp-browser-url {
+  flex:1; display:flex; align-items:center; gap:6px;
+  background:var(--nr-lead); border-radius:var(--radius);
+  padding:8px 12px; min-width:0;
+}
+.inapp-browser-lock { width:14px; height:14px; color:var(--nr-green); flex-shrink:0; }
+.inapp-browser-domain {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-smoke);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.inapp-browser-actions { display:flex; gap:4px; flex-shrink:0; }
+.inapp-browser-action {
+  width:32px; height:32px; display:flex; align-items:center;
+  justify-content:center; background:none; border:none; cursor:pointer;
+}
+.inapp-browser-action svg { width:18px; height:18px; color:var(--nr-silver); }
+.inapp-browser-content { flex:1; overflow-y:auto; background:var(--nr-white); }
+.inapp-browser-loading {
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:12px; height:200px;
+  font-size:14px; color:var(--nr-ash);
+}
+.inapp-browser-spinner {
+  width:28px; height:28px; border:3px solid var(--nr-iron);
+  border-top-color:var(--nr-red); border-radius:50%;
+  animation:spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
 
 /* ═══════════════════════════════════════════════
    EXPLORE
@@ -1223,6 +1293,27 @@ renderFeed();
 renderActivity();
 renderExplore();
 renderProfile();
+
+/* ═══════════════════════════════════════════════
+   VIEWPORT SCALE — Shrinks the phone frame to fit
+   any browser window so nothing gets cut off.
+   ═══════════════════════════════════════════════ */
+(function scaleToFit() {
+  function resize() {
+    const sx = window.innerWidth / 393;
+    const sy = window.innerHeight / 852;
+    const s = Math.min(sx, sy, 1);          // never scale UP
+    document.body.style.transform = 'scale(' + s + ')';
+    // Center vertically when scaled down
+    if (s < 1) {
+      document.body.style.marginTop = Math.max(0, (window.innerHeight - 852 * s) / 2) + 'px';
+    } else {
+      document.body.style.marginTop = '0';
+    }
+  }
+  resize();
+  window.addEventListener('resize', resize);
+})();
 </script>
 </body>
 </html>
