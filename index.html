@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=393, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Newsreel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -655,13 +658,13 @@ body {
    IN-APP BROWSER — Opens source articles
    ═══════════════════════════════════════════════ */
 .inapp-browser {
-  position:absolute; top:0; left:0; width:393px; height:852px;
-  transform:translateY(100%);
+  position:fixed; inset:0; width:393px; height:852px;
+  left:50%; transform:translateX(-50%) translateY(100%);
   background:var(--nr-white); z-index:4000;
   display:none; flex-direction:column;
   transition:transform 0.35s cubic-bezier(0.2,0,0.2,1);
 }
-.inapp-browser.on { display:flex; transform:translateY(0); }
+.inapp-browser.on { display:flex; transform:translateX(-50%) translateY(0); }
 
 .inapp-browser-progress {
   position:absolute; top:0; left:0; right:0; height:3px; z-index:1;
@@ -1645,7 +1648,7 @@ function openXP() {
     const story = STORIES[currentStoryIdx];
     if (story && story.readMore) {
       rmEl.innerHTML = `
-        <div class="readmore-card" onclick="openBrowserFor(${currentStoryIdx})">
+        <div class="readmore-card" onclick="event.stopPropagation();openBrowserFor(${currentStoryIdx})">
           <div class="readmore-row">
             <div class="readmore-favicon">${story.readMore.icon}</div>
             <div class="readmore-info">
