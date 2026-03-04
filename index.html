@@ -113,6 +113,12 @@ body {
 .today-progress {
   width:36px; height:36px; position:relative; cursor:pointer;
   -webkit-tap-highlight-color:transparent;
+  animation:progressBounce 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.8s both;
+}
+@keyframes progressBounce {
+  0%   { transform:scale(0.7); opacity:0; }
+  60%  { transform:scale(1.15); }
+  100% { transform:scale(1); opacity:1; }
 }
 .today-progress svg { width:100%; height:100%; }
 .today-progress svg circle:last-child {
@@ -178,6 +184,19 @@ body {
   border-radius: 12px;
   touch-action: pan-y;
 }
+/* Premium gold border */
+.card-img-wrap.premium {
+  border:2px solid var(--nr-yellow);
+  box-shadow:0 0 12px rgba(237,189,31,0.2);
+}
+.premium-badge {
+  position:absolute; top:10px; left:10px; z-index:3;
+  background:var(--nr-yellow); color:var(--nr-black);
+  font-family:var(--font-mono); font-size:9px; font-weight:600;
+  padding:3px 8px; border-radius:4px; text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+
 .card-slide-track {
   display:flex; height:100%;
   transition:transform 0.3s cubic-bezier(0.2,0,0.2,1);
@@ -780,7 +799,6 @@ body {
     </div>
     <div class="today-tabs">
       <button class="today-tab active">Stack</button>
-      <button class="today-tab">Premium</button>
     </div>
   </div>
 
@@ -933,6 +951,7 @@ const STORIES = [
     ],
     poll: "Diplomacy between the U.S. and Iran will resume within the next month.",
     readMore: { title: "Iran Strikes: What Comes Next", source: "Reuters", icon: "🌐", url: "#" },
+    premium: true,
   },
   {
     image: "https://images.unsplash.com/photo-1504711434969-e33886168d6c?w=700&h=900&fit=crop",
@@ -1021,7 +1040,8 @@ function renderFeed() {
   el.innerHTML = STORIES.map((s, i) => `
     <div class="feed-page" data-story="${i}">
       <div class="card-content-row">
-        <div class="card-img-wrap" id="imgWrap-${i}" data-slide="0" data-total="${s.slides.length}">
+        <div class="card-img-wrap${s.premium ? ' premium' : ''}" id="imgWrap-${i}" data-slide="0" data-total="${s.slides.length}">
+          ${s.premium ? '<div class="premium-badge">★ Premium</div>' : ''}
           <div class="card-slide-track" id="slideTrack-${i}">
             ${s.slides.map(sl => `<img src="${sl.img}" alt="">`).join('')}
           </div>
