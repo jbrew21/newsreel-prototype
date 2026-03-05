@@ -1803,7 +1803,7 @@ body {
     <div class="topics-sub">Choose topics you care about. We'll tailor your daily stories to match.</div>
     <div class="topics-search" id="topicsSearch">
       <div style="width:22px;height:22px;border-radius:50%;background:var(--nr-red);display:flex;align-items:center;justify-content:center;font-family:var(--font-headline);font-size:12px;color:var(--nr-white);flex-shrink:0;">n</div>
-      <input type="text" id="topicsSearchInput" placeholder="Ask Benny anything..." oninput="handleNLPSearch(this.value)">
+      <input type="text" id="topicsSearchInput" placeholder="Ask Benny anything..." onkeydown="if(event.key==='Enter'){event.preventDefault();handleNLPSearch(this.value);}">
       <button class="topics-search-clear" id="topicsSearchClear" onclick="clearNLPSearch()" style="display:none">✕</button>
     </div>
     <div class="topics-nlp-results" id="topicsNLPResults" style="display:none"></div>
@@ -2318,8 +2318,9 @@ const BENNY_LOADING_MSGS = [
   "One sec, pulling this together…",
 ];
 
-let nlpDebounce = null;
+let bennyThinkTimeout = null;
 let bennyLoadingInterval = null;
+let bennyTypeInterval = null;
 
 function showBennyLoading(results, grid) {
   grid.classList.add('search-active');
@@ -2345,9 +2346,26 @@ function showBennyLoading(results, grid) {
   }, 1200);
 }
 
+// Typewriter effect — types out text character by character
+function bennyTypeText(el, fullText, speed, callback) {
+  var i = 0;
+  el.textContent = '';
+  clearInterval(bennyTypeInterval);
+  bennyTypeInterval = setInterval(function() {
+    if (i < fullText.length) {
+      el.textContent += fullText.charAt(i);
+      i++;
+    } else {
+      clearInterval(bennyTypeInterval);
+      if (callback) callback();
+    }
+  }, speed);
+}
+
 function handleNLPSearch(query) {
-  clearTimeout(nlpDebounce);
+  clearTimeout(bennyThinkTimeout);
   clearInterval(bennyLoadingInterval);
+  clearInterval(bennyTypeInterval);
   const clear = document.getElementById('topicsSearchClear');
   const results = document.getElementById('topicsNLPResults');
   const grid = document.getElementById('topicsGrid');
@@ -2360,19 +2378,21 @@ function handleNLPSearch(query) {
   }
 
   clear.style.display = 'block';
+  // Blur input so keyboard dismisses
+  document.getElementById('topicsSearchInput').blur();
 
   // Show Benny loading immediately
   showBennyLoading(results, grid);
 
-  // Simulate Benny "thinking" — 800-1200ms delay
-  var thinkTime = 800 + Math.floor(Math.random() * 400);
+  // Benny "thinks" for 1.2-1.8s
+  var thinkTime = 1200 + Math.floor(Math.random() * 600);
 
-  nlpDebounce = setTimeout(function() {
+  bennyThinkTimeout = setTimeout(function() {
     clearInterval(bennyLoadingInterval);
-    const q = query.toLowerCase().trim();
+    var q = query.toLowerCase().trim();
 
-    // 1) Check hardcoded smart responses first
-    let matched = null;
+    // 1) Check hardcoded smart responses
+    var matched = null;
     for (var key in NLP_RESPONSES) {
       var resp = NLP_RESPONSES[key];
       if (resp.keywords.some(function(kw) { return q.includes(kw); })) {
@@ -2381,67 +2401,96 @@ function handleNLPSearch(query) {
       }
     }
 
-    // 2) Build result HTML
-    var html = '';
-
     if (matched) {
-      // Benny Byline chat response
-      html += '<div class="nlp-chat">';
-      html += '<div class="nlp-avatar">n</div>';
-      html += '<div class="nlp-bubble">';
-      html += '<div class="nlp-bubble-greeting">' + (matched.greeting || 'Here\'s what I found') + '</div>';
-      html += '<div class="nlp-bubble-text">' + matched.context + '</div>';
-      html += '<div class="nlp-bubble-source">— Benny Byline, today</div>';
-      html += '</div>';
-      html += '</div>';
-
-      // Story card(s)
+      // Build shell with empty text — we'll type it in
+      var cardsHTML = '';
       if (matched.storyIdx !== null) {
-        html += renderNLPCard(matched.storyIdx);
+        cardsHTML = renderNLPCard(matched.storyIdx);
       } else {
         var matchedIdxs = keywordMatchStories(q);
-        matchedIdxs.forEach(function(idx) { html += renderNLPCard(idx); });
+        matchedIdxs.forEach(function(idx) { cardsHTML += renderNLPCard(idx); });
       }
 
-      // "Keep reading" suggestions
+      var moreHTML = '';
       if (matched.relatedTopics && matched.relatedTopics.length) {
-        html += '<div class="nlp-more">';
-        html += '<span class="nlp-more-label">Keep reading →</span>';
+        moreHTML = '<div class="nlp-more" style="opacity:0" id="bennyMore">' +
+          '<span class="nlp-more-label">Keep reading →</span>';
         matched.relatedTopics.forEach(function(t) {
-          html += '<span class="nlp-more-chip" onclick="nlpSelectTopic(\'' + t + '\')">' + t + '</span>';
+          moreHTML += '<span class="nlp-more-chip" onclick="nlpSelectTopic(\'' + t + '\')">' + t + '</span>';
         });
-        html += '</div>';
+        moreHTML += '</div>';
       }
+
+      results.innerHTML = '<div class="nlp-chat">' +
+        '<div class="nlp-avatar">n</div>' +
+        '<div class="nlp-bubble">' +
+        '<div class="nlp-bubble-greeting">' + (matched.greeting || "Here's what I found") + '</div>' +
+        '<div class="nlp-bubble-text" id="bennyTypeTarget"></div>' +
+        '<div class="nlp-bubble-source" style="opacity:0" id="bennySource">— Benny Byline, today</div>' +
+        '</div>' +
+        '</div>' +
+        '<div id="bennyCards" style="opacity:0">' + cardsHTML + '</div>' +
+        moreHTML;
+
+      // Type out the context text
+      var typeTarget = document.getElementById('bennyTypeTarget');
+      bennyTypeText(typeTarget, matched.context, 18, function() {
+        // After typing, fade in source line
+        var src = document.getElementById('bennySource');
+        if (src) { src.style.transition = 'opacity 0.3s'; src.style.opacity = '1'; }
+        // Then fade in cards
+        setTimeout(function() {
+          var cards = document.getElementById('bennyCards');
+          if (cards) { cards.style.transition = 'opacity 0.4s ease, transform 0.4s ease'; cards.style.opacity = '1'; cards.style.transform = 'translateY(0)'; }
+        }, 200);
+        // Then fade in "more" chips
+        setTimeout(function() {
+          var more = document.getElementById('bennyMore');
+          if (more) { more.style.transition = 'opacity 0.3s'; more.style.opacity = '1'; }
+        }, 500);
+      });
+
+      // Set initial card state for animation
+      setTimeout(function() {
+        var cards = document.getElementById('bennyCards');
+        if (cards) cards.style.transform = 'translateY(8px)';
+      }, 0);
+
     } else {
       // Keyword fallback
       var fallbackIdxs = keywordMatchStories(q);
       if (fallbackIdxs.length > 0) {
-        html += '<div class="nlp-chat">';
-        html += '<div class="nlp-avatar">n</div>';
-        html += '<div class="nlp-bubble">';
-        html += '<div class="nlp-bubble-greeting">Found something 👇</div>';
-        html += '<div class="nlp-bubble-text">Here\'s what I pulled up for you.</div>';
-        html += '<div class="nlp-bubble-source">— Benny Byline</div>';
-        html += '</div>';
-        html += '</div>';
-        fallbackIdxs.forEach(function(idx) { html += renderNLPCard(idx); });
+        var fallbackCards = '';
+        fallbackIdxs.forEach(function(idx) { fallbackCards += renderNLPCard(idx); });
+
+        results.innerHTML = '<div class="nlp-chat">' +
+          '<div class="nlp-avatar">n</div>' +
+          '<div class="nlp-bubble">' +
+          '<div class="nlp-bubble-greeting">Found something 👇</div>' +
+          '<div class="nlp-bubble-text" id="bennyTypeTarget"></div>' +
+          '<div class="nlp-bubble-source" style="opacity:0" id="bennySource">— Benny Byline</div>' +
+          '</div>' +
+          '</div>' +
+          '<div id="bennyCards" style="opacity:0;transform:translateY(8px)">' + fallbackCards + '</div>';
+
+        bennyTypeText(document.getElementById('bennyTypeTarget'), "Here's what I pulled up for you.", 22, function() {
+          var src = document.getElementById('bennySource');
+          if (src) { src.style.transition = 'opacity 0.3s'; src.style.opacity = '1'; }
+          setTimeout(function() {
+            var cards = document.getElementById('bennyCards');
+            if (cards) { cards.style.transition = 'opacity 0.4s ease, transform 0.4s ease'; cards.style.opacity = '1'; cards.style.transform = 'translateY(0)'; }
+          }, 200);
+        });
       } else {
-        // No results — Benny is honest
-        html += '<div class="nlp-empty">';
-        html += '<div class="nlp-empty-face">🤷</div>';
-        html += '<div class="nlp-empty-text">Nothing on that today</div>';
-        html += '<div class="nlp-empty-hint">Benny publishes new stories every morning at 5 AM — check back tomorrow</div>';
-        html += '</div>';
+        // No results
+        results.innerHTML = '<div class="nlp-empty">' +
+          '<div class="nlp-empty-face">🤷</div>' +
+          '<div class="nlp-empty-text">Nothing on that today</div>' +
+          '<div class="nlp-empty-hint">Benny publishes new stories every morning at 5 AM — check back tomorrow</div>' +
+          '</div>';
         grid.classList.remove('search-active');
-        results.style.display = 'block';
-        results.innerHTML = html;
-        return;
       }
     }
-
-    grid.classList.add('search-active');
-    results.style.display = 'block';
-    results.innerHTML = html;
   }, thinkTime);
 }
 
@@ -2473,8 +2522,9 @@ function keywordMatchStories(q) {
 }
 
 function clearNLPSearch() {
-  clearTimeout(nlpDebounce);
+  clearTimeout(bennyThinkTimeout);
   clearInterval(bennyLoadingInterval);
+  clearInterval(bennyTypeInterval);
   var input = document.getElementById('topicsSearchInput');
   input.value = '';
   document.getElementById('topicsSearchClear').style.display = 'none';
