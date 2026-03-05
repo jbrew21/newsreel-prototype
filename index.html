@@ -529,6 +529,122 @@ body {
 }
 .discuss-share-btn:active { opacity:0.85; }
 
+/* Classroom badge on feed card */
+.classroom-badge {
+  display:flex; align-items:center; gap:6px; padding:6px 0 0;
+}
+.classroom-badge-icon { font-size:13px; }
+.classroom-badge-text {
+  font-family:var(--font-mono); font-size:11px; font-weight:500;
+  color:var(--nr-teal); text-transform:uppercase; letter-spacing:0.5px;
+}
+.classroom-badge-due {
+  font-family:var(--font-mono); font-size:11px; color:var(--nr-ash);
+  margin-left:auto;
+}
+
+/* Classroom discussion forum */
+.discuss-classroom {
+  flex:1; display:flex; flex-direction:column; overflow:hidden;
+}
+.discuss-class-bar {
+  display:flex; align-items:center; gap:8px;
+  padding:60px 24px 12px;
+  background:rgba(0,189,179,0.06);
+  border-bottom:1px solid rgba(0,189,179,0.15);
+  flex-shrink:0;
+}
+.discuss-class-icon { font-size:16px; }
+.discuss-class-course {
+  font-family:var(--font-mono); font-size:11px; font-weight:600;
+  color:var(--nr-teal); text-transform:uppercase; letter-spacing:0.5px;
+}
+.discuss-class-dot { color:var(--nr-iron); font-size:10px; }
+.discuss-class-prof {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-smoke);
+}
+.discuss-class-count {
+  font-family:var(--font-mono); font-size:11px; color:var(--nr-ash);
+  margin-left:auto;
+}
+
+/* Professor prompt card */
+.discuss-prof-card {
+  background:rgba(0,189,179,0.06); border-left:3px solid var(--nr-teal);
+  border-radius:var(--radius); padding:14px 16px; margin:16px 24px 8px;
+  flex-shrink:0;
+}
+.discuss-prof-name {
+  font-family:var(--font-mono); font-size:10px; color:var(--nr-teal);
+  text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;
+  display:flex; align-items:center; gap:6px;
+}
+.discuss-prof-prompt {
+  font-size:14px; color:var(--nr-white); line-height:1.5;
+}
+
+/* Classroom response cards */
+.discuss-class-scroll {
+  flex:1; overflow-y:auto; padding:8px 24px 16px;
+  -webkit-overflow-scrolling:touch;
+}
+.discuss-class-scroll::-webkit-scrollbar { display:none; }
+.discuss-class-card {
+  background:var(--nr-lead); border-radius:var(--radius); padding:14px 16px;
+  margin-bottom:10px;
+}
+.discuss-class-card.pinned { border-left:3px solid var(--nr-teal); }
+.discuss-class-card.mine { border-left:3px solid var(--nr-red); }
+.discuss-class-card-head {
+  display:flex; align-items:center; gap:8px; margin-bottom:8px;
+}
+.discuss-class-av {
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:600; color:var(--nr-white); flex-shrink:0;
+}
+.discuss-class-who {
+  font-family:var(--font-body); font-size:13px; font-weight:600; color:var(--nr-white);
+}
+.discuss-class-when {
+  font-family:var(--font-mono); font-size:10px; color:var(--nr-ash);
+  margin-left:auto;
+}
+.discuss-pin-badge {
+  font-family:var(--font-mono); font-size:9px; color:var(--nr-teal);
+  background:rgba(0,189,179,0.12); padding:2px 6px; border-radius:3px;
+  text-transform:uppercase; letter-spacing:0.5px;
+}
+.discuss-class-card-text {
+  font-size:14px; color:var(--nr-smoke); line-height:1.5; margin-bottom:8px;
+}
+.discuss-class-card-foot {
+  display:flex; align-items:center; justify-content:flex-end; gap:6px;
+}
+
+/* Classroom compose bar */
+.discuss-class-compose {
+  flex-shrink:0; padding:12px 24px 32px;
+  border-top:1px solid var(--nr-iron);
+  display:flex; gap:10px; align-items:flex-end;
+}
+.discuss-class-input {
+  flex:1; background:var(--nr-lead); border:1px solid var(--nr-iron);
+  border-radius:var(--radius); padding:10px 14px; color:var(--nr-white);
+  font-family:var(--font-body); font-size:14px; resize:none;
+  min-height:40px; max-height:80px; outline:none;
+}
+.discuss-class-input::placeholder { color:var(--nr-ash); }
+.discuss-class-input:focus { border-color:var(--nr-teal); }
+.discuss-class-send {
+  width:36px; height:36px; border-radius:50%;
+  background:var(--nr-teal); border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:transform 0.1s;
+}
+.discuss-class-send:active { transform:scale(0.9); }
+.discuss-class-send svg { width:16px; height:16px; }
+
 /* ═══════════════════════════════════════════════
    XP REWARD — Ring-centric, Duolingo-inspired
    ═══════════════════════════════════════════════ */
@@ -1385,6 +1501,18 @@ body {
       </div>
     </div>
   </div>
+  <!-- STATE 3: Classroom forum (hidden initially) -->
+  <div class="discuss-classroom" id="discussClassroom" style="display:none">
+    <div class="discuss-class-bar" id="discussClassBar"></div>
+    <div class="discuss-prof-card" id="discussProfCard"></div>
+    <div class="discuss-class-scroll" id="discussClassScroll"></div>
+    <div class="discuss-class-compose">
+      <textarea class="discuss-class-input" id="discussClassInput" placeholder="Add your response..." rows="1"></textarea>
+      <button class="discuss-class-send" onclick="submitClassDiscuss()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- COMPLETION RING — floats center then docks to header -->
@@ -1530,6 +1658,18 @@ const STORIES = [
       { q: "What did President Trump demand regarding the bridge?", opts: ["Shut it down", "Half ownership", "Rename it", "Toll-free access"], answer: 1, explain: "Trump demanded the U.S. receive half ownership of the crossing." },
       { q: "When is the bridge expected to open?", opts: ["2024", "2025", "Late 2026", "2028"], answer: 2, explain: "The Gordie Howe International Bridge is set to open in late 2026." },
     ],
+    classroom: {
+      course: 'POL 201',
+      professor: { name: 'Prof. Martinez', initials: 'PM' },
+      prompt: 'How does this story connect to our unit on trade policy? Reference at least one slide in your response.',
+      due: 'Due Friday',
+      responses: [
+        { name:'Emma Chen', initials:'EC', bg:'linear-gradient(135deg,var(--nr-pink),var(--nr-red))', text:'The shared ownership demand in slide 2 mirrors the protectionist trade policies we discussed last week. It\'s essentially using infrastructure as a bargaining chip.', time:'2h ago', pinned:true },
+        { name:'Kai Thompson', initials:'KT', bg:'linear-gradient(135deg,var(--nr-blue),var(--nr-teal))', text:'I disagree with the framing. Canada funded it 100% — demanding half is leverage, not trade policy. This is more about power dynamics than economics.', time:'1h ago', pinned:false },
+        { name:'Sofia Ruiz', initials:'SR', bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))', text:'This connects to the Nash equilibrium model from lecture. Both sides benefit from the bridge existing, so the threat to block it is a credible but irrational strategy.', time:'45m ago', pinned:false },
+        { name:'James Park', initials:'JP', bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))', text:'The real question is whether infrastructure should ever be used as a bargaining chip in trade disputes. Slide 3 shows this is part of a broader pattern.', time:'30m ago', pinned:false },
+      ]
+    },
   },
   {
     image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=700&h=900&fit=crop",
@@ -1694,6 +1834,7 @@ function renderFeed() {
         <div class="card-pill"><div class="card-pill-av">${s.author.initials}</div>${s.author.name}</div>
         ${s.tag ? `<div class="card-pill">${s.tag}</div>` : ''}
       </div>
+      ${s.classroom ? `<div class="classroom-badge"><span class="classroom-badge-icon">📚</span><span class="classroom-badge-text">Assigned · ${s.classroom.course}</span><span class="classroom-badge-due">${s.classroom.due}</span></div>` : ''}
       <div class="card-headline">${s.headline}</div>
       <div class="card-sub">${s.subtitle}</div>
     </div>
@@ -2190,7 +2331,16 @@ function openCarousel(idx, startSlide) {
           <div style="text-align:center;padding:40px"><div style="font-family:var(--font-headline);font-size:30px;color:var(--nr-white);margin-bottom:10px">Where do you stand?</div><div style="color:var(--nr-ash);font-size:14px">Tap to share your opinion</div></div>
         </div>
         ${hasDiscuss ? `<div class="car-slide" style="align-items:center;justify-content:center;cursor:pointer" onclick="openDiscuss(${idx})">
-          <div style="text-align:center;padding:40px"><div style="font-size:44px;margin-bottom:6px">💬</div><div style="font-family:var(--font-headline);font-size:22px;color:var(--nr-white);margin-bottom:10px;line-height:1.3">${story.discussion}</div><div style="color:var(--nr-ash);font-size:14px">Tap to share your take</div></div>
+          <div style="text-align:center;padding:40px">
+            ${story.classroom
+              ? `<div style="font-family:var(--font-mono);font-size:12px;color:var(--nr-teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">📚 ${story.classroom.course}</div>
+                 <div style="font-family:var(--font-headline);font-size:20px;color:var(--nr-white);line-height:1.3;margin-bottom:16px">${story.classroom.prompt}</div>
+                 <div style="color:var(--nr-ash);font-size:13px">${story.classroom.responses.length} classmates responded · Tap to join</div>`
+              : `<div style="font-size:44px;margin-bottom:6px">💬</div>
+                 <div style="font-family:var(--font-headline);font-size:22px;color:var(--nr-white);margin-bottom:10px;line-height:1.3">${story.discussion}</div>
+                 <div style="color:var(--nr-ash);font-size:14px">Tap to share your take</div>`
+            }
+          </div>
         </div>` : ''}
       </div>
     </div>
@@ -2389,9 +2539,16 @@ const MOCK_RESPONSES = [
 
 function openDiscuss(idx) {
   const story = STORIES[idx];
-  // Reset to input state
+
+  if (story.classroom) {
+    openClassroomDiscuss(idx);
+    return;
+  }
+
+  // REGULAR MODE — anonymous 140-char flow
   document.getElementById('discussInput').style.display = 'flex';
   document.getElementById('discussResponses').style.display = 'none';
+  document.getElementById('discussClassroom').style.display = 'none';
   document.getElementById('discussQ').textContent = story.discussion;
   document.getElementById('discussRespQ').textContent = story.discussion;
   document.getElementById('discussText').value = '';
@@ -2399,6 +2556,88 @@ function openDiscuss(idx) {
   document.getElementById('discussChar').classList.remove('warn');
   document.getElementById('discussBtn').disabled = true;
   document.getElementById('discuss').classList.add('on');
+}
+
+let classDiscussIdx = 0;
+
+function openClassroomDiscuss(idx) {
+  classDiscussIdx = idx;
+  const story = STORIES[idx];
+  const cr = story.classroom;
+
+  // Hide regular states, show classroom
+  document.getElementById('discussInput').style.display = 'none';
+  document.getElementById('discussResponses').style.display = 'none';
+  document.getElementById('discussClassroom').style.display = 'flex';
+
+  // Class bar
+  document.getElementById('discussClassBar').innerHTML =
+    '<span class="discuss-class-icon">📚</span>' +
+    '<span class="discuss-class-course">' + cr.course + '</span>' +
+    '<span class="discuss-class-dot">·</span>' +
+    '<span class="discuss-class-prof">' + cr.professor.name + '</span>' +
+    '<span class="discuss-class-count">' + cr.responses.length + ' responses</span>';
+
+  // Professor prompt card
+  document.getElementById('discussProfCard').innerHTML =
+    '<div class="discuss-prof-name">📌 ' + cr.professor.name + '\'s Prompt</div>' +
+    '<div class="discuss-prof-prompt">' + cr.prompt + '</div>';
+
+  // Student responses
+  var html = '';
+  cr.responses.forEach(function(r) {
+    html += '<div class="discuss-class-card' + (r.pinned ? ' pinned' : '') + '">' +
+      '<div class="discuss-class-card-head">' +
+        '<div class="discuss-class-av" style="background:' + r.bg + '">' + r.initials + '</div>' +
+        '<span class="discuss-class-who">' + r.name + '</span>' +
+        (r.pinned ? '<span class="discuss-pin-badge">📌 Pinned</span>' : '') +
+        '<span class="discuss-class-when">' + r.time + '</span>' +
+      '</div>' +
+      '<div class="discuss-class-card-text">' + r.text + '</div>' +
+      '<div class="discuss-class-card-foot">' +
+        '<span class="discuss-card-react" onclick="this.classList.toggle(\'on\')">🤝</span>' +
+        '<span class="discuss-card-react" onclick="this.classList.toggle(\'on\')">💡</span>' +
+      '</div>' +
+    '</div>';
+  });
+  document.getElementById('discussClassScroll').innerHTML = html;
+
+  // Clear compose
+  document.getElementById('discussClassInput').value = '';
+
+  // Show overlay
+  document.getElementById('discuss').classList.add('on');
+}
+
+function submitClassDiscuss() {
+  var input = document.getElementById('discussClassInput');
+  var text = input.value.trim();
+  if (!text) return;
+
+  // Add user response at top
+  var scroll = document.getElementById('discussClassScroll');
+  var card = document.createElement('div');
+  card.className = 'discuss-class-card mine';
+  card.innerHTML =
+    '<div class="discuss-class-card-head">' +
+      '<div class="discuss-class-av" style="background:linear-gradient(135deg,var(--nr-red),var(--nr-yellow))">J</div>' +
+      '<span class="discuss-class-who">You</span>' +
+      '<span class="discuss-class-when">just now</span>' +
+    '</div>' +
+    '<div class="discuss-class-card-text">' + text.replace(/</g, '&lt;') + '</div>' +
+    '<div class="discuss-class-card-foot">' +
+      '<span class="discuss-card-react" onclick="this.classList.toggle(\'on\')">🤝</span>' +
+      '<span class="discuss-card-react" onclick="this.classList.toggle(\'on\')">💡</span>' +
+    '</div>';
+  scroll.insertBefore(card, scroll.firstChild);
+
+  // Update count
+  var story = STORIES[classDiscussIdx];
+  var countEl = document.querySelector('.discuss-class-count');
+  if (countEl) countEl.textContent = (story.classroom.responses.length + 1) + ' responses';
+
+  // Clear input
+  input.value = '';
 }
 
 function closeDiscuss() { document.getElementById('discuss').classList.remove('on'); }
