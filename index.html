@@ -1013,6 +1013,20 @@ body {
 .briefing-prog {
   font-family:var(--font-body); font-size:13px; color:var(--nr-steel);
 }
+/* Classroom mode — class-branded header */
+.briefing-overlay.classroom-mode .briefing-h {
+  color:var(--nr-teal);
+}
+.briefing-overlay.classroom-mode .briefing-h::before {
+  content:'📚 '; font-size:24px;
+}
+.briefing-overlay.classroom-mode .briefing-date {
+  color:var(--nr-smoke); font-family:var(--font-body);
+  font-size:14px; text-transform:none; letter-spacing:0;
+}
+.briefing-overlay.classroom-mode .briefing-prog {
+  color:var(--nr-teal);
+}
 .briefing-list {
   flex:1; overflow-y:auto; padding:0 20px 40px;
   -webkit-overflow-scrolling:touch;
@@ -2946,13 +2960,30 @@ function openBriefing() {
   const list = document.getElementById('briefingList');
   const count = Math.min(STORIES.length, 4);
 
+  // Check if this is a classroom briefing (any story has classroom)
+  const classStory = STORIES.slice(0, count).find(s => s.classroom);
+  const isClassroom = !!classStory;
+
+  // Update header based on classroom vs regular
+  if (isClassroom) {
+    document.querySelector('.briefing-h').textContent = classStory.classroom.course;
+    document.querySelector('.briefing-date').textContent = classStory.classroom.professor.name;
+    document.getElementById('briefingProg').textContent = `${briefingRead.size}/${count} assigned · ${classStory.classroom.due}`;
+    el.classList.add('classroom-mode');
+  } else {
+    document.querySelector('.briefing-h').textContent = "Today's Briefing";
+    document.querySelector('.briefing-date').textContent = 'March 3, 2026';
+    document.getElementById('briefingProg').textContent = `${briefingRead.size}/${count} completed`;
+    el.classList.remove('classroom-mode');
+  }
+
   list.innerHTML = STORIES.slice(0, count).map((s, i) => `
     <div class="briefing-item${s.classroom ? ' briefing-item-classroom' : ''}" onclick="openFromBriefing(${i})">
       <div class="briefing-num${briefingRead.has(i) ? ' done' : ''}">${briefingRead.has(i) ? '✓' : i + 1}</div>
       <div class="briefing-thumb"><img src="${s.image}" alt=""></div>
       <div class="briefing-iinfo">
         <div class="briefing-ititle">${s.headline}</div>
-        <div class="briefing-imeta">${s.author.name} · ${s.slides.length} slides${s.classroom ? ' · ' + s.classroom.course : ''}</div>
+        <div class="briefing-imeta">${s.author.name} · ${s.slides.length} slides</div>
       </div>
       ${s.classroom && s.classroom.responses ? `
         <button class="briefing-discuss-btn" onclick="event.stopPropagation();openFeedDiscussion(${i})" title="Discussion forum">
@@ -2962,7 +2993,6 @@ function openBriefing() {
     </div>
   `).join('');
 
-  document.getElementById('briefingProg').textContent = `${briefingRead.size}/${count} completed`;
   el.classList.add('on');
 }
 
