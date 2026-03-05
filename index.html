@@ -878,78 +878,110 @@ body {
 /* ═══════════════════════════════════════════════
    ACTIVITY
    ═══════════════════════════════════════════════ */
-/* Header */
-.act-head { display:flex; justify-content:space-between; align-items:center; padding:12px 20px 4px; }
-.act-title { font-family:var(--font-headline); font-size:26px; color:var(--nr-white); }
-.act-add { width:32px; height:32px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; }
-.act-add svg { width:22px; height:22px; color:var(--nr-red); }
+/* Wire Header */
+.wire-head { display:flex; justify-content:space-between; align-items:center; padding:16px 20px 4px; }
+.wire-title { font-family:var(--font-headline); font-size:28px; color:var(--nr-white); }
+.wire-subtitle { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--nr-steel); margin-top:2px; }
 
-/* Today's Circle — IG Stories-style ring strip */
-.act-circle { display:flex; gap:16px; padding:12px 20px 16px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-.act-circle::-webkit-scrollbar { display:none; }
-.act-circle-card { display:flex; flex-direction:column; align-items:center; gap:6px; min-width:56px; }
-.act-circle-av { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:600; color:var(--nr-white); border:3px solid #333; box-shadow:0 0 0 2px rgba(0,0,0,1); transition:border-color 0.3s; }
-.act-circle-av.done { border-color:var(--nr-green); }
-.act-circle-av.progress { border-color:var(--nr-red); }
-.act-circle-nm { font-size:11px; color:var(--nr-silver); font-weight:400; max-width:56px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+/* Stories strip — IG-style rings */
+.wire-stories { display:flex; gap:14px; padding:16px 20px 12px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.wire-stories::-webkit-scrollbar { display:none; }
+.wire-story-card { display:flex; flex-direction:column; align-items:center; gap:6px; min-width:64px; cursor:pointer; }
+.wire-story-ring { width:60px; height:60px; border-radius:50%; padding:3px; background:linear-gradient(135deg, #FF6343, #FF8C6B, #EDBD1F); transition:all 0.3s; }
+.wire-story-ring.seen { background:#333; }
+.wire-story-av { width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:var(--nr-white); border:2.5px solid var(--nr-black); overflow:hidden; }
+.wire-story-av svg { width:100%; height:100%; }
+.wire-story-nm { font-size:11px; color:var(--nr-silver); font-weight:500; max-width:64px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.wire-story-card:active .wire-story-ring { transform:scale(0.92); }
 
-/* Time group headers */
-.act-group-hdr { font-family:var(--font-mono); font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:1px; color:var(--nr-steel); padding:20px 20px 8px; }
-.act-group-hdr:first-of-type { padding-top:4px; }
+/* Wire divider */
+.wire-divider { height:1px; background:rgba(255,255,255,0.06); margin:0 20px; }
 
-/* Activity items */
-.act-item { padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.05); }
-.act-item.is-you { border-left:3px solid var(--nr-red); padding-left:17px; }
-.act-item.is-challenge .act-milestone { border:1px solid rgba(255,99,67,0.15); }
-.act-urow { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-.act-uav { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:var(--nr-white); flex-shrink:0; }
-.act-unm { font-size:14px; font-weight:600; color:var(--nr-white); }
-.act-time { font-size:14px; font-weight:400; color:var(--nr-steel); margin-left:1px; }
+/* Tweet-style posts */
+.wire-post { padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.06); }
+.wire-post:active { background:rgba(255,255,255,0.02); }
+.wire-post-header { display:flex; align-items:flex-start; gap:10px; margin-bottom:8px; }
+.wire-post-av { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:var(--nr-white); flex-shrink:0; overflow:hidden; }
+.wire-post-av svg { width:100%; height:100%; }
+.wire-post-meta { flex:1; min-width:0; }
+.wire-post-name { font-size:14px; font-weight:700; color:var(--nr-white); display:flex; align-items:center; gap:6px; }
+.wire-post-handle { font-size:13px; color:var(--nr-steel); font-weight:400; }
+.wire-post-time { font-size:13px; color:var(--nr-steel); font-weight:400; }
+.wire-post-role { font-size:11px; color:var(--nr-ash); margin-top:1px; }
+.wire-post-text { font-size:15px; color:var(--nr-white); line-height:1.5; margin-bottom:10px; letter-spacing:-0.01em; }
 
-/* Story card inside activity item */
-.act-scard { background:var(--nr-lead); border-radius:var(--radius); padding:10px; display:flex; gap:12px; cursor:pointer; transition:background 0.15s; }
-.act-scard:active { background:var(--nr-iron); }
-.act-sthumb { width:56px; height:56px; border-radius:var(--radius); background:var(--nr-iron); flex-shrink:0; overflow:hidden; }
-.act-sthumb img { width:100%; height:100%; object-fit:cover; }
-.act-sinfo { flex:1; min-width:0; }
-.act-stitle { font-size:14px; font-weight:500; color:var(--nr-white); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.act-sact { font-size:12px; color:var(--nr-ash); margin-top:4px; }
+/* Story card inside tweet */
+.wire-post-story { background:var(--nr-lead); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:10px 12px; display:flex; gap:12px; cursor:pointer; margin-bottom:10px; transition:background 0.15s; }
+.wire-post-story:active { background:var(--nr-iron); }
+.wire-post-story-thumb { width:48px; height:48px; border-radius:6px; background:var(--nr-iron); flex-shrink:0; overflow:hidden; }
+.wire-post-story-thumb img { width:100%; height:100%; object-fit:cover; }
+.wire-post-story-info { flex:1; min-width:0; }
+.wire-post-story-title { font-size:13px; font-weight:600; color:var(--nr-white); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.wire-post-story-src { font-size:11px; color:var(--nr-ash); margin-top:3px; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:0.5px; }
 
-/* Quiz score blocks — Wordle-style */
-.act-score-blocks { display:flex; gap:3px; margin-top:6px; }
-.act-score-block { width:14px; height:14px; border-radius:3px; }
-.act-score-block.correct { background:var(--nr-green); }
-.act-score-block.wrong { background:var(--nr-red); opacity:0.45; }
+/* Tweet actions */
+.wire-post-actions { display:flex; gap:24px; margin-top:2px; }
+.wire-action { display:flex; align-items:center; gap:5px; background:none; border:none; cursor:pointer; padding:4px 0; }
+.wire-action svg { width:16px; height:16px; color:rgba(255,255,255,0.3); transition:all 0.2s; }
+.wire-action-count { font-size:12px; color:rgba(255,255,255,0.3); font-weight:500; transition:color 0.2s; }
+.wire-action:active { transform:scale(1.15); }
+.wire-action.liked svg { color:var(--nr-red); fill:var(--nr-red); }
+.wire-action.liked .wire-action-count { color:var(--nr-red); }
 
-/* Milestone banner (streak, challenge, joined) */
-.act-milestone { background:rgba(255,255,255,0.04); border-radius:var(--radius); padding:12px 14px; display:flex; align-items:center; gap:10px; }
-.act-milestone-icon { font-size:20px; flex-shrink:0; }
-.act-milestone-text { font-size:13px; color:var(--nr-silver); line-height:1.4; }
-.act-milestone-text strong { color:var(--nr-yellow); }
+/* Reader activity section */
+.wire-readers-header { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--nr-steel); padding:20px 20px 8px; }
+.wire-reader-item { display:flex; align-items:center; gap:10px; padding:10px 20px; }
+.wire-reader-av { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:var(--nr-white); flex-shrink:0; }
+.wire-reader-text { font-size:13px; color:var(--nr-silver); line-height:1.4; }
+.wire-reader-text strong { color:var(--nr-white); font-weight:600; }
+.wire-reader-time { font-size:11px; color:var(--nr-steel); margin-left:auto; flex-shrink:0; }
 
-/* CTA buttons */
-.act-cta-btn { display:flex; align-items:center; justify-content:center; width:100%; padding:10px 14px; background:var(--nr-red); border:none; border-radius:var(--radius); font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--nr-white); text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; margin-top:10px; transition:all 0.15s; }
-.act-cta-btn:active { transform:scale(0.97); opacity:0.9; }
-.act-cta-btn.secondary { background:rgba(255,255,255,0.07); }
-.act-cta-btn.sent { background:var(--nr-green); pointer-events:none; }
+/* ─── Stories Overlay (Instagram-style) ─── */
+.stories-overlay { display:none; position:fixed; inset:0; z-index:3500; background:var(--nr-black); flex-direction:column; }
+.stories-overlay.on { display:flex; animation:overlayIn 0.25s ease-out forwards; }
 
-/* Reactions — only on content items */
-.act-reactions { display:flex; gap:16px; margin-top:10px; }
-.act-react { width:24px; height:24px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; transition:transform 0.15s; }
-.act-react:active { transform:scale(1.3); }
-.act-react svg { width:18px; height:18px; color:rgba(255,255,255,0.35); transition:color 0.2s, fill 0.2s; }
-.act-react.liked svg { color:var(--nr-red); fill:var(--nr-red); }
-.act-react.commented svg { color:var(--nr-teal); }
-.act-react.notified svg { color:var(--nr-yellow); fill:var(--nr-yellow); }
+/* Progress bars */
+.stories-progress { display:flex; gap:3px; padding:8px 12px 6px; flex-shrink:0; }
+.stories-bar { flex:1; height:2.5px; background:rgba(255,255,255,0.2); border-radius:2px; overflow:hidden; }
+.stories-bar-fill { height:100%; background:var(--nr-white); border-radius:2px; width:0; transition:width 0.1s linear; }
+.stories-bar.done .stories-bar-fill { width:100%; }
+.stories-bar.active .stories-bar-fill { width:0; animation:storyProgress 5s linear forwards; }
 
-/* Nudge — inline style */
-.act-nudge { display:flex; align-items:center; gap:10px; padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.05); }
-.act-nudge-icon { font-size:18px; }
-.act-nudge-text { flex:1; font-size:13px; color:var(--nr-silver); }
-.act-nudge-text strong { color:var(--nr-white); font-weight:600; }
-.act-nudge-btn { background:rgba(255,255,255,0.07); border:none; border-radius:var(--radius); padding:6px 12px; font-family:var(--font-mono); font-size:10px; font-weight:600; color:var(--nr-white); text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; transition:all 0.15s; flex-shrink:0; }
-.act-nudge-btn:active { transform:scale(0.95); }
-.act-nudge-btn.sent { background:var(--nr-green); pointer-events:none; }
+@keyframes storyProgress {
+  from { width:0; }
+  to { width:100%; }
+}
+
+/* Stories header */
+.stories-header { display:flex; align-items:center; gap:10px; padding:6px 16px 12px; flex-shrink:0; }
+.stories-header-av { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--nr-white); overflow:hidden; }
+.stories-header-av svg { width:100%; height:100%; }
+.stories-header-name { font-size:14px; font-weight:700; color:var(--nr-white); }
+.stories-header-time { font-size:13px; color:rgba(255,255,255,0.5); }
+.stories-close { margin-left:auto; width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:none; border:none; color:var(--nr-white); font-size:20px; cursor:pointer; opacity:0.7; }
+.stories-close:active { opacity:1; }
+
+/* Stories content area */
+.stories-content { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px 32px; position:relative; text-align:center; overflow:hidden; }
+.stories-quote { font-family:var(--font-headline); font-size:22px; color:var(--nr-white); line-height:1.45; letter-spacing:-0.02em; max-width:320px; }
+.stories-quote::before { content:'"'; font-size:48px; color:var(--nr-red); display:block; margin-bottom:8px; line-height:0.5; font-family:Georgia,serif; }
+.stories-attribution { margin-top:20px; }
+.stories-attr-handle { font-size:14px; color:var(--nr-red); font-weight:600; }
+.stories-attr-role { font-size:12px; color:var(--nr-ash); margin-top:2px; }
+.stories-read-btn { display:inline-flex; align-items:center; gap:6px; margin-top:24px; padding:10px 20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:var(--radius); font-family:var(--font-mono); font-size:11px; font-weight:600; color:var(--nr-white); text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; transition:all 0.15s; }
+.stories-read-btn:active { background:rgba(255,255,255,0.15); transform:scale(0.96); }
+
+/* Tap zones */
+.stories-tap-left, .stories-tap-right { position:absolute; top:0; bottom:0; width:40%; z-index:1; }
+.stories-tap-left { left:0; }
+.stories-tap-right { right:0; }
+
+/* Stories reply bar */
+.stories-reply { display:flex; align-items:center; gap:10px; padding:12px 16px; flex-shrink:0; border-top:1px solid rgba(255,255,255,0.06); }
+.stories-reply-input { flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:8px 16px; font-size:13px; color:var(--nr-white); outline:none; font-family:var(--font-body); }
+.stories-reply-input::placeholder { color:rgba(255,255,255,0.3); }
+.stories-reply-send { width:32px; height:32px; display:flex; align-items:center; justify-content:center; background:var(--nr-red); border:none; border-radius:50%; cursor:pointer; flex-shrink:0; }
+.stories-reply-send svg { width:16px; height:16px; color:var(--nr-white); }
 
 /* Nav notification dot */
 .nav-dot { width:8px; height:8px; border-radius:50%; background:var(--nr-red); position:absolute; top:2px; right:12px; display:none; }
@@ -1670,6 +1702,23 @@ body {
   <div class="scr" id="profileScr"></div>
 </div>
 
+<!-- STORIES OVERLAY (Instagram-style) -->
+<div class="stories-overlay" id="storiesOverlay">
+  <div class="stories-progress" id="storiesProgress"></div>
+  <div class="stories-header" id="storiesHeader"></div>
+  <div class="stories-content" id="storiesContent">
+    <div class="stories-tap-left" onclick="storyPrev()"></div>
+    <div class="stories-tap-right" onclick="storyNext()"></div>
+    <div class="stories-quote" id="storiesQuote"></div>
+    <div class="stories-attribution" id="storiesAttr"></div>
+    <button class="stories-read-btn" id="storiesReadBtn" onclick="storyReadArticle()">📰 Read the story</button>
+  </div>
+  <div class="stories-reply">
+    <input class="stories-reply-input" id="storiesReplyInput" placeholder="Reply…" readonly>
+    <button class="stories-reply-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+  </div>
+</div>
+
 <!-- CAROUSEL OVERLAY -->
 <div class="carousel" id="carousel"></div>
 
@@ -1776,7 +1825,7 @@ body {
 <!-- BOTTOM NAV -->
 <nav class="bottomnav">
   <button class="navbtn on" data-tab="today"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span class="lbl">Today</span></button>
-  <button class="navbtn" data-tab="activity" style="position:relative"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span class="nav-dot" id="actNavDot"></span><span class="lbl">Activity</span></button>
+  <button class="navbtn" data-tab="activity" style="position:relative"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/></svg><span class="nav-dot" id="actNavDot"></span><span class="lbl">Wire</span></button>
   <button class="navbtn" data-tab="explore"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg><span class="lbl">Explore</span></button>
   <button class="navbtn" data-tab="profile"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0113 0"/></svg><span class="lbl">Profile</span></button>
 </nav>
@@ -2619,126 +2668,89 @@ function feedSlide(storyIdx, dir) {
   }
 }
 
-// — ACTIVITY —
-function renderActivity() {
-  const heartSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>';
-  const bellSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>';
+// — THE WIRE —
+function getContributorAv(c) {
+  if (c.isBenny) return '<div class="wire-post-av" style="background:' + c.gradient + '">' + BENNY_SVG + '</div>';
+  return '<div class="wire-post-av" style="background:' + c.gradient + '">' + c.avatar + '</div>';
+}
 
-  // Today's Circle — ring color IS the status, tap to scroll to person's activity
-  var circleHTML = '<div class="act-circle">' + CIRCLE_FRIENDS.map(function(f) {
-    return '<div class="act-circle-card" onclick="scrollToUser(\'' + f.av + '\')" style="cursor:pointer"><div class="act-circle-av ' + f.status + '" style="background:' + f.bg + '">' + f.av + '</div>' +
-      '<div class="act-circle-nm">' + f.nm + '</div></div>';
+function getStoryAv(c) {
+  if (c.isBenny) return '<div class="wire-story-av" style="background:' + c.gradient + '">' + BENNY_SVG + '</div>';
+  return '<div class="wire-story-av" style="background:' + c.gradient + '">' + c.avatar + '</div>';
+}
+
+function renderWire() {
+  const heartSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>';
+  const chatSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>';
+  const shareSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>';
+
+  // Stories strip
+  var storiesHTML = '<div class="wire-stories">' + CONTRIBUTORS.map(function(c, i) {
+    var seenClass = storiesSeen[i] ? ' seen' : '';
+    return '<div class="wire-story-card" onclick="openStory(' + i + ')">' +
+      '<div class="wire-story-ring' + seenClass + '">' + getStoryAv(c) + '</div>' +
+      '<div class="wire-story-nm">' + c.name.split(' ')[0] + '</div></div>';
   }).join('') + '</div>';
 
-  // Reactions — only for content items (story, quiz)
-  function reactionsHTML() {
-    return '<div class="act-reactions"><button class="act-react" onclick="toggleReact(this,\'liked\')">' + heartSVG + '</button><button class="act-react" onclick="toggleReact(this,\'commented\')">' + ICONS.chat + '</button><button class="act-react" onclick="toggleReact(this,\'notified\')">' + bellSVG + '</button></div>';
-  }
+  // Tweet posts
+  var postsHTML = WIRE_POSTS.map(function(p, idx) {
+    var c = CONTRIBUTORS[p.contributor];
+    var story = (p.storyIdx !== null && p.storyIdx !== undefined) ? STORIES[p.storyIdx] : null;
 
-  // Score blocks (Wordle-style)
-  function scoreBlocksHTML(score, total) {
-    var html = '<div class="act-score-blocks">';
-    for (var j = 0; j < total; j++) {
-      html += '<div class="act-score-block ' + (j < score ? 'correct' : 'wrong') + '"></div>';
-    }
-    return html + '</div>';
-  }
-
-  // Merge dynamic + seeded activity (exclude nudge — rendered separately)
-  var allActivity = activityFeed.concat(SEED_ACTIVITY).filter(function(a) { return a.type !== 'nudge'; });
-
-  // Find nudge item for bottom
-  var nudgeItem = SEED_ACTIVITY.find(function(a) { return a.type === 'nudge'; });
-
-  // Time grouping: "Today" for <=4h, "Earlier" for >4h
-  var todayItems = [];
-  var earlierItems = [];
-  allActivity.forEach(function(a) {
-    var h = a.time ? parseInt(a.time) : 0;
-    var isJustNow = a.time === 'Just now';
-    if (isJustNow || (a.time && a.time.includes('h') && h <= 4)) {
-      todayItems.push(a);
-    } else {
-      earlierItems.push(a);
-    }
-  });
-
-  function renderItem(a) {
-    var isYou = !a.user;
-    var av = isYou ? 'J' : a.user.av;
-    var bg = isYou ? 'linear-gradient(135deg,var(--nr-red),var(--nr-yellow))' : a.user.bg;
-    var nm = isYou ? 'You' : a.user.nm;
-    var story = (a.storyIdx !== null && a.storyIdx !== undefined) ? STORIES[a.storyIdx] : null;
-    var hasReactions = (a.type === 'story' || a.type === 'poll');
-    var itemClass = 'act-item' + (isYou ? ' is-you' : '') + (a.type === 'challenge' ? ' is-challenge' : '');
-
-    // Flattened header: Avatar + Name · time (one line, no handle, no overflow)
-    var headerHTML = '<div class="act-urow"><div class="act-uav" style="background:' + bg + '">' + av + '</div>' +
-      '<span class="act-unm">' + nm + '</span>' +
-      (a.time ? '<span class="act-time">\u00b7 ' + a.time + '</span>' : '') + '</div>';
-
-    var contentHTML = '';
-
-    if (a.type === 'story' && story) {
-      var desc = isYou ? 'You completed this story' : 'completed this story';
-      contentHTML = '<div class="act-scard" onclick="openCarousel(' + a.storyIdx + ')"><div class="act-sthumb"><img src="' + story.image + '" alt=""></div><div class="act-sinfo"><div class="act-stitle">' + story.headline + '</div><div class="act-sact">' + desc + '</div></div></div>';
-    } else if (a.type === 'poll' && story) {
-      var stance = a.detail.stance;
-      var stanceColor = (stance === 'Strongly Agree' || stance === 'Agree') ? 'var(--nr-green)' : (stance === 'Strongly Disagree' || stance === 'Disagree') ? 'var(--nr-red)' : 'var(--nr-yellow)';
-      contentHTML = '<div class="act-scard" onclick="openCarousel(' + a.storyIdx + ')"><div class="act-sthumb"><img src="' + story.image + '" alt=""></div><div class="act-sinfo"><div class="act-stitle">' + story.headline + '</div><div class="act-sact">voted <strong style="color:' + stanceColor + '">' + stance + '</strong> on the poll</div></div></div>';
-    } else if (a.type === 'streak') {
-      contentHTML = '<div class="act-milestone"><div class="act-milestone-icon">🔥</div><div class="act-milestone-text"><strong>' + a.detail.days + '-day streak!</strong> Keep it going.</div></div>';
-    } else if (a.type === 'challenge') {
-      var cs = a.detail;
-      contentHTML = '<div class="act-milestone"><div class="act-milestone-icon">⚔️</div><div class="act-milestone-text">scored <strong>' + cs.score + '/' + cs.total + '</strong> — think you can beat her?</div></div>' +
-        scoreBlocksHTML(cs.score, cs.total) +
-        '<button class="act-cta-btn" onclick="challengeQuiz(' + a.storyIdx + ')">TAKE THE QUIZ</button>';
-    } else if (a.type === 'joined') {
-      contentHTML = '<div class="act-milestone"><div class="act-milestone-icon">👋</div><div class="act-milestone-text">' + nm + ' joined Newsreel</div></div>';
+    var storyCardHTML = '';
+    if (story) {
+      storyCardHTML = '<div class="wire-post-story" onclick="openCarousel(' + p.storyIdx + ')">' +
+        '<div class="wire-post-story-thumb"><img src="' + story.image + '" alt=""></div>' +
+        '<div class="wire-post-story-info"><div class="wire-post-story-title">' + story.headline + '</div>' +
+        '<div class="wire-post-story-src">newsreel.com</div></div></div>';
     }
 
-    return '<div class="' + itemClass + '" data-user="' + av + '">' + headerHTML + contentHTML + (hasReactions ? reactionsHTML() : '') + '</div>';
-  }
+    return '<div class="wire-post">' +
+      '<div class="wire-post-header">' + getContributorAv(c) +
+      '<div class="wire-post-meta">' +
+        '<div class="wire-post-name">' + c.name + ' <span class="wire-post-handle">' + c.handle + '</span> <span class="wire-post-time">· ' + p.time + '</span></div>' +
+        '<div class="wire-post-role">' + c.role + '</div>' +
+      '</div></div>' +
+      '<div class="wire-post-text">' + p.text + '</div>' +
+      storyCardHTML +
+      '<div class="wire-post-actions">' +
+        '<button class="wire-action" onclick="event.stopPropagation()">' + chatSVG + '<span class="wire-action-count">' + p.replies + '</span></button>' +
+        '<button class="wire-action" onclick="toggleWireLike(this, event)" data-count="' + p.likes + '">' + heartSVG + '<span class="wire-action-count">' + p.likes + '</span></button>' +
+        '<button class="wire-action" onclick="event.stopPropagation()">' + shareSVG + '</button>' +
+      '</div></div>';
+  }).join('');
 
-  // Build feed with time groups
-  var feedHTML = '';
-  if (todayItems.length) {
-    feedHTML += '<div class="act-group-hdr">Today</div>';
-    feedHTML += todayItems.map(renderItem).join('');
-  }
-  if (earlierItems.length) {
-    feedHTML += '<div class="act-group-hdr">Earlier</div>';
-    feedHTML += earlierItems.map(renderItem).join('');
-  }
-
-  // Nudge as inline bottom element
-  var nudgeHTML = '';
-  if (nudgeItem) {
-    var nd = nudgeItem.detail;
-    nudgeHTML = '<div class="act-nudge"><span class="act-nudge-icon">👋</span><div class="act-nudge-text"><strong>' + nd.nm + '</strong> hasn\'t started today</div><button class="act-nudge-btn" onclick="sendNudge(this)">NUDGE</button></div>';
-  }
+  // Reader activity (subtle)
+  var readersHTML = '<div class="wire-readers-header">Readers</div>';
+  readersHTML += READER_ACTIVITY.map(function(r) {
+    return '<div class="wire-reader-item">' +
+      '<div class="wire-reader-av" style="background:' + r.bg + '">' + r.av + '</div>' +
+      '<div class="wire-reader-text"><strong>' + r.name + '</strong> ' + r.text + '</div>' +
+      '<span class="wire-reader-time">' + r.time + '</span></div>';
+  }).join('');
 
   document.getElementById('activityScr').innerHTML =
-    '<div class="act-head"><div class="act-title">Activity</div><button class="act-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></button></div>' +
-    circleHTML + feedHTML + nudgeHTML;
+    '<div class="wire-head"><div><div class="wire-title">The Wire</div><div class="wire-subtitle">From the newsroom</div></div></div>' +
+    storiesHTML +
+    '<div class="wire-divider"></div>' +
+    postsHTML +
+    '<div class="wire-divider" style="margin-top:8px"></div>' +
+    readersHTML +
+    '<div style="height:90px"></div>'; // bottom spacing for nav
 }
 
 /* ═══════════════════════════════════════════════
-   ACTIVITY — Utility functions
+   WIRE — Utility functions
    ═══════════════════════════════════════════════ */
-function toggleReact(btn, cls) { btn.classList.toggle(cls); }
-
-function sendNudge(btn) {
-  btn.textContent = 'NUDGED ✓';
-  btn.classList.add('sent');
-}
-
-function challengeQuiz(storyIdx) {
-  openQuiz(storyIdx);
+function toggleWireLike(btn, e) {
+  e.stopPropagation();
+  btn.classList.toggle('liked');
+  var countEl = btn.querySelector('.wire-action-count');
+  var base = parseInt(btn.dataset.count);
+  countEl.textContent = btn.classList.contains('liked') ? (base + 1) : base;
 }
 
 function pushActivity(type, storyIdx, detail) {
-  activityFeed.unshift({ type:type, user:null, storyIdx:storyIdx, time:'Just now', detail:detail || null });
   activityUnseen++;
   updateActivityDot();
 }
@@ -2753,13 +2765,119 @@ function clearActivityUnseen() {
   updateActivityDot();
 }
 
-function scrollToUser(av) {
-  var item = document.querySelector('.act-item[data-user="' + av + '"]');
-  if (item) {
-    item.scrollIntoView({ behavior:'smooth', block:'center' });
-    // Brief highlight flash
-    item.style.background = 'rgba(255,255,255,0.06)';
-    setTimeout(function() { item.style.background = ''; }, 800);
+/* ═══════════════════════════════════════════════
+   STORIES — Instagram-style overlay
+   ═══════════════════════════════════════════════ */
+let storyCurrentContributor = 0;
+let storyCurrentSlide = 0;
+let storyTimer = null;
+
+function getContributorPosts(cIdx) {
+  return WIRE_POSTS.filter(function(p) { return p.contributor === cIdx; });
+}
+
+function openStory(cIdx) {
+  storyCurrentContributor = cIdx;
+  storyCurrentSlide = 0;
+  var overlay = document.getElementById('storiesOverlay');
+  overlay.classList.add('on');
+  renderStorySlide();
+}
+
+function closeStory() {
+  var overlay = document.getElementById('storiesOverlay');
+  overlay.classList.remove('on');
+  clearInterval(storyTimer);
+  storyTimer = null;
+  // Mark this contributor as seen
+  storiesSeen[storyCurrentContributor] = true;
+  // Re-render wire to update ring colors
+  renderWire();
+}
+
+function renderStorySlide() {
+  var c = CONTRIBUTORS[storyCurrentContributor];
+  var posts = getContributorPosts(storyCurrentContributor);
+  if (!posts.length) { closeStory(); return; }
+  var post = posts[storyCurrentSlide];
+  var story = (post.storyIdx !== null && post.storyIdx !== undefined) ? STORIES[post.storyIdx] : null;
+
+  // Progress bars
+  var progHTML = posts.map(function(p, i) {
+    var cls = i < storyCurrentSlide ? 'done' : (i === storyCurrentSlide ? 'active' : '');
+    return '<div class="stories-bar ' + cls + '"><div class="stories-bar-fill"></div></div>';
+  }).join('');
+  document.getElementById('storiesProgress').innerHTML = progHTML;
+
+  // Header
+  var avHTML = c.isBenny ? BENNY_SVG : c.avatar;
+  document.getElementById('storiesHeader').innerHTML =
+    '<div class="stories-header-av" style="background:' + c.gradient + '">' + avHTML + '</div>' +
+    '<div><div class="stories-header-name">' + c.name + '</div></div>' +
+    '<span class="stories-header-time">' + post.time + '</span>' +
+    '<button class="stories-close" onclick="closeStory()">✕</button>';
+
+  // Content
+  document.getElementById('storiesQuote').textContent = post.text;
+  document.getElementById('storiesAttr').innerHTML =
+    '<div class="stories-attr-handle">' + c.handle + '</div>' +
+    '<div class="stories-attr-role">' + c.role + '</div>';
+
+  // Read button
+  var readBtn = document.getElementById('storiesReadBtn');
+  if (story) {
+    readBtn.style.display = 'inline-flex';
+  } else {
+    readBtn.style.display = 'none';
+  }
+
+  // Reply placeholder
+  document.getElementById('storiesReplyInput').placeholder = 'Reply to ' + c.handle + '…';
+
+  // Auto-advance timer
+  clearInterval(storyTimer);
+  storyTimer = setTimeout(function() {
+    storyNext();
+  }, 5000);
+}
+
+function storyNext() {
+  var posts = getContributorPosts(storyCurrentContributor);
+  if (storyCurrentSlide < posts.length - 1) {
+    storyCurrentSlide++;
+    renderStorySlide();
+  } else {
+    // Move to next contributor
+    storiesSeen[storyCurrentContributor] = true;
+    var nextC = storyCurrentContributor + 1;
+    if (nextC < CONTRIBUTORS.length) {
+      storyCurrentContributor = nextC;
+      storyCurrentSlide = 0;
+      renderStorySlide();
+    } else {
+      closeStory();
+    }
+  }
+}
+
+function storyPrev() {
+  if (storyCurrentSlide > 0) {
+    storyCurrentSlide--;
+    renderStorySlide();
+  }
+}
+
+function storyReadArticle() {
+  var posts = getContributorPosts(storyCurrentContributor);
+  var post = posts[storyCurrentSlide];
+  if (post && post.storyIdx !== null && post.storyIdx !== undefined) {
+    closeStory();
+    // Switch to today tab first
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('on'); });
+    document.getElementById('s-today').classList.add('on');
+    document.querySelectorAll('.navbtn').forEach(function(b) { b.classList.remove('on'); });
+    document.querySelector('.navbtn[data-tab="today"]').classList.add('on');
+    setTimeout(function() { openCarousel(post.storyIdx); }, 300);
   }
 }
 
@@ -2811,7 +2929,7 @@ document.querySelectorAll('.navbtn').forEach(btn => {
     document.getElementById('s-' + tab).classList.add('on');
     document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('on'));
     btn.classList.add('on');
-    if (tab === 'activity') { clearActivityUnseen(); renderActivity(); }
+    if (tab === 'activity') { clearActivityUnseen(); renderWire(); }
   });
 });
 
@@ -3413,23 +3531,31 @@ const briefingRead = new Set();
 const activityFeed = [];
 let activityUnseen = 0;
 
-const CIRCLE_FRIENDS = [
-  { av:'A', bg:'linear-gradient(135deg,var(--nr-teal),var(--nr-purple))', nm:'Alex', status:'done' },
-  { av:'S', bg:'linear-gradient(135deg,var(--nr-pink),var(--nr-purple))', nm:'Sarah', status:'done' },
-  { av:'K', bg:'linear-gradient(135deg,var(--nr-blue),var(--nr-teal))', nm:'Kai', status:'idle' },
-  { av:'M', bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))', nm:'Maya', status:'progress', progress:'2/3' },
-  { av:'R', bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))', nm:'Riley', status:'done' },
+const CONTRIBUTORS = [
+  { name:'Jack Brewster', handle:'@jackbrewster', role:'Founder', avatar:'JB', gradient:'linear-gradient(135deg, #FF6343, #FF8C6B)', isBenny:false },
+  { name:'Nadia Asmal', handle:'@nadia', role:'Senior Writer', avatar:'NA', gradient:'linear-gradient(135deg, var(--nr-teal), var(--nr-purple))', isBenny:false },
+  { name:'Benny Byline', handle:'@benny', role:'AI Reporter', avatar:null, gradient:'linear-gradient(135deg, var(--nr-yellow), var(--nr-red))', isBenny:true },
+  { name:'Priya Sharma', handle:'@priya', role:'Climate Desk', avatar:'PS', gradient:'linear-gradient(135deg, var(--nr-green), var(--nr-teal))', isBenny:false },
+  { name:'Marcus Cole', handle:'@marcus', role:'Breaking News', avatar:'MC', gradient:'linear-gradient(135deg, var(--nr-purple), #FF6B9D)', isBenny:false },
 ];
 
-const SEED_ACTIVITY = [
-  { type:'story', user:{av:'A',bg:'linear-gradient(135deg,var(--nr-teal),var(--nr-purple))',nm:'Alex Chen'}, storyIdx:1, time:'1h ago', detail:null },
-  { type:'poll', user:{av:'R',bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))',nm:'Riley Jackson'}, storyIdx:0, time:'2h ago', detail:{stance:'Agree'} },
-  { type:'streak', user:{av:'S',bg:'linear-gradient(135deg,var(--nr-pink),var(--nr-purple))',nm:'Sarah M.'}, storyIdx:null, time:'3h ago', detail:{days:7} },
-  { type:'challenge', user:{av:'S',bg:'linear-gradient(135deg,var(--nr-pink),var(--nr-purple))',nm:'Sarah M.'}, storyIdx:0, time:'5h ago', detail:{score:3,total:3} },
-  { type:'story', user:{av:'M',bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))',nm:'Maya R.'}, storyIdx:2, time:'6h ago', detail:null },
-  { type:'nudge', user:null, storyIdx:null, time:null, detail:{nm:'Kai',av:'K',bg:'linear-gradient(135deg,var(--nr-blue),var(--nr-teal))'} },
-  { type:'poll', user:{av:'M',bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))',nm:'Maya R.'}, storyIdx:1, time:'10h ago', detail:{stance:'Strongly Agree'} },
+const WIRE_POSTS = [
+  { contributor:0, text:"We've been tracking this bridge story for weeks. The ownership demand is unprecedented — no sitting president has ever tried this.", time:'14m', storyIdx:0, likes:42, replies:8 },
+  { contributor:1, text:"Just got off a call with a former IAEA inspector. They're saying the strike damage is worse than reported. Story updating now.", time:'1h', storyIdx:1, likes:128, replies:31 },
+  { contributor:4, text:"BREAKING context: Pentagon confirms second wave of strikes overnight. Our sources say this was planned for months.", time:'2h', storyIdx:1, likes:89, replies:15 },
+  { contributor:3, text:"The Arctic ice data in today's UN report is genuinely alarming. 40% faster than models predicted. We need to talk about this more.", time:'3h', storyIdx:2, likes:67, replies:22 },
+  { contributor:2, text:"I read all 47 pages of the UN Arctic report so you don't have to. The short version: it's worse than you think. 🧊", time:'4h', storyIdx:2, likes:203, replies:45 },
+  { contributor:0, text:"Good morning. Big briefing today — 3 stories, all interconnected. Start with the bridge, end with the Arctic. Trust me.", time:'6h', storyIdx:null, likes:156, replies:12 },
 ];
+
+const READER_ACTIVITY = [
+  { name:'Alex', av:'A', bg:'linear-gradient(135deg,var(--nr-teal),var(--nr-purple))', text:'finished today\'s briefing', time:'1h' },
+  { name:'Sarah', av:'S', bg:'linear-gradient(135deg,#FF6B9D,var(--nr-purple))', text:'hit a 7-day streak 🔥', time:'3h' },
+  { name:'Maya', av:'M', bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))', text:'scored 3/3 on the quiz', time:'5h' },
+  { name:'Riley', av:'R', bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))', text:'just joined Newsreel 👋', time:'8h' },
+];
+
+let storiesSeen = {};  // track which contributor stories have been viewed
 
 function openBriefing() {
   const el = document.getElementById('briefingOverlay');
@@ -3542,9 +3668,9 @@ function shareStory(idx) {
    INIT
    ═══════════════════════════════════════════════ */
 renderFeed();
-activityUnseen = SEED_ACTIVITY.length;
+activityUnseen = WIRE_POSTS.length;
 updateActivityDot();
-renderActivity();
+renderWire();
 renderExplore();
 renderProfile();
 
