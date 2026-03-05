@@ -644,6 +644,24 @@ body {
 }
 .discuss-class-send:active { transform:scale(0.9); }
 .discuss-class-send svg { width:16px; height:16px; }
+.discuss-class-done {
+  flex-shrink:0; padding:12px 24px 32px;
+  border-top:1px solid var(--nr-iron);
+  animation:doneFadeUp 0.4s ease;
+}
+.discuss-done-btn {
+  width:100%; padding:14px 0; border-radius:var(--radius);
+  background:var(--nr-teal); border:none; cursor:pointer;
+  color:var(--nr-white); font-family:var(--font-mono); font-size:13px;
+  font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  display:flex; align-items:center; justify-content:center;
+  transition:transform 0.1s, background 0.2s;
+}
+.discuss-done-btn:active { transform:scale(0.97); background:#009e95; }
+@keyframes doneFadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
 
 /* ═══════════════════════════════════════════════
    XP REWARD — Ring-centric, Duolingo-inspired
@@ -1506,10 +1524,16 @@ body {
     <div class="discuss-class-bar" id="discussClassBar"></div>
     <div class="discuss-prof-card" id="discussProfCard"></div>
     <div class="discuss-class-scroll" id="discussClassScroll"></div>
-    <div class="discuss-class-compose">
+    <div class="discuss-class-compose" id="discussClassCompose">
       <textarea class="discuss-class-input" id="discussClassInput" placeholder="Add your response..." rows="1"></textarea>
       <button class="discuss-class-send" onclick="submitClassDiscuss()">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="discuss-class-done" id="discussClassDone" style="display:none">
+      <button class="discuss-done-btn" onclick="finishClassDiscuss()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:18px;height:18px;margin-right:8px"><polyline points="20 6 9 17 4 12"/></svg>
+        MARK COMPLETE
       </button>
     </div>
   </div>
@@ -2602,8 +2626,10 @@ function openClassroomDiscuss(idx) {
   });
   document.getElementById('discussClassScroll').innerHTML = html;
 
-  // Clear compose
+  // Reset compose bar (show compose, hide done button)
   document.getElementById('discussClassInput').value = '';
+  document.getElementById('discussClassCompose').style.display = 'flex';
+  document.getElementById('discussClassDone').style.display = 'none';
 
   // Show overlay
   document.getElementById('discuss').classList.add('on');
@@ -2636,8 +2662,17 @@ function submitClassDiscuss() {
   var countEl = document.querySelector('.discuss-class-count');
   if (countEl) countEl.textContent = (story.classroom.responses.length + 1) + ' responses';
 
-  // Clear input
+  // Clear input and swap compose → done button
   input.value = '';
+  document.getElementById('discussClassCompose').style.display = 'none';
+  document.getElementById('discussClassDone').style.display = 'block';
+}
+
+function finishClassDiscuss() {
+  // Close the discussion overlay
+  closeDiscuss();
+  // Fire the completion ring
+  completeStory();
 }
 
 function closeDiscuss() { document.getElementById('discuss').classList.remove('on'); }
