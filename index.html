@@ -1334,6 +1334,51 @@ body {
 }
 .topics-search-clear:hover { color:var(--nr-white); }
 
+/* Benny Byline — loading state */
+.nlp-loading {
+  display:flex; gap:10px; align-items:flex-start; padding:4px 0 12px;
+  animation:nlpFadeIn 0.25s ease;
+}
+.nlp-loading-avatar {
+  width:34px; height:34px; border-radius:50%; flex-shrink:0;
+  background:var(--nr-red); display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-headline); font-size:17px; color:var(--nr-white);
+  box-shadow:0 0 0 2px rgba(255,99,67,0.2);
+  animation:bennyPulse 1.2s ease-in-out infinite;
+}
+@keyframes bennyPulse {
+  0%, 100% { box-shadow:0 0 0 2px rgba(255,99,67,0.2); }
+  50% { box-shadow:0 0 0 5px rgba(255,99,67,0.08); }
+}
+.nlp-loading-content {
+  flex:1; padding-top:4px;
+}
+.nlp-loading-name {
+  font-family:var(--font-headline); font-size:13px; color:var(--nr-yellow);
+  margin-bottom:6px;
+}
+.nlp-loading-dots {
+  display:flex; gap:4px; align-items:center;
+}
+.nlp-loading-dots span {
+  width:6px; height:6px; border-radius:50%; background:var(--nr-ash);
+  animation:bennyDot 1.2s ease-in-out infinite;
+}
+.nlp-loading-dots span:nth-child(2) { animation-delay:0.15s; }
+.nlp-loading-dots span:nth-child(3) { animation-delay:0.3s; }
+@keyframes bennyDot {
+  0%, 60%, 100% { opacity:0.3; transform:scale(0.8); }
+  30% { opacity:1; transform:scale(1.1); }
+}
+.nlp-loading-msg {
+  font-family:var(--font-body); font-size:12px; color:var(--nr-steel);
+  font-style:italic; margin-top:6px;
+  animation:bennyMsgFade 0.4s ease;
+}
+@keyframes bennyMsgFade {
+  from { opacity:0; } to { opacity:1; }
+}
+
 /* NLP Results container */
 .topics-nlp-results {
   animation:nlpFadeIn 0.35s cubic-bezier(0.2,0,0.2,1);
@@ -1757,8 +1802,8 @@ body {
     <div class="topics-h">Personalize<br>your briefing</div>
     <div class="topics-sub">Choose topics you care about. We'll tailor your daily stories to match.</div>
     <div class="topics-search" id="topicsSearch">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="topicsSearchInput" placeholder="Ask Newsreel anything..." oninput="handleNLPSearch(this.value)">
+      <div style="width:22px;height:22px;border-radius:50%;background:var(--nr-red);display:flex;align-items:center;justify-content:center;font-family:var(--font-headline);font-size:12px;color:var(--nr-white);flex-shrink:0;">n</div>
+      <input type="text" id="topicsSearchInput" placeholder="Ask Benny anything..." oninput="handleNLPSearch(this.value)">
       <button class="topics-search-clear" id="topicsSearchClear" onclick="clearNLPSearch()" style="display:none">✕</button>
     </div>
     <div class="topics-nlp-results" id="topicsNLPResults" style="display:none"></div>
@@ -2257,17 +2302,52 @@ const NLP_RESPONSES = {
   },
   'trump': {
     keywords: ['trump', 'president', 'white house', 'administration'],
-    greeting: "He's all over today's news 🇺🇸",
+    greeting: "He's everywhere today 🇺🇸",
     context: "Trump's in two big stories today — threatening to block a Canadian bridge unless the U.S. gets half, and alluding to \"war\" after strikes on Iran.",
     storyIdx: null,
     relatedTopics: ['Politics', 'Breaking']
   }
 };
 
+// Benny Byline's loading messages — rotates while "thinking"
+const BENNY_LOADING_MSGS = [
+  "Scanning today's briefing…",
+  "Checking the wire…",
+  "Reading up on that…",
+  "Digging through the stories…",
+  "One sec, pulling this together…",
+];
+
 let nlpDebounce = null;
+let bennyLoadingInterval = null;
+
+function showBennyLoading(results, grid) {
+  grid.classList.add('search-active');
+  results.style.display = 'block';
+
+  var msg = BENNY_LOADING_MSGS[Math.floor(Math.random() * BENNY_LOADING_MSGS.length)];
+  results.innerHTML = '<div class="nlp-loading">' +
+    '<div class="nlp-loading-avatar">n</div>' +
+    '<div class="nlp-loading-content">' +
+    '<div class="nlp-loading-name">Benny Byline</div>' +
+    '<div class="nlp-loading-dots"><span></span><span></span><span></span></div>' +
+    '<div class="nlp-loading-msg" id="bennyLoadMsg">' + msg + '</div>' +
+    '</div>' +
+    '</div>';
+
+  // Rotate loading messages
+  var msgIdx = 0;
+  clearInterval(bennyLoadingInterval);
+  bennyLoadingInterval = setInterval(function() {
+    msgIdx = (msgIdx + 1) % BENNY_LOADING_MSGS.length;
+    var el = document.getElementById('bennyLoadMsg');
+    if (el) el.textContent = BENNY_LOADING_MSGS[msgIdx];
+  }, 1200);
+}
 
 function handleNLPSearch(query) {
   clearTimeout(nlpDebounce);
+  clearInterval(bennyLoadingInterval);
   const clear = document.getElementById('topicsSearchClear');
   const results = document.getElementById('topicsNLPResults');
   const grid = document.getElementById('topicsGrid');
@@ -2281,7 +2361,14 @@ function handleNLPSearch(query) {
 
   clear.style.display = 'block';
 
+  // Show Benny loading immediately
+  showBennyLoading(results, grid);
+
+  // Simulate Benny "thinking" — 800-1200ms delay
+  var thinkTime = 800 + Math.floor(Math.random() * 400);
+
   nlpDebounce = setTimeout(function() {
+    clearInterval(bennyLoadingInterval);
     const q = query.toLowerCase().trim();
 
     // 1) Check hardcoded smart responses first
@@ -2298,13 +2385,13 @@ function handleNLPSearch(query) {
     var html = '';
 
     if (matched) {
-      // Chat bubble response — feels like talking to Newsreel
+      // Benny Byline chat response
       html += '<div class="nlp-chat">';
       html += '<div class="nlp-avatar">n</div>';
       html += '<div class="nlp-bubble">';
-      html += '<div class="nlp-bubble-greeting">' + (matched.greeting || 'Here\'s what we found') + '</div>';
+      html += '<div class="nlp-bubble-greeting">' + (matched.greeting || 'Here\'s what I found') + '</div>';
       html += '<div class="nlp-bubble-text">' + matched.context + '</div>';
-      html += '<div class="nlp-bubble-source">— newsreel editors, today</div>';
+      html += '<div class="nlp-bubble-source">— Benny Byline, today</div>';
       html += '</div>';
       html += '</div>';
 
@@ -2316,7 +2403,7 @@ function handleNLPSearch(query) {
         matchedIdxs.forEach(function(idx) { html += renderNLPCard(idx); });
       }
 
-      // "More on this" suggestions
+      // "Keep reading" suggestions
       if (matched.relatedTopics && matched.relatedTopics.length) {
         html += '<div class="nlp-more">';
         html += '<span class="nlp-more-label">Keep reading →</span>';
@@ -2326,24 +2413,24 @@ function handleNLPSearch(query) {
         html += '</div>';
       }
     } else {
-      // Keyword fallback — match against story data
+      // Keyword fallback
       var fallbackIdxs = keywordMatchStories(q);
       if (fallbackIdxs.length > 0) {
-        // Light chat intro for fallback
         html += '<div class="nlp-chat">';
         html += '<div class="nlp-avatar">n</div>';
         html += '<div class="nlp-bubble">';
         html += '<div class="nlp-bubble-greeting">Found something 👇</div>';
-        html += '<div class="nlp-bubble-text">Here are stories that match your search.</div>';
+        html += '<div class="nlp-bubble-text">Here\'s what I pulled up for you.</div>';
+        html += '<div class="nlp-bubble-source">— Benny Byline</div>';
         html += '</div>';
         html += '</div>';
         fallbackIdxs.forEach(function(idx) { html += renderNLPCard(idx); });
       } else {
-        // No results — friendly, not cold
+        // No results — Benny is honest
         html += '<div class="nlp-empty">';
         html += '<div class="nlp-empty-face">🤷</div>';
-        html += '<div class="nlp-empty-text">Nothing on that today — try a topic instead?</div>';
-        html += '<div class="nlp-empty-hint">We publish new stories every morning at 5 AM</div>';
+        html += '<div class="nlp-empty-text">Nothing on that today</div>';
+        html += '<div class="nlp-empty-hint">Benny publishes new stories every morning at 5 AM — check back tomorrow</div>';
         html += '</div>';
         grid.classList.remove('search-active');
         results.style.display = 'block';
@@ -2355,7 +2442,7 @@ function handleNLPSearch(query) {
     grid.classList.add('search-active');
     results.style.display = 'block';
     results.innerHTML = html;
-  }, 250);
+  }, thinkTime);
 }
 
 function renderNLPCard(idx) {
@@ -2386,6 +2473,8 @@ function keywordMatchStories(q) {
 }
 
 function clearNLPSearch() {
+  clearTimeout(nlpDebounce);
+  clearInterval(bennyLoadingInterval);
   var input = document.getElementById('topicsSearchInput');
   input.value = '';
   document.getElementById('topicsSearchClear').style.display = 'none';
