@@ -883,16 +883,40 @@ body {
 .wire-title { font-family:var(--font-headline); font-size:28px; color:var(--nr-white); }
 .wire-subtitle { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--nr-steel); margin-top:2px; }
 
-/* Stories strip — IG-style rings */
-.wire-stories { display:flex; gap:14px; padding:16px 20px 12px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-.wire-stories::-webkit-scrollbar { display:none; }
-.wire-story-card { display:flex; flex-direction:column; align-items:center; gap:6px; min-width:64px; cursor:pointer; }
-.wire-story-ring { width:60px; height:60px; border-radius:50%; padding:3px; background:linear-gradient(135deg, #FF6343, #FF8C6B, #EDBD1F); transition:all 0.3s; }
-.wire-story-ring.seen { background:#333; }
-.wire-story-av { width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:var(--nr-white); border:2.5px solid var(--nr-black); overflow:hidden; }
-.wire-story-av svg { width:100%; height:100%; }
-.wire-story-nm { font-size:11px; color:var(--nr-silver); font-weight:500; max-width:64px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.wire-story-card:active .wire-story-ring { transform:scale(0.92); }
+/* Section labels */
+.wire-section-label { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--nr-steel); padding:12px 20px 4px; }
+
+/* Friend circle strip — YOUR CIRCLE */
+.wire-friends { display:flex; gap:14px; padding:10px 20px 14px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.wire-friends::-webkit-scrollbar { display:none; }
+.wire-friend-card { display:flex; flex-direction:column; align-items:center; gap:5px; min-width:60px; cursor:pointer; }
+.wire-friend-ring { width:56px; height:56px; border-radius:50%; padding:2.5px; background:#333; transition:all 0.3s; }
+.wire-friend-ring.done { background:var(--nr-green); }
+.wire-friend-ring.progress { background:var(--nr-red); }
+.wire-friend-ring.idle { background:#333; }
+.wire-friend-ring.seen { opacity:0.5; }
+.wire-friend-av { width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:var(--nr-white); border:2.5px solid var(--nr-black); }
+.wire-friend-nm { font-size:10px; color:var(--nr-silver); font-weight:500; max-width:60px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.wire-friend-status { font-size:9px; color:var(--nr-ash); font-family:var(--font-mono); }
+.wire-friend-card:active .wire-friend-ring { transform:scale(0.92); }
+.wire-add-card { display:flex; flex-direction:column; align-items:center; gap:5px; min-width:60px; cursor:pointer; }
+.wire-add-ring { width:56px; height:56px; border-radius:50%; border:2px dashed rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:22px; color:rgba(255,255,255,0.3); transition:all 0.2s; }
+.wire-add-ring:active { border-color:rgba(255,255,255,0.3); transform:scale(0.92); }
+.wire-add-nm { font-size:10px; color:var(--nr-ash); font-weight:500; }
+
+/* Friend stories content (activity cards) */
+.stories-activity-icon { font-size:48px; margin-bottom:16px; }
+.stories-activity-label { font-size:16px; color:var(--nr-silver); margin-bottom:20px; }
+.stories-activity-label strong { color:var(--nr-white); }
+.stories-activity-card { background:var(--nr-lead); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:12px; display:flex; gap:12px; width:100%; max-width:300px; text-align:left; margin-bottom:12px; }
+.stories-activity-card img { width:56px; height:56px; border-radius:6px; object-fit:cover; flex-shrink:0; }
+.stories-activity-card-info { flex:1; min-width:0; }
+.stories-activity-card-title { font-size:14px; font-weight:600; color:var(--nr-white); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.stories-activity-card-sub { font-size:12px; color:var(--nr-ash); margin-top:3px; }
+.stories-nudge-msg { font-size:16px; color:var(--nr-silver); margin-bottom:20px; text-align:center; }
+.stories-nudge-btn { padding:12px 28px; background:var(--nr-red); border:none; border-radius:var(--radius); font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--nr-white); text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; transition:all 0.15s; }
+.stories-nudge-btn:active { transform:scale(0.96); opacity:0.9; }
+.stories-nudge-btn.sent { background:var(--nr-green); pointer-events:none; }
 
 /* Wire divider */
 .wire-divider { height:1px; background:rgba(255,255,255,0.06); margin:0 20px; }
@@ -953,17 +977,11 @@ body {
 .wire-action.liked svg { color:var(--nr-red); fill:var(--nr-red); }
 .wire-action.liked .wire-action-count { color:var(--nr-red); }
 
-/* Reader activity section */
-.wire-readers-header { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--nr-steel); padding:20px 20px 8px; }
-.wire-reader-item { display:flex; align-items:center; gap:10px; padding:10px 20px; }
-.wire-reader-av { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:var(--nr-white); flex-shrink:0; }
-.wire-reader-text { font-size:13px; color:var(--nr-silver); line-height:1.4; }
-.wire-reader-text strong { color:var(--nr-white); font-weight:600; }
-.wire-reader-time { font-size:11px; color:var(--nr-steel); margin-left:auto; flex-shrink:0; }
+/* (Readers section removed — friends now handle this via circles) */
 
 /* ─── Stories Overlay (Instagram-style) ─── */
-.stories-overlay { display:none; position:fixed; inset:0; z-index:3500; background:var(--nr-black); flex-direction:column; }
-.stories-overlay.on { display:flex; animation:overlayIn 0.25s ease-out forwards; }
+.stories-overlay { display:none; position:fixed; top:0; left:50%; transform:translateX(-50%); width:393px; height:852px; z-index:3500; background:#000000; flex-direction:column; }
+.stories-overlay.on { display:flex; }
 
 /* Progress bars */
 .stories-progress { display:flex; gap:3px; padding:8px 12px 6px; flex-shrink:0; }
@@ -990,7 +1008,7 @@ body {
 .stories-content { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px 32px; position:relative; text-align:center; overflow:hidden; }
 .stories-quote { font-family:var(--font-headline); font-size:22px; color:var(--nr-white); line-height:1.45; letter-spacing:-0.02em; max-width:320px; }
 .stories-quote::before { content:'"'; font-size:48px; color:var(--nr-red); display:block; margin-bottom:8px; line-height:0.5; font-family:Georgia,serif; }
-.stories-attribution { margin-top:20px; }
+.stories-attribution { margin-top:20px; display:flex; flex-direction:column; align-items:center; }
 .stories-attr-handle { font-size:14px; color:var(--nr-red); font-weight:600; }
 .stories-attr-role { font-size:12px; color:var(--nr-ash); margin-top:2px; }
 .stories-read-btn { display:inline-flex; align-items:center; gap:6px; margin-top:24px; padding:10px 20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:var(--radius); font-family:var(--font-mono); font-size:11px; font-weight:600; color:var(--nr-white); text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; transition:all 0.15s; }
@@ -2694,9 +2712,10 @@ function feedSlide(storyIdx, dir) {
 }
 
 // — THE WIRE —
-function getContributorAv(c) {
-  if (c.isBenny) return '<div class="wire-post-av" style="background:' + c.gradient + '">' + BENNY_SVG + '</div>';
-  return '<div class="wire-post-av" style="background:' + c.gradient + '">' + c.avatar + '</div>';
+function getContributorAv(c, cIdx) {
+  var click = typeof cIdx === 'number' ? ' onclick="openStory(' + cIdx + ')"' : '';
+  if (c.isBenny) return '<div class="wire-post-av" style="background:' + c.gradient + '; cursor:pointer"' + click + '>' + BENNY_SVG + '</div>';
+  return '<div class="wire-post-av" style="background:' + c.gradient + '; cursor:pointer"' + click + '>' + c.avatar + '</div>';
 }
 
 function getStoryAv(c) {
@@ -2709,13 +2728,18 @@ function renderWire() {
   const chatSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>';
   const shareSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>';
 
-  // Stories strip
-  var storiesHTML = '<div class="wire-stories">' + CONTRIBUTORS.map(function(c, i) {
-    var seenClass = storiesSeen[i] ? ' seen' : '';
-    return '<div class="wire-story-card" onclick="openStory(' + i + ')">' +
-      '<div class="wire-story-ring' + seenClass + '">' + getStoryAv(c) + '</div>' +
-      '<div class="wire-story-nm">' + c.name.split(' ')[0] + '</div></div>';
-  }).join('') + '</div>';
+  // YOUR CIRCLE — friend circles with status rings
+  var friendsHTML = '<div class="wire-section-label">Your Circle</div>' +
+    '<div class="wire-friends">' + WIRE_FRIENDS.map(function(f, i) {
+      var seenClass = friendStoriesSeen[i] ? ' seen' : '';
+      var statusLabel = f.status === 'done' ? '✓ done' : f.status === 'progress' ? 'reading' : 'idle';
+      return '<div class="wire-friend-card" onclick="openFriendStory(' + i + ')">' +
+        '<div class="wire-friend-ring ' + f.status + seenClass + '"><div class="wire-friend-av" style="background:' + f.bg + '">' + f.av + '</div></div>' +
+        '<div class="wire-friend-nm">' + f.name.split(' ')[0] + '</div>' +
+        '<div class="wire-friend-status">' + statusLabel + '</div></div>';
+    }).join('') +
+    '<div class="wire-add-card"><div class="wire-add-ring">+</div><div class="wire-add-nm">Add</div></div>' +
+    '</div>';
 
   const playSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
 
@@ -2758,7 +2782,7 @@ function renderWire() {
     // type === 'text' has no media block
 
     return '<div class="wire-post">' +
-      '<div class="wire-post-header">' + getContributorAv(c) +
+      '<div class="wire-post-header">' + getContributorAv(c, p.contributor) +
       '<div class="wire-post-meta">' +
         '<div class="wire-post-name">' + c.name + ' <span class="wire-post-handle">' + c.handle + '</span> <span class="wire-post-time">· ' + p.time + '</span></div>' +
         '<div class="wire-post-role">' + c.role + '</div>' +
@@ -2772,22 +2796,12 @@ function renderWire() {
       '</div></div>';
   }).join('');
 
-  // Reader activity (subtle)
-  var readersHTML = '<div class="wire-readers-header">Readers</div>';
-  readersHTML += READER_ACTIVITY.map(function(r) {
-    return '<div class="wire-reader-item">' +
-      '<div class="wire-reader-av" style="background:' + r.bg + '">' + r.av + '</div>' +
-      '<div class="wire-reader-text"><strong>' + r.name + '</strong> ' + r.text + '</div>' +
-      '<span class="wire-reader-time">' + r.time + '</span></div>';
-  }).join('');
-
   document.getElementById('activityScr').innerHTML =
-    '<div class="wire-head"><div><div class="wire-title">The Wire</div><div class="wire-subtitle">From the newsroom</div></div></div>' +
-    storiesHTML +
+    '<div class="wire-head"><div><div class="wire-title">The Wire</div></div></div>' +
+    friendsHTML +
     '<div class="wire-divider"></div>' +
+    '<div class="wire-section-label">From the Newsroom</div>' +
     postsHTML +
-    '<div class="wire-divider" style="margin-top:8px"></div>' +
-    readersHTML +
     '<div style="height:90px"></div>'; // bottom spacing for nav
 }
 
@@ -2818,9 +2832,11 @@ function clearActivityUnseen() {
 }
 
 /* ═══════════════════════════════════════════════
-   STORIES — Instagram-style overlay
+   STORIES — Instagram-style overlay (dual mode)
+   Supports both 'friend' and 'contributor' modes
    ═══════════════════════════════════════════════ */
-let storyCurrentContributor = 0;
+let storyMode = 'contributor'; // 'friend' or 'contributor'
+let storyCurrentIdx = 0;       // index into WIRE_FRIENDS or CONTRIBUTORS
 let storyCurrentSlide = 0;
 let storyTimer = null;
 
@@ -2828,38 +2844,84 @@ function getContributorPosts(cIdx) {
   return WIRE_POSTS.filter(function(p) { return p.contributor === cIdx; });
 }
 
+/* ─── Get slides for current story subject ─── */
+function getStorySlides() {
+  if (storyMode === 'friend') {
+    return WIRE_FRIENDS[storyCurrentIdx].stories || [];
+  } else {
+    return getContributorPosts(storyCurrentIdx);
+  }
+}
+
+/* ─── Open contributor story (from avatar tap in feed) ─── */
 function openStory(cIdx) {
-  storyCurrentContributor = cIdx;
+  storyMode = 'contributor';
+  storyCurrentIdx = cIdx;
   storyCurrentSlide = 0;
   var overlay = document.getElementById('storiesOverlay');
   overlay.classList.add('on');
   renderStorySlide();
 }
 
+/* ─── Open friend story (from circle tap) ─── */
+function openFriendStory(fIdx) {
+  storyMode = 'friend';
+  storyCurrentIdx = fIdx;
+  storyCurrentSlide = 0;
+  var overlay = document.getElementById('storiesOverlay');
+  overlay.classList.add('on');
+  renderStorySlide();
+}
+
+/* ─── Close overlay ─── */
 function closeStory() {
   var overlay = document.getElementById('storiesOverlay');
   overlay.classList.remove('on');
-  clearInterval(storyTimer);
+  clearTimeout(storyTimer);
   storyTimer = null;
-  // Mark this contributor as seen
-  storiesSeen[storyCurrentContributor] = true;
-  // Re-render wire to update ring colors
+  // Mark as seen
+  if (storyMode === 'friend') {
+    friendStoriesSeen[storyCurrentIdx] = true;
+  } else {
+    contributorStoriesSeen[storyCurrentIdx] = true;
+  }
   renderWire();
 }
 
+/* ─── Render current slide ─── */
 function renderStorySlide() {
-  var c = CONTRIBUTORS[storyCurrentContributor];
-  var posts = getContributorPosts(storyCurrentContributor);
-  if (!posts.length) { closeStory(); return; }
-  var post = posts[storyCurrentSlide];
-  var story = (post.storyIdx !== null && post.storyIdx !== undefined) ? STORIES[post.storyIdx] : null;
+  var slides = getStorySlides();
+
+  // Handle idle friend (no stories)
+  if (storyMode === 'friend' && slides.length === 0) {
+    renderIdleFriendSlide();
+    return;
+  }
+
+  if (!slides.length) { closeStory(); return; }
 
   // Progress bars
-  var progHTML = posts.map(function(p, i) {
+  var progHTML = slides.map(function(s, i) {
     var cls = i < storyCurrentSlide ? 'done' : (i === storyCurrentSlide ? 'active' : '');
     return '<div class="stories-bar ' + cls + '"><div class="stories-bar-fill"></div></div>';
   }).join('');
   document.getElementById('storiesProgress').innerHTML = progHTML;
+
+  if (storyMode === 'friend') {
+    renderFriendSlide(slides[storyCurrentSlide]);
+  } else {
+    renderContributorSlide(slides[storyCurrentSlide]);
+  }
+
+  // Auto-advance timer
+  clearTimeout(storyTimer);
+  storyTimer = setTimeout(function() { storyNext(); }, 5000);
+}
+
+/* ─── Render a CONTRIBUTOR slide (existing behavior: quote text) ─── */
+function renderContributorSlide(post) {
+  var c = CONTRIBUTORS[storyCurrentIdx];
+  var story = (post.storyIdx !== null && post.storyIdx !== undefined) ? STORIES[post.storyIdx] : null;
 
   // Header
   var avHTML = c.isBenny ? BENNY_SVG : c.avatar;
@@ -2869,45 +2931,187 @@ function renderStorySlide() {
     '<span class="stories-header-time">' + post.time + '</span>' +
     '<button class="stories-close" onclick="closeStory()">✕</button>';
 
-  // Content
-  document.getElementById('storiesQuote').textContent = post.text;
-  document.getElementById('storiesAttr').innerHTML =
+  // Content — quote style
+  var quoteEl = document.getElementById('storiesQuote');
+  quoteEl.textContent = post.text;
+  quoteEl.style.display = '';
+
+  var attrEl = document.getElementById('storiesAttr');
+  attrEl.innerHTML =
     '<div class="stories-attr-handle">' + c.handle + '</div>' +
     '<div class="stories-attr-role">' + c.role + '</div>';
+  attrEl.style.display = '';
 
   // Read button
   var readBtn = document.getElementById('storiesReadBtn');
   if (story) {
     readBtn.style.display = 'inline-flex';
+    readBtn.textContent = '📰 Read the story';
   } else {
     readBtn.style.display = 'none';
   }
 
-  // Reply placeholder
+  // Reply
   document.getElementById('storiesReplyInput').placeholder = 'Reply to ' + c.handle + '…';
-
-  // Auto-advance timer
-  clearInterval(storyTimer);
-  storyTimer = setTimeout(function() {
-    storyNext();
-  }, 5000);
 }
 
+/* ─── Render a FRIEND activity slide ─── */
+function renderFriendSlide(activity) {
+  var f = WIRE_FRIENDS[storyCurrentIdx];
+  var story = (activity.storyIdx !== null && activity.storyIdx !== undefined) ? STORIES[activity.storyIdx] : null;
+
+  // Header — friend avatar + name + time
+  document.getElementById('storiesHeader').innerHTML =
+    '<div class="stories-header-av" style="background:' + f.bg + '">' + f.av + '</div>' +
+    '<div><div class="stories-header-name">' + f.name + '</div></div>' +
+    '<span class="stories-header-time">' + activity.time + '</span>' +
+    '<button class="stories-close" onclick="closeStory()">✕</button>';
+
+  // Content — activity cards
+  var icon = '📖';
+  var label = '';
+  var cardHTML = '';
+  var firstName = f.name.split(' ')[0];
+
+  if (activity.type === 'read') {
+    icon = '📖';
+    label = firstName + ' finished reading';
+    if (story) {
+      cardHTML = '<div class="stories-activity-card">' +
+        '<img src="' + story.image + '" alt="">' +
+        '<div class="stories-activity-card-info">' +
+        '<div class="stories-activity-card-title">' + story.headline + '</div>' +
+        '<div class="stories-activity-card-sub">' + story.readTime + '</div>' +
+        '</div></div>';
+    }
+  } else if (activity.type === 'quiz') {
+    icon = '🧠';
+    var d = activity.detail;
+    label = firstName + ' scored ' + d.score + '/' + d.total + ' on the quiz';
+    if (story) {
+      cardHTML = '<div class="stories-activity-card">' +
+        '<img src="' + story.image + '" alt="">' +
+        '<div class="stories-activity-card-info">' +
+        '<div class="stories-activity-card-title">' + story.headline + '</div>' +
+        '<div class="stories-activity-card-sub">Quiz · ' + d.score + '/' + d.total + ' correct</div>' +
+        '</div></div>';
+    }
+  } else if (activity.type === 'poll') {
+    icon = '📊';
+    var stance = activity.detail.stance;
+    label = firstName + ' voted "' + stance + '"';
+    if (story) {
+      cardHTML = '<div class="stories-activity-card">' +
+        '<img src="' + story.image + '" alt="">' +
+        '<div class="stories-activity-card-info">' +
+        '<div class="stories-activity-card-title">' + story.headline + '</div>' +
+        '<div class="stories-activity-card-sub">Poll · Voted "' + stance + '"</div>' +
+        '</div></div>';
+    }
+  } else if (activity.type === 'streak') {
+    icon = '🔥';
+    label = firstName + ' hit a ' + activity.detail.days + '-day streak';
+  } else if (activity.type === 'joined') {
+    icon = '🎉';
+    label = firstName + ' joined Newsreel';
+  }
+
+  // Build content area
+  var quoteEl = document.getElementById('storiesQuote');
+  quoteEl.style.display = 'none';
+
+  var attrEl = document.getElementById('storiesAttr');
+  attrEl.innerHTML =
+    '<div class="stories-activity-icon">' + icon + '</div>' +
+    '<div class="stories-activity-label"><strong>' + label + '</strong></div>' +
+    cardHTML;
+  attrEl.style.display = '';
+
+  // Read button for story-related activities
+  var readBtn = document.getElementById('storiesReadBtn');
+  if (story && (activity.type === 'read' || activity.type === 'quiz' || activity.type === 'poll')) {
+    readBtn.style.display = 'inline-flex';
+    readBtn.textContent = '📰 Read the story';
+  } else {
+    readBtn.style.display = 'none';
+  }
+
+  // Reply
+  document.getElementById('storiesReplyInput').placeholder = 'Reply to ' + firstName + '…';
+}
+
+/* ─── Idle friend: no stories, show nudge ─── */
+function renderIdleFriendSlide() {
+  var f = WIRE_FRIENDS[storyCurrentIdx];
+  var firstName = f.name.split(' ')[0];
+
+  // Single progress bar (no slides)
+  document.getElementById('storiesProgress').innerHTML =
+    '<div class="stories-bar active"><div class="stories-bar-fill"></div></div>';
+
+  // Header
+  document.getElementById('storiesHeader').innerHTML =
+    '<div class="stories-header-av" style="background:' + f.bg + '">' + f.av + '</div>' +
+    '<div><div class="stories-header-name">' + f.name + '</div></div>' +
+    '<span class="stories-header-time">today</span>' +
+    '<button class="stories-close" onclick="closeStory()">✕</button>';
+
+  // Content — nudge message
+  var quoteEl = document.getElementById('storiesQuote');
+  quoteEl.style.display = 'none';
+
+  var attrEl = document.getElementById('storiesAttr');
+  attrEl.innerHTML =
+    '<div class="stories-activity-icon">😴</div>' +
+    '<div class="stories-nudge-msg">' + firstName + ' hasn\'t started today\'s briefing yet</div>' +
+    '<button class="stories-nudge-btn" onclick="sendNudge(this, ' + storyCurrentIdx + ')">Send Nudge</button>';
+  attrEl.style.display = '';
+
+  // Hide read button
+  document.getElementById('storiesReadBtn').style.display = 'none';
+
+  // Reply
+  document.getElementById('storiesReplyInput').placeholder = 'Reply to ' + firstName + '…';
+
+  // Auto-close after longer timeout
+  clearTimeout(storyTimer);
+  storyTimer = setTimeout(function() { closeStory(); }, 8000);
+}
+
+/* ─── Nudge button interaction ─── */
+function sendNudge(btn, friendIdx) {
+  btn.textContent = 'Nudged ✓';
+  btn.classList.add('sent');
+}
+
+/* ─── Navigate slides ─── */
 function storyNext() {
-  var posts = getContributorPosts(storyCurrentContributor);
-  if (storyCurrentSlide < posts.length - 1) {
+  var slides = getStorySlides();
+  if (storyCurrentSlide < slides.length - 1) {
     storyCurrentSlide++;
     renderStorySlide();
   } else {
-    // Move to next contributor
-    storiesSeen[storyCurrentContributor] = true;
-    var nextC = storyCurrentContributor + 1;
-    if (nextC < CONTRIBUTORS.length) {
-      storyCurrentContributor = nextC;
-      storyCurrentSlide = 0;
-      renderStorySlide();
+    // Move to next person in the same mode
+    if (storyMode === 'friend') {
+      friendStoriesSeen[storyCurrentIdx] = true;
+      var nextF = storyCurrentIdx + 1;
+      if (nextF < WIRE_FRIENDS.length) {
+        storyCurrentIdx = nextF;
+        storyCurrentSlide = 0;
+        renderStorySlide();
+      } else {
+        closeStory();
+      }
     } else {
-      closeStory();
+      contributorStoriesSeen[storyCurrentIdx] = true;
+      var nextC = storyCurrentIdx + 1;
+      if (nextC < CONTRIBUTORS.length) {
+        storyCurrentIdx = nextC;
+        storyCurrentSlide = 0;
+        renderStorySlide();
+      } else {
+        closeStory();
+      }
     }
   }
 }
@@ -2920,16 +3124,27 @@ function storyPrev() {
 }
 
 function storyReadArticle() {
-  var posts = getContributorPosts(storyCurrentContributor);
-  var post = posts[storyCurrentSlide];
-  if (post && post.storyIdx !== null && post.storyIdx !== undefined) {
+  var storyIdx = null;
+  if (storyMode === 'friend') {
+    var slides = getStorySlides();
+    var activity = slides[storyCurrentSlide];
+    if (activity && activity.storyIdx !== null && activity.storyIdx !== undefined) {
+      storyIdx = activity.storyIdx;
+    }
+  } else {
+    var posts = getContributorPosts(storyCurrentIdx);
+    var post = posts[storyCurrentSlide];
+    if (post && post.storyIdx !== null && post.storyIdx !== undefined) {
+      storyIdx = post.storyIdx;
+    }
+  }
+  if (storyIdx !== null) {
     closeStory();
-    // Switch to today tab first
     document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('on'); });
     document.getElementById('s-today').classList.add('on');
     document.querySelectorAll('.navbtn').forEach(function(b) { b.classList.remove('on'); });
     document.querySelector('.navbtn[data-tab="today"]').classList.add('on');
-    setTimeout(function() { openCarousel(post.storyIdx); }, 300);
+    setTimeout(function() { openCarousel(storyIdx); }, 300);
   }
 }
 
@@ -3620,14 +3835,28 @@ const WIRE_POSTS = [
   { type:'link', contributor:1, text:"For anyone wanting deeper context on U.S.-Iran history. This is the thread to pull.", time:'7h', link:{ url:'foreignaffairs.com', domain:'foreignaffairs.com', title:'The Long Road to Confrontation: How U.S.-Iran Relations Reached a Breaking Point', image:'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&h=300&fit=crop' }, likes:71, replies:9 },
 ];
 
-const READER_ACTIVITY = [
-  { name:'Alex', av:'A', bg:'linear-gradient(135deg,var(--nr-teal),var(--nr-purple))', text:'finished today\'s briefing', time:'1h' },
-  { name:'Sarah', av:'S', bg:'linear-gradient(135deg,#FF6B9D,var(--nr-purple))', text:'hit a 7-day streak 🔥', time:'3h' },
-  { name:'Maya', av:'M', bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))', text:'scored 3/3 on the quiz', time:'5h' },
-  { name:'Riley', av:'R', bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))', text:'just joined Newsreel 👋', time:'8h' },
+const WIRE_FRIENDS = [
+  { name:'Alex Chen', av:'A', bg:'linear-gradient(135deg,var(--nr-teal),var(--nr-purple))', status:'done', stories:[
+    { type:'read', storyIdx:0, time:'1h ago' },
+    { type:'read', storyIdx:1, time:'1h ago' },
+    { type:'quiz', storyIdx:1, detail:{score:3,total:3}, time:'1h ago' },
+  ]},
+  { name:'Sarah M.', av:'S', bg:'linear-gradient(135deg,#FF6B9D,var(--nr-purple))', status:'done', stories:[
+    { type:'read', storyIdx:0, time:'2h ago' },
+    { type:'streak', detail:{days:7}, time:'3h ago' },
+  ]},
+  { name:'Kai', av:'K', bg:'linear-gradient(135deg,var(--nr-blue,#4A90D9),var(--nr-teal))', status:'idle', stories:[] },
+  { name:'Maya R.', av:'M', bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))', status:'progress', stories:[
+    { type:'read', storyIdx:2, time:'4h ago' },
+    { type:'poll', storyIdx:2, detail:{stance:'Agree'}, time:'4h ago' },
+  ]},
+  { name:'Riley', av:'R', bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))', status:'done', stories:[
+    { type:'joined', time:'8h ago' },
+  ]},
 ];
 
-let storiesSeen = {};  // track which contributor stories have been viewed
+let friendStoriesSeen = {};  // track which friend stories have been viewed
+let contributorStoriesSeen = {};  // track which contributor stories have been viewed
 
 function openBriefing() {
   const el = document.getElementById('briefingOverlay');
