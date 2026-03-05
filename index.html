@@ -332,18 +332,46 @@ body {
 }
 .car-abtn { width:40px; height:40px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; }
 .car-abtn svg { width:22px; height:22px; color:var(--nr-white); }
-.car-abtn-source {
-  width:auto; height:auto; gap:5px; padding:8px 14px 8px 11px;
-  background:rgba(255,99,67,0.15); border:1px solid rgba(255,99,67,0.3);
-  border-radius:100px; transition:background 0.15s ease;
+/* ═══════════════════════════════════════════════
+   QUIZ OVERLAY
+   ═══════════════════════════════════════════════ */
+.quiz-overlay {
+  position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
+  background:var(--nr-black); z-index:3000; display:none; flex-direction:column;
+  align-items:center; justify-content:center; padding:40px 24px;
+  opacity:0;
 }
-.car-abtn-source:hover { background:rgba(255,99,67,0.25); }
-.car-abtn-source:active { transform:scale(0.95); }
-.car-abtn-source svg { width:16px; height:16px; color:var(--nr-red); }
-.car-abtn-source span {
-  font-family:var(--font-mono); font-size:11px; font-weight:500;
-  color:var(--nr-red); text-transform:uppercase; letter-spacing:0.5px;
+.quiz-overlay.on { display:flex; animation:overlayIn 0.3s cubic-bezier(0.2,0,0.2,1) forwards; }
+.quiz-x { position:absolute; top:56px; right:20px; background:none; border:none; color:var(--nr-white); font-size:26px; cursor:pointer; }
+.quiz-progress { font-family:var(--font-mono); font-size:12px; color:var(--nr-ash); margin-bottom:12px; text-transform:uppercase; letter-spacing:1px; }
+.quiz-q { font-family:var(--font-headline); font-size:24px; color:var(--nr-white); text-align:center; line-height:1.3; margin-bottom:32px; max-width:330px; }
+.quiz-options { width:100%; display:flex; flex-direction:column; gap:12px; }
+.quiz-opt {
+  width:100%; padding:16px 18px; background:var(--nr-lead); border:1.5px solid var(--nr-iron);
+  border-radius:var(--radius); font-family:var(--font-body); font-size:15px; color:var(--nr-white);
+  text-align:left; cursor:pointer; transition:all 0.2s ease; position:relative; overflow:hidden;
 }
+.quiz-opt:active { transform:scale(0.98); }
+.quiz-opt.correct { border-color:var(--nr-green); background:rgba(26,173,23,0.15); }
+.quiz-opt.wrong { border-color:var(--nr-red); background:rgba(255,99,67,0.15); }
+.quiz-opt.dimmed { opacity:0.4; pointer-events:none; }
+.quiz-explain {
+  margin-top:24px; padding:16px; background:var(--nr-lead); border-radius:var(--radius);
+  font-size:13px; color:var(--nr-smoke); line-height:1.5; text-align:center;
+  display:none;
+}
+.quiz-explain.show { display:block; animation:overlayIn 0.3s ease forwards; }
+.quiz-next {
+  margin-top:20px; padding:12px 32px; background:var(--nr-red); border:none; border-radius:100px;
+  font-family:var(--font-mono); font-size:13px; font-weight:500; color:var(--nr-white);
+  text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; display:none;
+}
+.quiz-next.show { display:block; animation:overlayIn 0.2s ease forwards; }
+.quiz-next:active { transform:scale(0.95); }
+.quiz-score { text-align:center; }
+.quiz-score-num { font-family:var(--font-headline); font-size:64px; color:var(--nr-red); }
+.quiz-score-label { font-size:15px; color:var(--nr-smoke); margin-top:4px; }
+.quiz-score-msg { font-family:var(--font-headline); font-size:22px; color:var(--nr-white); margin-top:20px; }
 .car-journalist {
   position:absolute; bottom:40px; left:16px;
   display:flex; align-items:center; gap:10px;
@@ -504,141 +532,64 @@ body {
 /* ═══════════════════════════════════════════════
    XP REWARD — Ring-centric, Duolingo-inspired
    ═══════════════════════════════════════════════ */
-.xp {
-  position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
-  background:var(--nr-black); z-index:3000; display:none; flex-direction:column;
-  align-items:center; justify-content:center; padding:0 32px;
-  opacity:0;
-}
-.xp.on { display:flex; animation:xpFadeIn 0.25s cubic-bezier(0.2,0,0.2,1) forwards; }
-@keyframes xpFadeIn { from { opacity:0; } to { opacity:1; } }
-@keyframes xpPop { from { opacity:0; transform:scale(0.5); } 60% { transform:scale(1.1); } to { opacity:1; transform:scale(1); } }
-@keyframes xpSlideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-
-/* Progress ring — the hero element */
-.xp-ring-wrap {
-  width:140px; height:140px; position:relative; margin-bottom:20px;
-  animation:xpPop 0.6s cubic-bezier(0.175,0.885,0.32,1.275) 0.1s both;
-}
-.xp-ring-svg { width:100%; height:100%; }
-#xpRingFill { transition:stroke-dasharray 1s cubic-bezier(0.4,0,0.2,1) 0.3s; }
-.xp-ring-inner {
-  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  text-align:center;
-}
-.xp-ring-streak {
-  font-size:36px; line-height:1;
-  animation:xpPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.4s both;
-}
-
-/* XP count */
-.xp-xp-count {
-  font-family:var(--font-headline); font-size:28px; color:var(--nr-red);
-  margin-bottom:4px;
-  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 0.7s both;
-}
-
-/* Context line — specific data, not cheerleading */
-.xp-context {
-  font-family:var(--font-body); font-size:14px; color:var(--nr-ash);
-  margin-bottom:28px;
-  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 0.85s both;
-}
-
-/* Source card area */
-#readMoreArea { width:100%; animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1s both; }
-
-/* Continue button */
-.xp-btn {
-  width:100%; padding:16px; background:var(--nr-red); border:none; border-radius:var(--radius);
-  color:var(--nr-white); font-family:var(--font-mono); font-size:14px; font-weight:500;
-  text-transform:uppercase; letter-spacing:1px; cursor:pointer; margin-top:20px;
-  transition:transform 0.1s ease-out, opacity 0.1s ease-out;
-  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 0.4s both;
-}
-.xp-btn:active { opacity:0.9; transform:scale(0.97); }
-
 /* ═══════════════════════════════════════════════
-   CELEBRATION — Post-article reward animation
+   COMPLETION RING — center → header dock animation
    ═══════════════════════════════════════════════ */
-.celebrate {
+.comp-ring-overlay {
   position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
-  background:var(--nr-black); z-index:3500;
-  display:none; flex-direction:column;
-  align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.85); z-index:3000;
+  display:none; flex-direction:column; align-items:center; justify-content:center;
   opacity:0;
 }
-.celebrate.on { display:flex; opacity:1; animation:xpFadeIn 0.3s ease forwards; }
+.comp-ring-overlay.on {
+  display:flex;
+  animation:compFadeIn 0.3s ease forwards;
+}
+@keyframes compFadeIn { from { opacity:0; } to { opacity:1; } }
 
-/* Big progress ring */
-.cel-ring {
-  width:140px; height:140px; position:relative;
-  margin-bottom:24px;
-  animation:xpPop 0.6s cubic-bezier(0.175,0.885,0.32,1.275) 0.1s both;
+.comp-ring-float {
+  width:120px; height:120px; position:relative;
+  animation:compPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.1s both;
 }
-.cel-ring svg { width:100%; height:100%; }
-.cel-ring-bg { fill:none; stroke:var(--nr-iron); stroke-width:6; }
-.cel-ring-fill {
-  fill:none; stroke:var(--nr-red); stroke-width:6;
-  stroke-linecap:round; transform:rotate(-90deg); transform-origin:center;
-  stroke-dasharray:0 314; /* starts empty, animated via JS */
-  transition:stroke-dasharray 1s cubic-bezier(0.4,0,0.2,1);
+@keyframes compPop {
+  from { opacity:0; transform:scale(0.4); }
+  60% { transform:scale(1.08); }
+  to { opacity:1; transform:scale(1); }
 }
-.cel-ring-check {
+.comp-ring-svg { width:100%; height:100%; }
+#compRingFill { transition:stroke-dasharray 0.8s cubic-bezier(0.4,0,0.2,1) 0.3s; }
+.comp-ring-count {
   position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  font-size:48px; opacity:0;
-  animation:xpPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.7s both;
+  font-family:var(--font-mono); font-size:22px; font-weight:700;
+  color:var(--nr-white); letter-spacing:-0.5px;
 }
-.cel-xp-badge {
-  font-family:var(--font-headline); font-size:32px; color:var(--nr-red);
-  opacity:0; animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 0.9s both;
+.comp-ring-label {
+  font-family:var(--font-mono); font-size:12px; color:var(--nr-steel);
+  text-transform:uppercase; letter-spacing:1px; margin-top:16px;
+  opacity:0;
+  animation:compLabelIn 0.3s ease 0.5s both;
 }
-.cel-msg {
-  font-family:var(--font-headline); font-size:20px; color:var(--nr-white);
-  margin-top:6px; opacity:0;
-  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1.05s both;
-}
-.cel-streak {
-  font-family:var(--font-mono); font-size:14px; color:var(--nr-yellow);
-  margin-top:16px; opacity:0;
-  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1.2s both;
-}
-.cel-sub {
-  font-family:var(--font-body); font-size:13px; color:var(--nr-ash);
-  margin-top:4px; opacity:0;
-  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1.3s both;
-}
-.cel-btn {
-  margin-top:32px; padding:14px 32px; background:var(--nr-red); border:none;
-  border-radius:var(--radius); color:var(--nr-white);
-  font-family:var(--font-mono); font-size:13px; font-weight:600;
-  letter-spacing:0.5px; cursor:pointer; opacity:0;
-  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1.5s both;
-  transition:opacity 0.15s, transform 0.15s;
-}
-.cel-btn:active { opacity:0.85; transform:scale(0.97); }
-.cel-dismiss {
-  margin-top:12px; padding:10px 24px; background:none; border:none;
-  color:var(--nr-ash); font-family:var(--font-body); font-size:14px;
-  cursor:pointer; opacity:0;
-  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1.6s both;
+@keyframes compLabelIn {
+  from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); }
 }
 
-/* Confetti particles */
-.cel-confetti {
-  position:absolute; top:0; left:0; right:0; bottom:0;
-  pointer-events:none; overflow:hidden;
+/* Phase 2: shrink + fly to header */
+.comp-ring-float.dock {
+  animation:compDock 0.6s cubic-bezier(0.4,0,0.2,1) forwards !important;
 }
-.cel-particle {
-  position:absolute; width:8px; height:8px; border-radius:2px;
-  top:50%; left:50%; opacity:0;
-  animation:confettiShoot 1.2s cubic-bezier(0.2,0,0.2,1) forwards;
+@keyframes compDock {
+  0% { transform:scale(1) translate(0, 0); opacity:1; }
+  100% { transform:scale(0.33) translate(430px, -780px); opacity:0.6; }
 }
-@keyframes confettiShoot {
-  0%   { opacity:1; transform:translate(0,0) rotate(0deg) scale(1); }
-  70%  { opacity:1; }
-  100% { opacity:0; transform:translate(var(--cx), var(--cy)) rotate(var(--cr)) scale(0.3); }
+.comp-ring-label.dock {
+  animation:compLabelOut 0.2s ease forwards !important;
 }
+@keyframes compLabelOut { to { opacity:0; transform:translateY(-8px); } }
+.comp-ring-overlay.fade-out {
+  animation:compFadeOut 0.3s ease 0.4s forwards;
+}
+@keyframes compFadeOut { to { opacity:0; } }
 
 /* Header ring animation */
 .today-progress svg circle:last-child {
@@ -780,38 +731,82 @@ body {
 /* ═══════════════════════════════════════════════
    ACTIVITY
    ═══════════════════════════════════════════════ */
-.act-head { display:flex; justify-content:space-between; align-items:center; padding:10px 20px 6px; }
+/* Header */
+.act-head { display:flex; justify-content:space-between; align-items:center; padding:12px 20px 4px; }
 .act-title { font-family:var(--font-headline); font-size:26px; color:var(--nr-white); }
 .act-add { width:32px; height:32px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; }
 .act-add svg { width:22px; height:22px; color:var(--nr-red); }
-.ppl-banner { margin:6px 20px 14px; background:var(--nr-lead); border-radius:var(--radius); padding:12px; }
-.ppl-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-.ppl-hdr-t { font-size:13px; font-weight:500; color:var(--nr-silver); }
-.ppl-hdr-x { background:none; border:none; color:var(--nr-ash); cursor:pointer; font-size:14px; }
-.ppl-scroll { display:flex; gap:12px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-.ppl-scroll::-webkit-scrollbar { display:none; }
-.ppl-card { display:flex; flex-direction:column; align-items:center; gap:4px; min-width:82px; }
-.ppl-av { width:40px; height:40px; border-radius:50%; background:var(--nr-iron); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:600; color:var(--nr-silver); }
-.ppl-nm { font-size:12px; font-weight:500; color:var(--nr-white); text-align:center; }
-.ppl-h { font-size:10px; color:var(--nr-ash); }
-.ppl-add-btn { display:flex; align-items:center; gap:3px; background:var(--nr-red); border:none; border-radius:16px; padding:4px 10px; cursor:pointer; font-family:var(--font-body); font-size:11px; font-weight:500; color:var(--nr-white); }
-.act-item { padding:10px 20px; border-bottom:1px solid rgba(255,255,255,0.04); }
-.act-urow { display:flex; align-items:center; gap:9px; margin-bottom:6px; }
-.act-uav { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:600; color:var(--nr-white); flex-shrink:0; }
-.act-uinfo { flex:1; }
+
+/* Today's Circle — IG Stories-style ring strip */
+.act-circle { display:flex; gap:16px; padding:12px 20px 16px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.act-circle::-webkit-scrollbar { display:none; }
+.act-circle-card { display:flex; flex-direction:column; align-items:center; gap:6px; min-width:56px; }
+.act-circle-av { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:600; color:var(--nr-white); border:3px solid #333; box-shadow:0 0 0 2px rgba(0,0,0,1); transition:border-color 0.3s; }
+.act-circle-av.done { border-color:var(--nr-green); }
+.act-circle-av.progress { border-color:var(--nr-red); }
+.act-circle-nm { font-size:11px; color:var(--nr-silver); font-weight:400; max-width:56px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* Time group headers */
+.act-group-hdr { font-family:var(--font-mono); font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:1px; color:var(--nr-steel); padding:20px 20px 8px; }
+.act-group-hdr:first-of-type { padding-top:4px; }
+
+/* Activity items */
+.act-item { padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.05); }
+.act-item.is-you { border-left:3px solid var(--nr-red); padding-left:17px; }
+.act-item.is-challenge .act-milestone { border:1px solid rgba(255,99,67,0.15); }
+.act-urow { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.act-uav { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:var(--nr-white); flex-shrink:0; }
 .act-unm { font-size:14px; font-weight:600; color:var(--nr-white); }
-.act-uh { font-size:12px; color:var(--nr-ash); }
-.act-time { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--nr-steel); margin-bottom:7px; }
-.act-time svg { width:13px; height:13px; }
-.act-scard { background:var(--nr-lead); border-radius:var(--radius); padding:10px; display:flex; gap:10px; cursor:pointer; }
-.act-sthumb { width:50px; height:50px; border-radius:var(--radius-sm); background:var(--nr-iron); flex-shrink:0; overflow:hidden; }
+.act-time { font-size:14px; font-weight:400; color:var(--nr-steel); margin-left:1px; }
+
+/* Story card inside activity item */
+.act-scard { background:var(--nr-lead); border-radius:var(--radius); padding:10px; display:flex; gap:12px; cursor:pointer; transition:background 0.15s; }
+.act-scard:active { background:var(--nr-iron); }
+.act-sthumb { width:56px; height:56px; border-radius:var(--radius); background:var(--nr-iron); flex-shrink:0; overflow:hidden; }
 .act-sthumb img { width:100%; height:100%; object-fit:cover; }
-.act-sinfo { flex:1; }
-.act-stitle { font-size:13px; font-weight:500; color:var(--nr-white); line-height:1.3; }
-.act-sact { font-size:11px; color:var(--nr-ash); margin-top:3px; }
-.act-reactions { display:flex; gap:18px; margin-top:8px; padding-left:2px; }
-.act-react { width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; }
-.act-react svg { width:17px; height:17px; color:var(--nr-steel); }
+.act-sinfo { flex:1; min-width:0; }
+.act-stitle { font-size:14px; font-weight:500; color:var(--nr-white); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.act-sact { font-size:12px; color:var(--nr-ash); margin-top:4px; }
+
+/* Quiz score blocks — Wordle-style */
+.act-score-blocks { display:flex; gap:3px; margin-top:6px; }
+.act-score-block { width:14px; height:14px; border-radius:3px; }
+.act-score-block.correct { background:var(--nr-green); }
+.act-score-block.wrong { background:var(--nr-red); opacity:0.45; }
+
+/* Milestone banner (streak, challenge, joined) */
+.act-milestone { background:rgba(255,255,255,0.04); border-radius:var(--radius); padding:12px 14px; display:flex; align-items:center; gap:10px; }
+.act-milestone-icon { font-size:20px; flex-shrink:0; }
+.act-milestone-text { font-size:13px; color:var(--nr-silver); line-height:1.4; }
+.act-milestone-text strong { color:var(--nr-yellow); }
+
+/* CTA buttons */
+.act-cta-btn { display:flex; align-items:center; justify-content:center; width:100%; padding:10px 14px; background:var(--nr-red); border:none; border-radius:var(--radius); font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--nr-white); text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; margin-top:10px; transition:all 0.15s; }
+.act-cta-btn:active { transform:scale(0.97); opacity:0.9; }
+.act-cta-btn.secondary { background:rgba(255,255,255,0.07); }
+.act-cta-btn.sent { background:var(--nr-green); pointer-events:none; }
+
+/* Reactions — only on content items */
+.act-reactions { display:flex; gap:16px; margin-top:10px; }
+.act-react { width:24px; height:24px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; transition:transform 0.15s; }
+.act-react:active { transform:scale(1.3); }
+.act-react svg { width:18px; height:18px; color:rgba(255,255,255,0.35); transition:color 0.2s, fill 0.2s; }
+.act-react.liked svg { color:var(--nr-red); fill:var(--nr-red); }
+.act-react.commented svg { color:var(--nr-teal); }
+.act-react.notified svg { color:var(--nr-yellow); fill:var(--nr-yellow); }
+
+/* Nudge — inline style */
+.act-nudge { display:flex; align-items:center; gap:10px; padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.05); }
+.act-nudge-icon { font-size:18px; }
+.act-nudge-text { flex:1; font-size:13px; color:var(--nr-silver); }
+.act-nudge-text strong { color:var(--nr-white); font-weight:600; }
+.act-nudge-btn { background:rgba(255,255,255,0.07); border:none; border-radius:var(--radius); padding:6px 12px; font-family:var(--font-mono); font-size:10px; font-weight:600; color:var(--nr-white); text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; transition:all 0.15s; flex-shrink:0; }
+.act-nudge-btn:active { transform:scale(0.95); }
+.act-nudge-btn.sent { background:var(--nr-green); pointer-events:none; }
+
+/* Nav notification dot */
+.nav-dot { width:8px; height:8px; border-radius:50%; background:var(--nr-red); position:absolute; top:2px; right:12px; display:none; }
+.nav-dot.show { display:block; }
 
 /* ═══════════════════════════════════════════════
    PROFILE
@@ -926,6 +921,356 @@ body {
 .briefing-pill-dot.done { background:var(--nr-green); animation:none; }
 @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
 
+/* ═══════════════════════════════════════════════
+   CAUGHT UP — North Star completion screen
+   ═══════════════════════════════════════════════ */
+
+/* New keyframes */
+@keyframes ringDraw {
+  0%   { stroke-dasharray:0 314; stroke:var(--nr-iron); }
+  60%  { stroke-dasharray:314 0; stroke:var(--nr-red); }
+  80%  { stroke-dasharray:314 0; stroke:var(--nr-green); }
+  100% { stroke-dasharray:314 0; stroke:var(--nr-green); filter:drop-shadow(0 0 8px rgba(26,173,23,0.4)); }
+}
+@keyframes checkDraw {
+  0%   { stroke-dashoffset:60; opacity:0; }
+  30%  { opacity:1; }
+  100% { stroke-dashoffset:0; opacity:1; }
+}
+@keyframes ambientFloat {
+  0%   { transform:translate(0,0) scale(1); }
+  33%  { transform:translate(30px,-20px) scale(1.1); }
+  66%  { transform:translate(-20px,15px) scale(0.95); }
+  100% { transform:translate(0,0) scale(1); }
+}
+@keyframes staggerReveal {
+  0%   { opacity:0; transform:translateY(20px) scale(0.97); filter:blur(4px); }
+  60%  { filter:blur(0); }
+  100% { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+}
+@keyframes glowPulse {
+  0%,100% { filter:drop-shadow(0 0 6px rgba(26,173,23,0.3)); }
+  50%     { filter:drop-shadow(0 0 14px rgba(26,173,23,0.6)); }
+}
+@keyframes cardHoverReady {
+  0%,100% { transform:translateY(0); }
+  50%     { transform:translateY(-2px); }
+}
+@keyframes gradientShift {
+  0%   { background-position:0% 50%; }
+  50%  { background-position:100% 50%; }
+  100% { background-position:200% 50%; }
+}
+
+/* Hide when briefing not complete */
+.caughtup-hidden { display:none !important; }
+
+/* Full snap page */
+.caughtup-page { position:relative; overflow:hidden; background:var(--nr-black); }
+
+/* Ambient background orbs */
+.caughtup-orb {
+  position:absolute; border-radius:50%; filter:blur(80px);
+  opacity:0; pointer-events:none; transition:opacity 1.5s ease;
+}
+.caughtup-visible .caughtup-orb { opacity:1; }
+.caughtup-orb-1 {
+  width:200px; height:200px; background:var(--nr-red);
+  opacity:0.08; top:10%; left:-30%;
+  animation:ambientFloat 12s ease-in-out infinite;
+}
+.caughtup-orb-2 {
+  width:160px; height:160px; background:var(--nr-green);
+  opacity:0.06; top:40%; right:-20%;
+  animation:ambientFloat 15s ease-in-out infinite 4s;
+}
+.caughtup-orb-3 {
+  width:180px; height:180px; background:var(--nr-yellow);
+  opacity:0.05; bottom:15%; left:10%;
+  animation:ambientFloat 18s ease-in-out infinite 8s;
+}
+
+/* Centered content */
+.caughtup-inner {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  height:100%; padding:40px 32px; position:relative; z-index:1;
+}
+
+/* Ring + checkmark */
+.caughtup-ring-wrap { width:140px; height:140px; margin-bottom:24px; opacity:0; }
+.caughtup-visible .caughtup-ring-wrap {
+  animation:xpPop 0.6s cubic-bezier(0.175,0.885,0.32,1.275) 0.2s both;
+}
+.caughtup-ring-svg { width:100%; height:100%; }
+.caughtup-ring-fill { stroke-dasharray:0 314; }
+.caughtup-visible .caughtup-ring-fill {
+  animation:ringDraw 1.8s cubic-bezier(0.4,0,0.2,1) 0.5s both;
+}
+.caughtup-check { stroke-dasharray:60; stroke-dashoffset:60; opacity:0; }
+.caughtup-visible .caughtup-check {
+  animation:checkDraw 0.6s cubic-bezier(0.4,0,0.2,1) 1.6s both;
+}
+/* Glow after ring completes */
+.caughtup-visible .caughtup-ring-svg {
+  animation:glowPulse 3s ease-in-out 2.5s infinite;
+}
+
+/* Headline */
+.caughtup-headline {
+  font-family:var(--font-headline); font-size:28px; color:var(--nr-white);
+  text-align:center; margin-bottom:8px; opacity:0;
+}
+.caughtup-visible .caughtup-headline {
+  animation:staggerReveal 0.5s cubic-bezier(0.2,0,0.2,1) 2s both;
+}
+
+/* Stats line */
+.caughtup-stats {
+  font-family:var(--font-mono); font-size:12px; color:var(--nr-ash);
+  letter-spacing:0.5px; text-transform:uppercase; margin-bottom:28px;
+  display:flex; align-items:center; gap:8px; opacity:0;
+}
+.caughtup-dot { color:var(--nr-iron); font-size:16px; }
+.caughtup-visible .caughtup-stats {
+  animation:staggerReveal 0.5s cubic-bezier(0.2,0,0.2,1) 2.2s both;
+}
+
+/* Divider */
+.caughtup-divider {
+  width:80%; height:2px; margin-bottom:28px; opacity:0; border-radius:1px;
+  background:linear-gradient(90deg,transparent,var(--nr-red),var(--nr-yellow),var(--nr-teal),var(--nr-red),transparent);
+  background-size:300% 100%;
+}
+.caughtup-visible .caughtup-divider {
+  animation:staggerReveal 0.5s cubic-bezier(0.2,0,0.2,1) 2.4s both,
+            gradientShift 6s ease-in-out 3s infinite;
+}
+
+/* Action cards */
+.caughtup-actions { width:100%; display:flex; flex-direction:column; gap:10px; margin-bottom:32px; }
+.caughtup-action-card {
+  width:100%; display:flex; align-items:center; gap:12px; padding:14px 16px;
+  background:var(--nr-lead); border:1px solid var(--nr-iron); border-radius:var(--radius);
+  cursor:pointer; transition:background 0.15s,transform 0.1s; opacity:0;
+  font-family:var(--font-body);
+}
+.caughtup-action-card:active { transform:scale(0.98); background:var(--nr-iron); }
+.caughtup-action-card.accent { background:rgba(255,99,67,0.12); border-color:rgba(255,99,67,0.3); }
+.caughtup-action-card.accent:active { background:rgba(255,99,67,0.2); }
+
+.caughtup-visible .caughtup-action-card:nth-child(1) {
+  animation:staggerReveal 0.5s cubic-bezier(0.2,0,0.2,1) 2.6s both,
+            cardHoverReady 2.5s ease-in-out 3.5s infinite;
+}
+.caughtup-visible .caughtup-action-card:nth-child(2) {
+  animation:staggerReveal 0.5s cubic-bezier(0.2,0,0.2,1) 2.75s both,
+            cardHoverReady 2.5s ease-in-out 3.8s infinite;
+}
+.caughtup-visible .caughtup-action-card:nth-child(3) {
+  animation:staggerReveal 0.5s cubic-bezier(0.2,0,0.2,1) 2.9s both,
+            cardHoverReady 2.5s ease-in-out 4.1s infinite;
+}
+
+.caughtup-action-icon { font-size:20px; flex-shrink:0; }
+.caughtup-action-text { flex:1; font-size:14px; font-weight:500; color:var(--nr-white); text-align:left; }
+.caughtup-action-arrow { font-size:20px; color:var(--nr-steel); flex-shrink:0; }
+
+/* Footer */
+.caughtup-footer {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-steel);
+  text-align:center; letter-spacing:-0.2px; opacity:0;
+}
+.caughtup-visible .caughtup-footer {
+  animation:staggerReveal 0.5s cubic-bezier(0.2,0,0.2,1) 3.1s both;
+}
+
+/* ═══════════════════════════════════════════════
+   TOPIC SELECTOR — Onboarding + filter
+   ═══════════════════════════════════════════════ */
+.topics-overlay {
+  position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
+  background:var(--nr-black); z-index:4500; display:none; flex-direction:column;
+  padding:0; opacity:0;
+}
+.topics-overlay.on { display:flex; animation:overlayIn 0.3s cubic-bezier(0.2,0,0.2,1) forwards; }
+.topics-inner {
+  flex:1; display:flex; flex-direction:column; padding:0 24px;
+  padding-top:calc(var(--safe-top) + 20px); overflow-y:auto;
+}
+.topics-back {
+  background:none; border:none; color:var(--nr-white); font-size:24px;
+  cursor:pointer; align-self:flex-start; margin-bottom:8px; padding:4px 0;
+}
+.topics-h {
+  font-family:var(--font-headline); font-size:32px; color:var(--nr-white);
+  line-height:1.2; margin-bottom:6px;
+}
+.topics-sub {
+  font-family:var(--font-body); font-size:14px; color:var(--nr-ash);
+  line-height:1.5; margin-bottom:28px;
+}
+.topics-grid {
+  display:flex; flex-wrap:wrap; gap:10px; margin-bottom:32px;
+}
+.topic-chip {
+  display:flex; align-items:center; gap:8px; padding:12px 18px;
+  background:var(--nr-lead); border:1.5px solid var(--nr-iron); border-radius:100px;
+  font-family:var(--font-body); font-size:14px; font-weight:500; color:var(--nr-white);
+  cursor:pointer; transition:all 0.2s ease; user-select:none;
+}
+.topic-chip:active { transform:scale(0.96); }
+.topic-chip.selected {
+  background:rgba(255,99,67,0.15); border-color:var(--nr-red); color:var(--nr-white);
+}
+.topic-chip .chip-icon { font-size:18px; }
+.topic-chip .chip-check {
+  width:18px; height:18px; border-radius:50%; border:1.5px solid var(--nr-iron);
+  display:flex; align-items:center; justify-content:center; transition:all 0.2s;
+  flex-shrink:0;
+}
+.topic-chip.selected .chip-check {
+  background:var(--nr-red); border-color:var(--nr-red);
+}
+.topic-chip.selected .chip-check::after {
+  content:''; width:8px; height:5px; border-left:2px solid white; border-bottom:2px solid white;
+  transform:rotate(-45deg) translateY(-1px);
+}
+.topics-footer {
+  padding:16px 24px calc(var(--safe-bottom) + 10px); border-top:1px solid var(--nr-iron);
+}
+.topics-save {
+  width:100%; padding:16px; background:var(--nr-red); border:none; border-radius:var(--radius);
+  font-family:var(--font-mono); font-size:14px; font-weight:500; color:var(--nr-white);
+  text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; transition:all 0.15s;
+}
+.topics-save:active { transform:scale(0.98); opacity:0.9; }
+.topics-save:disabled { background:var(--nr-iron); color:var(--nr-steel); cursor:default; }
+.topics-count {
+  text-align:center; margin-top:10px; font-family:var(--font-mono); font-size:11px;
+  color:var(--nr-ash); text-transform:uppercase; letter-spacing:0.5px;
+}
+
+/* Loading overlay — logo spinner */
+.loading-overlay {
+  position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
+  background:var(--nr-black); z-index:5000; display:none; flex-direction:column;
+  align-items:center; justify-content:center; opacity:0;
+}
+.loading-overlay.on {
+  display:flex; animation:loaderFadeIn 0.3s ease forwards;
+}
+.loading-overlay.out {
+  animation:loaderFadeOut 0.4s ease forwards;
+}
+@keyframes loaderFadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes loaderFadeOut { from { opacity:1; } to { opacity:0; } }
+.loading-inner { display:flex; flex-direction:column; align-items:center; gap:24px; }
+.loading-logo-ring {
+  width:72px; height:72px; border-radius:50%;
+  border:3px solid var(--nr-iron);
+  border-top-color:var(--nr-red);
+  display:flex; align-items:center; justify-content:center;
+  animation:loaderSpin 0.9s cubic-bezier(0.4,0,0.2,1) infinite;
+}
+@keyframes loaderSpin { to { transform:rotate(360deg); } }
+.loading-logo {
+  font-family:var(--font-headline); font-size:28px; color:var(--nr-white);
+  animation:loaderCounterSpin 0.9s cubic-bezier(0.4,0,0.2,1) infinite;
+}
+@keyframes loaderCounterSpin { to { transform:rotate(-360deg); } }
+.loading-text {
+  font-family:var(--font-mono); font-size:12px; color:var(--nr-steel);
+  letter-spacing:0.5px; text-transform:uppercase;
+}
+
+/* Filter button in Today header */
+.today-filter-btn {
+  background:none; border:1px solid var(--nr-iron); border-radius:100px;
+  padding:5px 10px; cursor:pointer; display:flex; align-items:center; gap:4px;
+  transition:all 0.15s;
+}
+.today-filter-btn:active { transform:scale(0.95); }
+.today-filter-btn svg { width:14px; height:14px; color:var(--nr-smoke); }
+.today-filter-btn.has-filter { border-color:var(--nr-red); }
+.today-filter-btn.has-filter svg { color:var(--nr-red); }
+
+/* ═══════════════════════════════════════════════
+   SHARE CARD — Instagram Story sized streak card
+   ═══════════════════════════════════════════════ */
+.share-overlay {
+  position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,0.85); z-index:4000; display:none; flex-direction:column;
+  align-items:center; justify-content:center; padding:24px; opacity:0;
+  -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+}
+.share-overlay.on { display:flex; animation:overlayIn 0.3s cubic-bezier(0.2,0,0.2,1) forwards; }
+.share-x {
+  position:absolute; top:56px; right:20px; background:none; border:none;
+  color:var(--nr-white); font-size:26px; cursor:pointer;
+}
+.share-card {
+  width:310px; height:440px; border-radius:20px; overflow:hidden; position:relative;
+  background:linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%);
+  border:1px solid var(--nr-iron);
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+}
+.share-card-bg {
+  position:absolute; inset:0; overflow:hidden;
+}
+.share-card-orb {
+  position:absolute; border-radius:50%; filter:blur(60px);
+  animation:ambientFloat 10s ease-in-out infinite;
+}
+.share-card-orb-1 { width:150px; height:150px; background:var(--nr-red); opacity:0.15; top:-20%; left:-10%; }
+.share-card-orb-2 { width:120px; height:120px; background:var(--nr-green); opacity:0.1; bottom:10%; right:-10%; animation-delay:3s; }
+.share-card-orb-3 { width:100px; height:100px; background:var(--nr-yellow); opacity:0.08; top:40%; left:60%; animation-delay:6s; }
+.share-card-inner {
+  position:relative; z-index:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; height:100%; padding:32px 24px;
+}
+.share-card-logo {
+  font-family:var(--font-headline); font-size:16px; color:var(--nr-white);
+  opacity:0.6; margin-bottom:32px;
+}
+.share-card-ring {
+  width:100px; height:100px; margin-bottom:20px;
+}
+.share-card-ring svg { width:100%; height:100%; }
+.share-card-title {
+  font-family:var(--font-headline); font-size:22px; color:var(--nr-white);
+  text-align:center; margin-bottom:6px;
+}
+.share-card-stats {
+  font-family:var(--font-mono); font-size:11px; color:var(--nr-ash);
+  text-transform:uppercase; letter-spacing:1px; margin-bottom:24px;
+}
+.share-card-streak {
+  display:flex; align-items:center; gap:8px; padding:10px 20px;
+  background:rgba(255,255,255,0.06); border-radius:100px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.share-card-streak-fire { font-size:20px; }
+.share-card-streak-text {
+  font-family:var(--font-mono); font-size:13px; font-weight:500;
+  color:var(--nr-yellow); text-transform:uppercase; letter-spacing:0.5px;
+}
+.share-card-date {
+  font-family:var(--font-body); font-size:11px; color:var(--nr-steel);
+  margin-top:auto;
+}
+.share-actions {
+  display:flex; gap:12px; margin-top:24px;
+}
+.share-action-btn {
+  display:flex; align-items:center; gap:8px; padding:14px 24px;
+  background:var(--nr-lead); border:1px solid var(--nr-iron); border-radius:var(--radius);
+  font-family:var(--font-mono); font-size:12px; font-weight:500;
+  color:var(--nr-white); text-transform:uppercase; letter-spacing:0.5px;
+  cursor:pointer; transition:all 0.15s;
+}
+.share-action-btn:active { transform:scale(0.96); }
+.share-action-btn.primary { background:var(--nr-red); border-color:var(--nr-red); }
+
 </style>
 </head>
 <body>
@@ -948,6 +1293,9 @@ body {
     <div class="today-top-row">
       <span class="today-logo">newsreel</span>
       <div class="today-right">
+        <button class="today-filter-btn" id="topicFilterBtn" onclick="openTopics()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+        </button>
         <span class="today-date" id="todayDate">MAR 3</span>
         <div class="today-progress" id="todayProgress" onclick="openBriefing()">
           <svg viewBox="0 0 40 40">
@@ -1001,6 +1349,16 @@ body {
   <div class="poll-link">Have more you want to say? Write to us!</div>
 </div>
 
+<!-- QUIZ OVERLAY -->
+<div class="quiz-overlay" id="quizOverlay">
+  <button class="quiz-x" onclick="closeQuiz()">✕</button>
+  <div class="quiz-progress" id="quizProgress"></div>
+  <div class="quiz-q" id="quizQ"></div>
+  <div class="quiz-options" id="quizOpts"></div>
+  <div class="quiz-explain" id="quizExplain"></div>
+  <button class="quiz-next" id="quizNext" onclick="nextQuizQ()">Next</button>
+</div>
+
 <!-- DISCUSSION OVERLAY -->
 <div class="discuss" id="discuss">
   <button class="discuss-x" onclick="closeDiscuss()">✕</button>
@@ -1029,30 +1387,16 @@ body {
   </div>
 </div>
 
-<!-- XP OVERLAY -->
-<div class="xp" id="xpScreen" onclick="xpTapDismiss(event)">
-  <!-- Animated progress ring -->
-  <div class="xp-ring-wrap">
-    <svg class="xp-ring-svg" viewBox="0 0 120 120">
+<!-- COMPLETION RING — floats center then docks to header -->
+<div class="comp-ring-overlay" id="compRingOverlay">
+  <div class="comp-ring-float" id="compRingFloat">
+    <svg class="comp-ring-svg" viewBox="0 0 120 120">
       <circle cx="60" cy="60" r="50" fill="none" stroke="var(--nr-iron)" stroke-width="6"/>
-      <circle id="xpRingFill" cx="60" cy="60" r="50" fill="none" stroke="var(--nr-red)" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 314" transform="rotate(-90 60 60)"/>
+      <circle id="compRingFill" cx="60" cy="60" r="50" fill="none" stroke="var(--nr-red)" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 314" transform="rotate(-90 60 60)"/>
     </svg>
-    <div class="xp-ring-inner">
-      <div class="xp-ring-streak" id="xpStreak">🔥 1</div>
-    </div>
+    <div class="comp-ring-count" id="compRingCount">1/3</div>
   </div>
-
-  <!-- XP count animates in -->
-  <div class="xp-xp-count" id="xpCountEl">+5 XP</div>
-
-  <!-- Specific progress line (not generic cheerleading) -->
-  <div class="xp-context" id="xpContext">1 of 3 stories today</div>
-
-  <!-- Source article (optional, only if not already read) -->
-  <div id="readMoreArea"></div>
-
-  <!-- Simple continue -->
-  <button class="xp-btn" onclick="closeXP()">CONTINUE</button>
+  <div class="comp-ring-label" id="compRingLabel">Story complete</div>
 </div>
 
 <!-- IN-APP BROWSER -->
@@ -1074,28 +1418,10 @@ body {
   <div class="inapp-browser-content" id="browserContent"></div>
 </div>
 
-<!-- CELEBRATION OVERLAY -->
-<div class="celebrate" id="celebrateScreen" onclick="closeCelebrate()">
-  <div class="cel-confetti" id="celConfetti"></div>
-  <div class="cel-ring">
-    <svg viewBox="0 0 120 120">
-      <circle cx="60" cy="60" r="50" class="cel-ring-bg"/>
-      <circle id="celRingFill" cx="60" cy="60" r="50" class="cel-ring-fill"/>
-    </svg>
-    <div class="cel-ring-check">🔥</div>
-  </div>
-  <div class="cel-xp-badge" id="celXp">+15 XP</div>
-  <div class="cel-msg">Daily Briefing Complete!</div>
-  <div class="cel-streak" id="celStreak">🔥 1 day streak</div>
-  <div class="cel-sub">Come back tomorrow to keep it going</div>
-  <button class="cel-btn" onclick="event.stopPropagation();shareCelebrate()">SHARE YOUR STREAK</button>
-  <button class="cel-dismiss" onclick="event.stopPropagation();closeCelebrate()">Done</button>
-</div>
-
 <!-- BOTTOM NAV -->
 <nav class="bottomnav">
   <button class="navbtn on" data-tab="today"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span class="lbl">Today</span></button>
-  <button class="navbtn" data-tab="activity"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span class="lbl">Activity</span></button>
+  <button class="navbtn" data-tab="activity" style="position:relative"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span class="nav-dot" id="actNavDot"></span><span class="lbl">Activity</span></button>
   <button class="navbtn" data-tab="explore"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg><span class="lbl">Explore</span></button>
   <button class="navbtn" data-tab="profile"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0113 0"/></svg><span class="lbl">Profile</span></button>
 </nav>
@@ -1111,6 +1437,68 @@ body {
   <div class="briefing-list" id="briefingList"></div>
 </div>
 
+<!-- TOPICS OVERLAY -->
+<div class="topics-overlay" id="topicsOverlay">
+  <div class="topics-inner">
+    <button class="topics-back" onclick="closeTopics()">←</button>
+    <div class="topics-h">Personalize<br>your briefing</div>
+    <div class="topics-sub">Choose topics you care about. We'll tailor your daily stories to match.</div>
+    <div class="topics-grid" id="topicsGrid"></div>
+  </div>
+  <div class="topics-footer">
+    <button class="topics-save" id="topicsSaveBtn" onclick="saveTopics()" disabled>CONTINUE</button>
+    <div class="topics-count" id="topicsCount">Select at least 1 topic</div>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-inner">
+    <div class="loading-logo-ring">
+      <div class="loading-logo">n</div>
+    </div>
+    <div class="loading-text" id="loadingText">Personalizing your briefing…</div>
+  </div>
+</div>
+
+<!-- SHARE OVERLAY -->
+<div class="share-overlay" id="shareOverlay">
+  <button class="share-x" onclick="closeShareCard()">✕</button>
+  <div class="share-card">
+    <div class="share-card-bg">
+      <div class="share-card-orb share-card-orb-1"></div>
+      <div class="share-card-orb share-card-orb-2"></div>
+      <div class="share-card-orb share-card-orb-3"></div>
+    </div>
+    <div class="share-card-inner">
+      <div class="share-card-logo">newsreel</div>
+      <div class="share-card-ring">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--nr-green)" stroke-width="6" stroke-linecap="round" stroke-dasharray="314 0" transform="rotate(-90 60 60)"/>
+          <path d="M38 62 L52 76 L82 46" fill="none" stroke="var(--nr-green)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="share-card-title">I finished the<br>news today.</div>
+      <div class="share-card-stats" id="shareCardStats">3 STORIES · COMPLETED</div>
+      <div class="share-card-streak">
+        <span class="share-card-streak-fire">🔥</span>
+        <span class="share-card-streak-text" id="shareStreakText">1 DAY STREAK</span>
+      </div>
+      <div class="share-card-date" id="shareCardDate">March 3, 2026</div>
+    </div>
+  </div>
+  <div class="share-actions">
+    <button class="share-action-btn" onclick="closeShareCard()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      CLOSE
+    </button>
+    <button class="share-action-btn primary" onclick="shareToStories()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      SHARE
+    </button>
+  </div>
+</div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -1137,6 +1525,11 @@ const STORIES = [
     poll: "The U.S. should receive partial ownership of the Gordie Howe Bridge.",
     discussion: "Should foreign infrastructure deals include shared ownership?",
     readMore: { title: "Full Story: Trump's Bridge Ultimatum", source: "Newsreel", icon: "📰", url: "#" },
+    quiz: [
+      { q: "Who funded the construction of the Gordie Howe International Bridge?", opts: ["The U.S.", "Canada", "Both countries equally", "A private company"], answer: 1, explain: "Canada fully funded the $5.7 billion bridge connecting Detroit to Windsor." },
+      { q: "What did President Trump demand regarding the bridge?", opts: ["Shut it down", "Half ownership", "Rename it", "Toll-free access"], answer: 1, explain: "Trump demanded the U.S. receive half ownership of the crossing." },
+      { q: "When is the bridge expected to open?", opts: ["2024", "2025", "Late 2026", "2028"], answer: 2, explain: "The Gordie Howe International Bridge is set to open in late 2026." },
+    ],
   },
   {
     image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=700&h=900&fit=crop",
@@ -1158,6 +1551,11 @@ const STORIES = [
     discussion: "Was this strike justified? What should happen next?",
     readMore: { title: "Iran Strikes: What Comes Next", source: "Reuters", icon: "🌐", url: "#" },
     premium: true,
+    quiz: [
+      { q: "Which country did the U.S. and Israel jointly strike?", opts: ["Syria", "Iraq", "Iran", "Lebanon"], answer: 2, explain: "U.S. and Israeli forces launched coordinated strikes against Iranian nuclear facilities." },
+      { q: "How many carrier strike groups were deployed to the Persian Gulf?", opts: ["One", "Two", "Three", "Four"], answer: 1, explain: "The Pentagon deployed two additional carrier strike groups ahead of the operation." },
+      { q: "To what purity level has Iran enriched uranium?", opts: ["20%", "40%", "60%", "90%"], answer: 2, explain: "Iran has enriched uranium to 60% purity since the 2018 JCPOA withdrawal." },
+    ],
   },
   {
     image: "https://images.unsplash.com/photo-1504711434969-e33886168d6c?w=700&h=900&fit=crop",
@@ -1175,6 +1573,10 @@ const STORIES = [
     ],
     poll: "Climate change is the most urgent issue facing the next generation.",
     readMore: { title: "UN Climate Report: Full Findings", source: "Associated Press", icon: "🌍", url: "#" },
+    quiz: [
+      { q: "How much faster is Arctic ice melting than previously projected?", opts: ["10%", "20%", "40%", "60%"], answer: 2, explain: "Arctic ice is melting 40% faster than previously projected." },
+      { q: "What is eroding ice shelves from below?", opts: ["Volcanic activity", "Warming ocean currents", "Underground rivers", "Rising air temperatures"], answer: 1, explain: "Warming ocean currents are eroding ice shelves from below — a process invisible from the surface." },
+    ],
   },
 ];
 
@@ -1236,6 +1638,22 @@ function setVerdictReason(id, reason) {
 }
 
 /* ═══════════════════════════════════════════════
+   TOPICS — Personalization data
+   ═══════════════════════════════════════════════ */
+const TOPICS = [
+  { id: 'politics', label: 'Politics', icon: '🏛️' },
+  { id: 'world', label: 'World', icon: '🌍' },
+  { id: 'breaking', label: 'Breaking', icon: '⚡' },
+  { id: 'climate', label: 'Climate', icon: '🌱' },
+  { id: 'science', label: 'Science', icon: '🔬' },
+  { id: 'expo', label: 'Expo', icon: '🎪' },
+];
+
+let selectedTopics = new Set();
+let topicsChosen = false;
+let activeFilter = 'all';
+
+/* ═══════════════════════════════════════════════
    RENDER — Build all screens from data
    ═══════════════════════════════════════════════ */
 
@@ -1243,7 +1661,15 @@ function setVerdictReason(id, reason) {
 function renderFeed() {
   const el = document.getElementById('feedSnap');
 
-  el.innerHTML = STORIES.map((s, i) => `
+  // Filter stories by selected topics
+  const storyItems = STORIES.map((s, i) => ({ s, i }));
+  const filtered = !topicsChosen || selectedTopics.size === 0
+    ? storyItems
+    : activeFilter !== 'all'
+      ? storyItems.filter(({ s }) => s.tags.includes(activeFilter))
+      : storyItems.filter(({ s }) => s.tags.some(t => selectedTopics.has(t)));
+
+  el.innerHTML = filtered.map(({ s, i }) => `
     <div class="feed-page" data-story="${i}">
       <div class="card-content-row">
         <div class="card-img-wrap${s.premium ? ' premium' : ''}" id="imgWrap-${i}" data-slide="0" data-total="${s.slides.length}">
@@ -1255,7 +1681,7 @@ function renderFeed() {
           <button class="card-expand-btn" onclick="event.stopPropagation();openCarousel(${i})">${ICONS.expand}</button>
         </div>
         <div class="card-actions">
-          <button class="card-action" onclick="event.stopPropagation();openCarousel(${i})" title="Quiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
+          <button class="card-action" onclick="event.stopPropagation();openQuiz(${i})" title="Quiz">${ICONS.quiz}</button>
           <button class="card-action" onclick="event.stopPropagation();openPoll(${i})" title="Poll">${ICONS.poll}</button>
           <button class="card-action" id="bm-${i}" onclick="event.stopPropagation();toggleBookmark(this)" title="Bookmark">${ICONS.bookmark}</button>
           <button class="card-action" onclick="event.stopPropagation();shareStory(${i})" title="Share">${ICONS.share}</button>
@@ -1272,6 +1698,48 @@ function renderFeed() {
       <div class="card-sub">${s.subtitle}</div>
     </div>
   `).join('');
+
+  // Append "You're Caught Up" card at end of feed
+  const caughtUpCount = Math.min(STORIES.length, 4);
+  el.innerHTML += `
+  <div class="feed-page caughtup-page${briefingRead.size >= caughtUpCount ? '' : ' caughtup-hidden'}" id="caughtUpCard">
+    <div class="caughtup-orb caughtup-orb-1"></div>
+    <div class="caughtup-orb caughtup-orb-2"></div>
+    <div class="caughtup-orb caughtup-orb-3"></div>
+    <div class="caughtup-inner">
+      <div class="caughtup-ring-wrap">
+        <svg class="caughtup-ring-svg" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--nr-iron)" stroke-width="6"/>
+          <circle class="caughtup-ring-fill" cx="60" cy="60" r="50" fill="none" stroke="var(--nr-green)" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 314" transform="rotate(-90 60 60)"/>
+          <path class="caughtup-check" d="M38 62 L52 76 L82 46" fill="none" stroke="var(--nr-green)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="caughtup-headline">You're caught up.</div>
+      <div class="caughtup-stats" id="caughtUpStats">
+        <span>${caughtUpCount} stories</span><span class="caughtup-dot">&middot;</span>
+        <span>finished</span>
+      </div>
+      <div class="caughtup-divider"></div>
+      <div class="caughtup-actions">
+        <button class="caughtup-action-card" onclick="switchToExplore()">
+          <span class="caughtup-action-icon">&#x1F5C2;&#xFE0F;</span>
+          <span class="caughtup-action-text">Explore the archive</span>
+          <span class="caughtup-action-arrow">&rsaquo;</span>
+        </button>
+        <button class="caughtup-action-card" onclick="retakeQuiz()">
+          <span class="caughtup-action-icon">&#x1F9E0;</span>
+          <span class="caughtup-action-text">Retake a quiz</span>
+          <span class="caughtup-action-arrow">&rsaquo;</span>
+        </button>
+        <button class="caughtup-action-card accent" onclick="shareCelebrate()">
+          <span class="caughtup-action-icon">&#x1F525;</span>
+          <span class="caughtup-action-text">Share your streak</span>
+          <span class="caughtup-action-arrow">&rsaquo;</span>
+        </button>
+      </div>
+      <div class="caughtup-footer">That's the news. Come back tomorrow.</div>
+    </div>
+  </div>`;
 
   // Size slide images to match wrap width, then wire up swipe
   STORIES.forEach((s, i) => {
@@ -1320,6 +1788,138 @@ function renderFeed() {
       }
     });
   });
+
+  // Init scroll-triggered animations for caught-up card
+  initCaughtUpAnimations();
+}
+
+/* ═══════════════════════════════════════════════
+   CAUGHT UP — Scroll-triggered reveal
+   ═══════════════════════════════════════════════ */
+function initCaughtUpAnimations() {
+  const card = document.getElementById('caughtUpCard');
+  if (!card) return;
+  card.classList.remove('caughtup-visible');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        card.classList.add('caughtup-visible');
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.5, root: document.getElementById('feedSnap') });
+  observer.observe(card);
+}
+
+function switchToExplore() {
+  document.querySelector('.navbtn[data-tab="explore"]').click();
+}
+
+function retakeQuiz() {
+  const readStories = Array.from(briefingRead);
+  if (readStories.length === 0) return;
+  const idx = readStories[Math.floor(Math.random() * readStories.length)];
+  openQuiz(idx);
+}
+
+/* ═══════════════════════════════════════════════
+   TOPICS — Onboarding + filtering
+   ═══════════════════════════════════════════════ */
+function openTopics() {
+  const grid = document.getElementById('topicsGrid');
+  grid.innerHTML = TOPICS.map(t => `
+    <div class="topic-chip${selectedTopics.has(t.label) ? ' selected' : ''}"
+         onclick="toggleTopic('${t.label}', this)" data-topic="${t.label}">
+      <span class="chip-icon">${t.icon}</span>
+      <span>${t.label}</span>
+      <span class="chip-check"></span>
+    </div>
+  `).join('');
+  updateTopicsSave();
+  document.getElementById('topicsOverlay').classList.add('on');
+}
+
+function closeTopics() {
+  document.getElementById('topicsOverlay').classList.remove('on');
+}
+
+function toggleTopic(label, el) {
+  if (selectedTopics.has(label)) {
+    selectedTopics.delete(label);
+    el.classList.remove('selected');
+  } else {
+    selectedTopics.add(label);
+    el.classList.add('selected');
+  }
+  updateTopicsSave();
+}
+
+function updateTopicsSave() {
+  const btn = document.getElementById('topicsSaveBtn');
+  const count = document.getElementById('topicsCount');
+  const n = selectedTopics.size;
+  btn.disabled = n === 0;
+  count.textContent = n === 0 ? 'Select at least 1 topic' : n + ' topic' + (n > 1 ? 's' : '') + ' selected';
+}
+
+function saveTopics() {
+  topicsChosen = true;
+  activeFilter = 'all';
+  closeTopics();
+
+  // Show loading spinner
+  var loader = document.getElementById('loadingOverlay');
+  var loadingText = document.getElementById('loadingText');
+  loader.classList.remove('out');
+  loader.classList.add('on');
+
+  // Cycle through loading messages
+  var messages = ['Personalizing your briefing…', 'Curating stories…', 'Almost there…'];
+  var msgIdx = 0;
+  var msgInterval = setInterval(function() {
+    msgIdx++;
+    if (msgIdx < messages.length) loadingText.textContent = messages[msgIdx];
+  }, 600);
+
+  // After 1.6s, fade out loader and show feed
+  setTimeout(function() {
+    clearInterval(msgInterval);
+    loader.classList.add('out');
+    setTimeout(function() {
+      loader.classList.remove('on', 'out');
+      renderFeed();
+      updateBriefingCard();
+    }, 400);
+  }, 1600);
+}
+
+/* ═══════════════════════════════════════════════
+   SHARE CARD — Instagram Story streak card
+   ═══════════════════════════════════════════════ */
+function openShareCard() {
+  const stats = document.getElementById('shareCardStats');
+  const dateEl = document.getElementById('shareCardDate');
+  const count = briefingRead.size;
+  stats.textContent = count + ' STORIES \u00B7 COMPLETED';
+  const now = new Date();
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  dateEl.textContent = months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+  document.getElementById('shareOverlay').classList.add('on');
+}
+
+function closeShareCard() {
+  document.getElementById('shareOverlay').classList.remove('on');
+}
+
+function shareToStories() {
+  const btn = document.querySelector('.share-action-btn.primary');
+  const origHTML = btn.innerHTML;
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> SHARED!';
+  btn.style.background = 'var(--nr-green)';
+  setTimeout(() => {
+    btn.innerHTML = origHTML;
+    btn.style.background = 'var(--nr-red)';
+  }, 2000);
 }
 
 function feedSlide(storyIdx, dir) {
@@ -1353,22 +1953,146 @@ function feedSlide(storyIdx, dir) {
 
 // — ACTIVITY —
 function renderActivity() {
-  document.getElementById('activityScr').innerHTML = `
-    <div class="act-head"><div class="act-title">Activity</div><button class="act-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></button></div>
-    <div class="ppl-banner">
-      <div class="ppl-hdr"><span class="ppl-hdr-t">More people on Newsreel</span><button class="ppl-hdr-x">✕</button></div>
-      <div class="ppl-scroll">
-        ${['Sarah M.|S|@sarahm','Kai L.|K|@kail','Maya R.|M|@mayar','James T.|J|@jamest'].map(p=>{const[n,i,h]=p.split('|');return`<div class="ppl-card"><div class="ppl-av">${i}</div><div class="ppl-nm">${n}</div><div class="ppl-h">${h}</div><button class="ppl-add-btn">+ Add</button></div>`;}).join('')}
-      </div>
-    </div>
-    ${[{av:'A',bg:'linear-gradient(135deg,var(--nr-teal),var(--nr-purple))',nm:'Alex Chen',h:'@alexc',t:'1h ago',icon:'book',title:'BREAKING: U.S. And Israel Strike Iran',act:'Alex completed this story',img:STORIES[1].image},{av:'R',bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))',nm:'Riley Jackson',h:'@rileyj',t:'3h ago',icon:'quiz',title:'Senate Advances Spending Bill',act:'Riley scored 4/5 on the quiz',img:STORIES[1].image}].map(a=>`
-    <div class="act-item">
-      <div class="act-urow"><div class="act-uav" style="background:${a.bg}">${a.av}</div><div class="act-uinfo"><div class="act-unm">${a.nm}</div><div class="act-uh">${a.h}</div></div><span style="color:var(--nr-steel);font-size:16px;cursor:pointer">⋯</span></div>
-      <div class="act-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>${a.t}</div>
-      <div class="act-scard" onclick="openCarousel(1)"><div class="act-sthumb"><img src="${a.img}" alt=""></div><div class="act-sinfo"><div class="act-stitle">${a.title}</div><div class="act-sact">${a.act}</div></div></div>
-      <div class="act-reactions"><button class="act-react"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></button><button class="act-react">${ICONS.chat}</button><button class="act-react"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button></div>
-    </div>`).join('')}
-  `;
+  const heartSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>';
+  const bellSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>';
+
+  // Today's Circle — ring color IS the status, tap to scroll to person's activity
+  var circleHTML = '<div class="act-circle">' + CIRCLE_FRIENDS.map(function(f) {
+    return '<div class="act-circle-card" onclick="scrollToUser(\'' + f.av + '\')" style="cursor:pointer"><div class="act-circle-av ' + f.status + '" style="background:' + f.bg + '">' + f.av + '</div>' +
+      '<div class="act-circle-nm">' + f.nm + '</div></div>';
+  }).join('') + '</div>';
+
+  // Reactions — only for content items (story, quiz)
+  function reactionsHTML() {
+    return '<div class="act-reactions"><button class="act-react" onclick="toggleReact(this,\'liked\')">' + heartSVG + '</button><button class="act-react" onclick="toggleReact(this,\'commented\')">' + ICONS.chat + '</button><button class="act-react" onclick="toggleReact(this,\'notified\')">' + bellSVG + '</button></div>';
+  }
+
+  // Score blocks (Wordle-style)
+  function scoreBlocksHTML(score, total) {
+    var html = '<div class="act-score-blocks">';
+    for (var j = 0; j < total; j++) {
+      html += '<div class="act-score-block ' + (j < score ? 'correct' : 'wrong') + '"></div>';
+    }
+    return html + '</div>';
+  }
+
+  // Merge dynamic + seeded activity (exclude nudge — rendered separately)
+  var allActivity = activityFeed.concat(SEED_ACTIVITY).filter(function(a) { return a.type !== 'nudge'; });
+
+  // Find nudge item for bottom
+  var nudgeItem = SEED_ACTIVITY.find(function(a) { return a.type === 'nudge'; });
+
+  // Time grouping: "Today" for <=4h, "Earlier" for >4h
+  var todayItems = [];
+  var earlierItems = [];
+  allActivity.forEach(function(a) {
+    var h = a.time ? parseInt(a.time) : 0;
+    var isJustNow = a.time === 'Just now';
+    if (isJustNow || (a.time && a.time.includes('h') && h <= 4)) {
+      todayItems.push(a);
+    } else {
+      earlierItems.push(a);
+    }
+  });
+
+  function renderItem(a) {
+    var isYou = !a.user;
+    var av = isYou ? 'J' : a.user.av;
+    var bg = isYou ? 'linear-gradient(135deg,var(--nr-red),var(--nr-yellow))' : a.user.bg;
+    var nm = isYou ? 'You' : a.user.nm;
+    var story = (a.storyIdx !== null && a.storyIdx !== undefined) ? STORIES[a.storyIdx] : null;
+    var hasReactions = (a.type === 'story' || a.type === 'poll');
+    var itemClass = 'act-item' + (isYou ? ' is-you' : '') + (a.type === 'challenge' ? ' is-challenge' : '');
+
+    // Flattened header: Avatar + Name · time (one line, no handle, no overflow)
+    var headerHTML = '<div class="act-urow"><div class="act-uav" style="background:' + bg + '">' + av + '</div>' +
+      '<span class="act-unm">' + nm + '</span>' +
+      (a.time ? '<span class="act-time">\u00b7 ' + a.time + '</span>' : '') + '</div>';
+
+    var contentHTML = '';
+
+    if (a.type === 'story' && story) {
+      var desc = isYou ? 'You completed this story' : 'completed this story';
+      contentHTML = '<div class="act-scard" onclick="openCarousel(' + a.storyIdx + ')"><div class="act-sthumb"><img src="' + story.image + '" alt=""></div><div class="act-sinfo"><div class="act-stitle">' + story.headline + '</div><div class="act-sact">' + desc + '</div></div></div>';
+    } else if (a.type === 'poll' && story) {
+      var stance = a.detail.stance;
+      var stanceColor = (stance === 'Strongly Agree' || stance === 'Agree') ? 'var(--nr-green)' : (stance === 'Strongly Disagree' || stance === 'Disagree') ? 'var(--nr-red)' : 'var(--nr-yellow)';
+      contentHTML = '<div class="act-scard" onclick="openCarousel(' + a.storyIdx + ')"><div class="act-sthumb"><img src="' + story.image + '" alt=""></div><div class="act-sinfo"><div class="act-stitle">' + story.headline + '</div><div class="act-sact">voted <strong style="color:' + stanceColor + '">' + stance + '</strong> on the poll</div></div></div>';
+    } else if (a.type === 'streak') {
+      contentHTML = '<div class="act-milestone"><div class="act-milestone-icon">🔥</div><div class="act-milestone-text"><strong>' + a.detail.days + '-day streak!</strong> Keep it going.</div></div>';
+    } else if (a.type === 'challenge') {
+      var cs = a.detail;
+      contentHTML = '<div class="act-milestone"><div class="act-milestone-icon">⚔️</div><div class="act-milestone-text">scored <strong>' + cs.score + '/' + cs.total + '</strong> — think you can beat her?</div></div>' +
+        scoreBlocksHTML(cs.score, cs.total) +
+        '<button class="act-cta-btn" onclick="challengeQuiz(' + a.storyIdx + ')">TAKE THE QUIZ</button>';
+    } else if (a.type === 'joined') {
+      contentHTML = '<div class="act-milestone"><div class="act-milestone-icon">👋</div><div class="act-milestone-text">' + nm + ' joined Newsreel</div></div>';
+    }
+
+    return '<div class="' + itemClass + '" data-user="' + av + '">' + headerHTML + contentHTML + (hasReactions ? reactionsHTML() : '') + '</div>';
+  }
+
+  // Build feed with time groups
+  var feedHTML = '';
+  if (todayItems.length) {
+    feedHTML += '<div class="act-group-hdr">Today</div>';
+    feedHTML += todayItems.map(renderItem).join('');
+  }
+  if (earlierItems.length) {
+    feedHTML += '<div class="act-group-hdr">Earlier</div>';
+    feedHTML += earlierItems.map(renderItem).join('');
+  }
+
+  // Nudge as inline bottom element
+  var nudgeHTML = '';
+  if (nudgeItem) {
+    var nd = nudgeItem.detail;
+    nudgeHTML = '<div class="act-nudge"><span class="act-nudge-icon">👋</span><div class="act-nudge-text"><strong>' + nd.nm + '</strong> hasn\'t started today</div><button class="act-nudge-btn" onclick="sendNudge(this)">NUDGE</button></div>';
+  }
+
+  document.getElementById('activityScr').innerHTML =
+    '<div class="act-head"><div class="act-title">Activity</div><button class="act-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></button></div>' +
+    circleHTML + feedHTML + nudgeHTML;
+}
+
+/* ═══════════════════════════════════════════════
+   ACTIVITY — Utility functions
+   ═══════════════════════════════════════════════ */
+function toggleReact(btn, cls) { btn.classList.toggle(cls); }
+
+function sendNudge(btn) {
+  btn.textContent = 'NUDGED ✓';
+  btn.classList.add('sent');
+}
+
+function challengeQuiz(storyIdx) {
+  openQuiz(storyIdx);
+}
+
+function pushActivity(type, storyIdx, detail) {
+  activityFeed.unshift({ type:type, user:null, storyIdx:storyIdx, time:'Just now', detail:detail || null });
+  activityUnseen++;
+  updateActivityDot();
+}
+
+function updateActivityDot() {
+  var dot = document.getElementById('actNavDot');
+  if (dot) dot.classList.toggle('show', activityUnseen > 0);
+}
+
+function clearActivityUnseen() {
+  activityUnseen = 0;
+  updateActivityDot();
+}
+
+function scrollToUser(av) {
+  var item = document.querySelector('.act-item[data-user="' + av + '"]');
+  if (item) {
+    item.scrollIntoView({ behavior:'smooth', block:'center' });
+    // Brief highlight flash
+    item.style.background = 'rgba(255,255,255,0.06)';
+    setTimeout(function() { item.style.background = ''; }, 800);
+  }
 }
 
 // — EXPLORE —
@@ -1419,6 +2143,7 @@ document.querySelectorAll('.navbtn').forEach(btn => {
     document.getElementById('s-' + tab).classList.add('on');
     document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('on'));
     btn.classList.add('on');
+    if (tab === 'activity') { clearActivityUnseen(); renderActivity(); }
   });
 });
 
@@ -1435,7 +2160,7 @@ function openCarousel(idx, startSlide) {
   currentStoryIdx = idx;
   carSlide = startSlide || 0;
   const hasDiscuss = !!story.discussion;
-  carTotal = story.slides.length + 2 + (hasDiscuss ? 1 : 0); // +poll +discuss? +xp
+  carTotal = story.slides.length + 1 + (hasDiscuss ? 1 : 0); // +poll +discuss? (no XP slide)
   const el = document.getElementById('carousel');
   el.innerHTML = `
     <div class="car-top">
@@ -1446,7 +2171,7 @@ function openCarousel(idx, startSlide) {
       <button class="car-nav l" id="carPrev" onclick="carGo(-1)">${ICONS.chevLeft}</button>
       <button class="car-nav r" id="carNext" onclick="carGo(1)">${ICONS.chevRight}</button>
       <div class="car-track" id="carTrack">
-        ${story.slides.map(s=>`
+        ${story.slides.map((s,si)=>`
         <div class="car-slide">
           <img class="car-slide-img" src="${s.img}">
           <div class="car-slide-fade"></div>
@@ -1458,7 +2183,6 @@ function openCarousel(idx, startSlide) {
             <button class="car-abtn">${ICONS.audio}</button>
             <button class="car-abtn">${ICONS.cc}</button>
             <button class="car-abtn">${ICONS.share}</button>
-            ${story.readMore && story.readMore.url ? `<button class="car-abtn car-abtn-source" onclick="event.stopPropagation();openBrowserFor(${idx})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg><span>Read</span></button>` : ''}
           </div>
           <div class="car-journalist"><div class="car-j-av">${story.author.initials}</div><span class="car-j-name">${story.author.name}</span></div>
         </div>`).join('')}
@@ -1468,9 +2192,6 @@ function openCarousel(idx, startSlide) {
         ${hasDiscuss ? `<div class="car-slide" style="align-items:center;justify-content:center;cursor:pointer" onclick="openDiscuss(${idx})">
           <div style="text-align:center;padding:40px"><div style="font-size:44px;margin-bottom:6px">💬</div><div style="font-family:var(--font-headline);font-size:22px;color:var(--nr-white);margin-bottom:10px;line-height:1.3">${story.discussion}</div><div style="color:var(--nr-ash);font-size:14px">Tap to share your take</div></div>
         </div>` : ''}
-        <div class="car-slide" style="align-items:center;justify-content:center;cursor:pointer" onclick="openXP()">
-          <div style="text-align:center;padding:40px"><div style="font-size:44px;margin-bottom:6px">🔥</div><div style="font-family:var(--font-headline);font-size:26px;color:var(--nr-white);margin-bottom:6px">Claim your XP!</div><div style="color:var(--nr-ash);font-size:14px">Tap to see your reward</div></div>
-        </div>
       </div>
     </div>
   `;
@@ -1523,6 +2244,9 @@ function carGo(dir) {
   if (next >= 0 && next < carTotal) {
     carSlide = next;
     updateCar();
+  } else if (dir === 1 && next >= carTotal) {
+    // Swiped past the last slide → complete the story
+    completeStory();
   }
 }
 function updateCar() {
@@ -1559,6 +2283,97 @@ function closePoll() { document.getElementById('poll').classList.remove('on'); }
 function setPoll(i) {
   document.getElementById('pollThumb').style.left = [0,25,50,75,100][i]+'%';
   document.querySelectorAll('.poll-lbl').forEach((l,j) => l.classList.toggle('sel', j===i));
+}
+
+/* ═══════════════════════════════════════════════
+   QUIZ
+   ═══════════════════════════════════════════════ */
+let quizStoryIdx = 0, quizQIdx = 0, quizScore = 0, quizAnswered = false;
+
+function openQuiz(idx) {
+  const story = STORIES[idx];
+  if (!story.quiz || !story.quiz.length) return;
+  quizStoryIdx = idx;
+  quizQIdx = 0;
+  quizScore = 0;
+  quizAnswered = false;
+  renderQuizQ();
+  document.getElementById('quizOverlay').classList.add('on');
+}
+
+function renderQuizQ() {
+  const story = STORIES[quizStoryIdx];
+  const quiz = story.quiz;
+  if (quizQIdx >= quiz.length) { showQuizScore(); return; }
+  const q = quiz[quizQIdx];
+  quizAnswered = false;
+  document.getElementById('quizProgress').textContent = `Question ${quizQIdx + 1} of ${quiz.length}`;
+  document.getElementById('quizQ').textContent = q.q;
+  document.getElementById('quizOpts').innerHTML = q.opts.map((o, i) =>
+    `<button class="quiz-opt" onclick="pickQuizOpt(${i})">${o}</button>`
+  ).join('');
+  document.getElementById('quizExplain').classList.remove('show');
+  document.getElementById('quizExplain').style.display = 'none';
+  document.getElementById('quizNext').classList.remove('show');
+  document.getElementById('quizNext').style.display = 'none';
+}
+
+function pickQuizOpt(i) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const q = STORIES[quizStoryIdx].quiz[quizQIdx];
+  const btns = document.querySelectorAll('.quiz-opt');
+  btns.forEach((b, j) => {
+    if (j === q.answer) b.classList.add('correct');
+    else if (j === i && i !== q.answer) b.classList.add('wrong');
+    else b.classList.add('dimmed');
+  });
+  if (i === q.answer) quizScore++;
+  document.getElementById('quizExplain').textContent = q.explain;
+  document.getElementById('quizExplain').style.display = '';
+  document.getElementById('quizExplain').classList.add('show');
+  const nextBtn = document.getElementById('quizNext');
+  nextBtn.textContent = quizQIdx < STORIES[quizStoryIdx].quiz.length - 1 ? 'Next' : 'See Results';
+  nextBtn.style.display = '';
+  nextBtn.classList.add('show');
+}
+
+function nextQuizQ() {
+  quizQIdx++;
+  renderQuizQ();
+}
+
+function showQuizScore() {
+  const total = STORIES[quizStoryIdx].quiz.length;
+  const pct = Math.round((quizScore / total) * 100);
+  const msg = pct === 100 ? 'Perfect score!' : pct >= 66 ? 'Great job!' : 'Keep reading!';
+  const el = document.getElementById('quizOverlay');
+  const progress = document.getElementById('quizProgress');
+  const qEl = document.getElementById('quizQ');
+  const optsEl = document.getElementById('quizOpts');
+  const explainEl = document.getElementById('quizExplain');
+  const nextBtn = document.getElementById('quizNext');
+
+  progress.textContent = 'Results';
+  qEl.textContent = '';
+  optsEl.innerHTML = `
+    <div class="quiz-score">
+      <div class="quiz-score-num">${quizScore}/${total}</div>
+      <div class="quiz-score-label">${pct}% correct</div>
+      <div class="quiz-score-msg">${msg}</div>
+    </div>`;
+  explainEl.style.display = 'none';
+  explainEl.classList.remove('show');
+  nextBtn.textContent = 'Done';
+  nextBtn.style.display = '';
+  nextBtn.classList.add('show');
+  nextBtn.onclick = closeQuiz;
+  pushActivity('quiz', quizStoryIdx, { score: quizScore, total });
+}
+
+function closeQuiz() {
+  document.getElementById('quizOverlay').classList.remove('on');
+  document.getElementById('quizNext').onclick = nextQuizQ;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1655,133 +2470,101 @@ function shareDiscuss() {
    ═══════════════════════════════════════════════ */
 let currentStoryIdx = 0;
 let cameFromBrowser = false;
-function openXP() {
-  // Mark story as read in briefing
+/* ═══════════════════════════════════════════════
+   STORY COMPLETION — ring fills center then docks to header
+   ═══════════════════════════════════════════════ */
+function completeStory() {
+  // Mark story as read
   briefingRead.add(currentStoryIdx);
-  updateBriefingCard();
+  pushActivity('story', currentStoryIdx);
 
   const count = Math.min(STORIES.length, 4);
   const done = briefingRead.size;
-  const ring = document.getElementById('xpRingFill');
 
-  // Reset ring before showing (so animation plays fresh)
-  ring.style.transition = 'none';
-  ring.style.strokeDasharray = '0 314';
-  ring.offsetHeight; // force reflow
-  ring.style.transition = 'stroke-dasharray 1s cubic-bezier(0.4,0,0.2,1) 0.3s';
+  // Close carousel first
+  closeCarousel();
 
-  // Update context text
-  document.getElementById('xpContext').textContent = `${done} of ${count} stories today`;
-  document.getElementById('xpStreak').textContent = '🔥 ' + done;
+  // Setup the floating ring
+  const overlay = document.getElementById('compRingOverlay');
+  const floatRing = document.getElementById('compRingFloat');
+  const ringFill = document.getElementById('compRingFill');
+  const countEl = document.getElementById('compRingCount');
+  const labelEl = document.getElementById('compRingLabel');
+
+  // Reset classes
+  floatRing.classList.remove('dock');
+  labelEl.classList.remove('dock');
+  overlay.classList.remove('fade-out');
+
+  // Reset ring to previous progress
+  const prevDone = done - 1;
+  const prevFill = (prevDone / count) * 314;
+  ringFill.style.transition = 'none';
+  ringFill.style.strokeDasharray = `${prevFill} ${314 - prevFill}`;
+  ringFill.style.stroke = 'var(--nr-red)';
+  ringFill.offsetHeight; // force reflow
+  ringFill.style.transition = 'stroke-dasharray 0.8s cubic-bezier(0.4,0,0.2,1) 0.3s';
+
+  // Set count text
+  countEl.textContent = `${done}/${count}`;
+  labelEl.textContent = done >= count ? 'All caught up' : 'Story complete';
 
   // Show overlay
-  document.getElementById('xpScreen').classList.add('on');
+  overlay.classList.add('on');
 
-  // Animate ring to current progress (circumference = 2π×50 ≈ 314)
+  // Animate ring fill to new progress
   requestAnimationFrame(() => {
-    const fill = (done / count) * 314;
-    ring.style.strokeDasharray = `${fill} ${314 - fill}`;
-    // Turn green when all done
-    if (done >= count) ring.style.stroke = 'var(--nr-green)';
-    else ring.style.stroke = 'var(--nr-red)';
+    const newFill = (done / count) * 314;
+    ringFill.style.strokeDasharray = `${newFill} ${314 - newFill}`;
+    if (done >= count) ringFill.style.stroke = 'var(--nr-green)';
   });
 
-  // Source card — "Go deeper" (only if they haven't read the article)
-  const rmEl = document.getElementById('readMoreArea');
-  if (cameFromBrowser) {
-    rmEl.innerHTML = '';
-    cameFromBrowser = false;
-  } else {
-    const story = STORIES[currentStoryIdx];
-    if (story && story.readMore) {
-      rmEl.innerHTML = `
-        <div class="readmore-card" onclick="event.stopPropagation();openBrowserFor(${currentStoryIdx})">
-          <div class="readmore-row">
-            <div class="readmore-favicon">${story.readMore.icon}</div>
-            <div class="readmore-info">
-              <div class="readmore-title">${story.readMore.title}</div>
-              <div class="readmore-source">${story.readMore.source}</div>
-            </div>
-            <div class="readmore-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
-          </div>
-        </div>`;
-    } else {
-      rmEl.innerHTML = '';
-    }
-  }
+  // After ring fills, dock it to the header
+  setTimeout(function() {
+    floatRing.classList.add('dock');
+    labelEl.classList.add('dock');
+    overlay.classList.add('fade-out');
+
+    // When dock animation finishes, clean up and update header
+    setTimeout(function() {
+      overlay.classList.remove('on', 'fade-out');
+      floatRing.classList.remove('dock');
+      labelEl.classList.remove('dock');
+      updateBriefingCard();
+
+      // Pulse the header progress ring to show it "landed"
+      var headerRing = document.getElementById('todayProgress');
+      if (headerRing) {
+        headerRing.style.animation = 'none';
+        headerRing.offsetHeight;
+        headerRing.style.animation = 'progressPulse 0.6s ease 2';
+      }
+    }, 700);
+  }, 1400);
 }
 
-// Tap anywhere to dismiss after animations settle
-function xpTapDismiss(e) {
-  // Don't dismiss if tapping a button or the source card
-  if (e.target.closest('.xp-btn') || e.target.closest('.readmore-card')) return;
-  closeXP();
-}
+// Keep openXP as alias for backward compat (carousel onclick refs)
+function openXP() { completeStory(); }
 
 function closeXP() {
-  document.getElementById('xpScreen').classList.remove('on');
+  document.getElementById('compRingOverlay').classList.remove('on');
   closeCarousel();
-  // Check if all stories JUST completed → trigger celebration!
-  const count = Math.min(STORIES.length, 4);
-  if (briefingRead.size >= count && !celebrateShown) {
-    setTimeout(() => openCelebrate(), 400);
-  }
-}
-
-/* ═══════════════════════════════════════════════
-   CELEBRATION SCREEN
-   ═══════════════════════════════════════════════ */
-let celebrateShown = false;
-function openCelebrate() {
-  if (celebrateShown) return; // only once per session
-  celebrateShown = true;
-
-  const count = Math.min(STORIES.length, 4);
-  const totalXP = count * 5;
-  document.getElementById('celXp').textContent = `+${totalXP} XP`;
-
-  // Spawn confetti
-  const confettiEl = document.getElementById('celConfetti');
-  confettiEl.innerHTML = '';
-  const colors = ['var(--nr-red)','var(--nr-yellow)','var(--nr-purple)','var(--nr-teal)','var(--nr-pink)','var(--nr-green)'];
-  for (let i = 0; i < 40; i++) {
-    const p = document.createElement('div');
-    p.className = 'cel-particle';
-    const angle = (Math.random() * 360) * (Math.PI / 180);
-    const dist = 120 + Math.random() * 200;
-    p.style.setProperty('--cx', `${Math.cos(angle) * dist}px`);
-    p.style.setProperty('--cy', `${Math.sin(angle) * dist}px`);
-    p.style.setProperty('--cr', `${Math.random() * 720 - 360}deg`);
-    p.style.background = colors[i % colors.length];
-    p.style.animationDelay = `${0.1 + Math.random() * 0.4}s`;
-    p.style.width = `${6 + Math.random() * 6}px`;
-    p.style.height = `${6 + Math.random() * 6}px`;
-    confettiEl.appendChild(p);
-  }
-
-  // Show overlay
-  document.getElementById('celebrateScreen').classList.add('on');
-
-  // Animate ring to full (green)
-  requestAnimationFrame(() => {
-    const ring = document.getElementById('celRingFill');
-    ring.style.strokeDasharray = '314 0';
-    ring.style.stroke = 'var(--nr-green)';
-  });
 }
 
 function closeCelebrate() {
-  document.getElementById('celebrateScreen').classList.remove('on');
+  // No-op — celebration removed
+  // Auto-scroll feed to the caught-up card
+  const caughtUpCard = document.getElementById('caughtUpCard');
+  const feed = document.getElementById('feedSnap');
+  if (caughtUpCard && feed && !caughtUpCard.classList.contains('caughtup-hidden')) {
+    setTimeout(() => {
+      feed.scrollTo({ top: caughtUpCard.offsetTop, behavior: 'smooth' });
+    }, 300);
+  }
 }
 
 function shareCelebrate() {
-  const btn = document.querySelector('.cel-btn');
-  btn.textContent = 'SHARED ✓';
-  btn.style.background = 'var(--nr-green)';
-  setTimeout(() => {
-    btn.textContent = 'SHARE YOUR STREAK';
-    btn.style.background = 'var(--nr-red)';
-  }, 2000);
+  openShareCard();
 }
 
 /* ═══════════════════════════════════════════════
@@ -1841,6 +2624,30 @@ function closeBrowser() {
    ═══════════════════════════════════════════════ */
 const briefingRead = new Set();
 
+/* ═══════════════════════════════════════════════
+   ACTIVITY FEED STATE
+   ═══════════════════════════════════════════════ */
+const activityFeed = [];
+let activityUnseen = 0;
+
+const CIRCLE_FRIENDS = [
+  { av:'A', bg:'linear-gradient(135deg,var(--nr-teal),var(--nr-purple))', nm:'Alex', status:'done' },
+  { av:'S', bg:'linear-gradient(135deg,var(--nr-pink),var(--nr-purple))', nm:'Sarah', status:'done' },
+  { av:'K', bg:'linear-gradient(135deg,var(--nr-blue),var(--nr-teal))', nm:'Kai', status:'idle' },
+  { av:'M', bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))', nm:'Maya', status:'progress', progress:'2/3' },
+  { av:'R', bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))', nm:'Riley', status:'done' },
+];
+
+const SEED_ACTIVITY = [
+  { type:'story', user:{av:'A',bg:'linear-gradient(135deg,var(--nr-teal),var(--nr-purple))',nm:'Alex Chen'}, storyIdx:1, time:'1h ago', detail:null },
+  { type:'poll', user:{av:'R',bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))',nm:'Riley Jackson'}, storyIdx:0, time:'2h ago', detail:{stance:'Agree'} },
+  { type:'streak', user:{av:'S',bg:'linear-gradient(135deg,var(--nr-pink),var(--nr-purple))',nm:'Sarah M.'}, storyIdx:null, time:'3h ago', detail:{days:7} },
+  { type:'challenge', user:{av:'S',bg:'linear-gradient(135deg,var(--nr-pink),var(--nr-purple))',nm:'Sarah M.'}, storyIdx:0, time:'5h ago', detail:{score:3,total:3} },
+  { type:'story', user:{av:'M',bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))',nm:'Maya R.'}, storyIdx:2, time:'6h ago', detail:null },
+  { type:'nudge', user:null, storyIdx:null, time:null, detail:{nm:'Kai',av:'K',bg:'linear-gradient(135deg,var(--nr-blue),var(--nr-teal))'} },
+  { type:'poll', user:{av:'M',bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))',nm:'Maya R.'}, storyIdx:1, time:'10h ago', detail:{stance:'Strongly Agree'} },
+];
+
 function openBriefing() {
   const el = document.getElementById('briefingOverlay');
   const list = document.getElementById('briefingList');
@@ -1893,6 +2700,19 @@ function updateBriefingCard() {
     prog.classList.toggle('has-progress', done > 0 && done < count);
     prog.classList.toggle('all-done', done >= count);
   }
+  // Show/hide the caught-up card
+  const caughtUpCard = document.getElementById('caughtUpCard');
+  if (caughtUpCard) {
+    if (done >= count) {
+      caughtUpCard.classList.remove('caughtup-hidden');
+      // Update stats text
+      const stats = document.getElementById('caughtUpStats');
+      if (stats) stats.innerHTML = `<span>${done} stories</span><span class="caughtup-dot">&middot;</span><span>finished</span>`;
+      initCaughtUpAnimations();
+    } else {
+      caughtUpCard.classList.add('caughtup-hidden');
+    }
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -1918,9 +2738,16 @@ function shareStory(idx) {
    INIT
    ═══════════════════════════════════════════════ */
 renderFeed();
+activityUnseen = SEED_ACTIVITY.length;
+updateActivityDot();
 renderActivity();
 renderExplore();
 renderProfile();
+
+// Auto-open topic selection on first visit
+setTimeout(() => {
+  if (!topicsChosen) openTopics();
+}, 800);
 
 /* ═══════════════════════════════════════════════
    VIEWPORT SCALE — Shrinks the phone frame to fit
