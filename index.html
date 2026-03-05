@@ -1315,6 +1315,120 @@ body {
   color:var(--nr-ash); text-transform:uppercase; letter-spacing:0.5px;
 }
 
+/* NLP Search — inside topic picker */
+.topics-search {
+  display:flex; align-items:center; gap:10px; background:var(--nr-lead);
+  border-radius:100px; padding:12px 16px; margin-bottom:20px;
+  border:1.5px solid var(--nr-iron); transition:border-color 0.2s;
+}
+.topics-search:focus-within { border-color:rgba(255,99,67,0.5); }
+.topics-search svg { width:18px; height:18px; color:var(--nr-ash); flex-shrink:0; }
+.topics-search input {
+  background:none; border:none; color:var(--nr-white); font-family:var(--font-body);
+  font-size:15px; width:100%; outline:none;
+}
+.topics-search input::placeholder { color:var(--nr-steel); font-style:italic; }
+.topics-search-clear {
+  background:none; border:none; color:var(--nr-ash); font-size:16px;
+  cursor:pointer; padding:0 2px; flex-shrink:0; transition:color 0.15s;
+}
+.topics-search-clear:hover { color:var(--nr-white); }
+
+/* NLP Results container */
+.topics-nlp-results {
+  animation:nlpFadeIn 0.35s cubic-bezier(0.2,0,0.2,1);
+}
+@keyframes nlpFadeIn {
+  from { opacity:0; transform:translateY(12px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* Chat-style response wrapper */
+.nlp-chat {
+  display:flex; gap:10px; align-items:flex-start; margin-bottom:16px;
+}
+.nlp-avatar {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  background:var(--nr-red); display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-headline); font-size:16px; color:var(--nr-white);
+  margin-top:2px;
+}
+.nlp-bubble {
+  flex:1; background:var(--nr-lead); border-radius:4px 16px 16px 16px;
+  padding:14px 16px; position:relative;
+}
+.nlp-bubble-greeting {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-red);
+  font-weight:600; margin-bottom:6px;
+}
+.nlp-bubble-text {
+  font-family:var(--font-body); font-size:14px; color:var(--nr-smoke);
+  line-height:1.55;
+}
+
+/* Story result card — warm tappable */
+.nlp-card {
+  display:flex; align-items:center; gap:12px; padding:12px 14px;
+  background:var(--nr-lead); border-radius:12px;
+  cursor:pointer; transition:all 0.15s; margin-bottom:10px;
+  border:1.5px solid transparent;
+}
+.nlp-card:active { transform:scale(0.97); }
+.nlp-card:hover { border-color:rgba(255,99,67,0.3); }
+.nlp-card-thumb {
+  width:52px; height:52px; border-radius:8px; object-fit:cover; flex-shrink:0;
+}
+.nlp-card-info { flex:1; min-width:0; }
+.nlp-card-title {
+  font-family:var(--font-headline); font-size:13.5px; color:var(--nr-white);
+  line-height:1.3; margin-bottom:3px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.nlp-card-meta {
+  font-family:var(--font-body); font-size:12px; color:var(--nr-ash);
+  display:flex; align-items:center; gap:4px;
+}
+.nlp-card-read {
+  font-family:var(--font-mono); font-size:10px; font-weight:600;
+  color:var(--nr-red); text-transform:uppercase; letter-spacing:0.5px;
+  padding:4px 10px; background:rgba(255,99,67,0.1); border-radius:100px;
+  flex-shrink:0; white-space:nowrap;
+}
+
+/* "More on this" related suggestions */
+.nlp-more {
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  margin-top:14px; padding-top:14px; border-top:1px solid var(--nr-iron);
+}
+.nlp-more-label {
+  font-family:var(--font-body); font-size:12px; color:var(--nr-steel);
+  margin-right:2px;
+}
+.nlp-more-chip {
+  padding:6px 14px; background:rgba(255,99,67,0.08); border:1px solid rgba(255,99,67,0.2);
+  border-radius:100px; font-family:var(--font-body); font-size:12px;
+  color:var(--nr-red); cursor:pointer; transition:all 0.15s; font-weight:500;
+}
+.nlp-more-chip:active { transform:scale(0.95); background:rgba(255,99,67,0.15); }
+
+/* No results — friendly tone */
+.nlp-empty {
+  text-align:center; padding:28px 16px;
+}
+.nlp-empty-face { font-size:36px; margin-bottom:10px; }
+.nlp-empty-text {
+  font-family:var(--font-body); font-size:15px; color:var(--nr-smoke);
+  line-height:1.5; margin-bottom:4px;
+}
+.nlp-empty-hint {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-steel);
+}
+
+/* Fade topics grid when search active */
+.topics-grid.search-active {
+  opacity:0; height:0; overflow:hidden; margin:0; transition:opacity 0.25s ease;
+}
+
 /* Loading overlay — logo spinner */
 .loading-overlay {
   position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
@@ -1626,6 +1740,12 @@ body {
     <button class="topics-back" onclick="closeTopics()">←</button>
     <div class="topics-h">Personalize<br>your briefing</div>
     <div class="topics-sub">Choose topics you care about. We'll tailor your daily stories to match.</div>
+    <div class="topics-search" id="topicsSearch">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="topicsSearchInput" placeholder="Ask Newsreel anything..." oninput="handleNLPSearch(this.value)">
+      <button class="topics-search-clear" id="topicsSearchClear" onclick="clearNLPSearch()" style="display:none">✕</button>
+    </div>
+    <div class="topics-nlp-results" id="topicsNLPResults" style="display:none"></div>
     <div class="topics-grid" id="topicsGrid"></div>
   </div>
   <div class="topics-footer">
@@ -2031,6 +2151,11 @@ function openTopics() {
       <span class="chip-check"></span>
     </div>
   `).join('');
+  // Reset NLP search state
+  document.getElementById('topicsSearchInput').value = '';
+  document.getElementById('topicsSearchClear').style.display = 'none';
+  document.getElementById('topicsNLPResults').style.display = 'none';
+  grid.classList.remove('search-active');
   updateTopicsSave();
   document.getElementById('topicsOverlay').classList.add('on');
 }
@@ -2087,6 +2212,198 @@ function saveTopics() {
       updateBriefingCard();
     }, 400);
   }, 1600);
+}
+
+/* ═══════════════════════════════════════════════
+   NLP SEARCH — Smart search in topic picker
+   ═══════════════════════════════════════════════ */
+const NLP_RESPONSES = {
+  'iran': {
+    keywords: ['iran', 'strike', 'war', 'israel', 'nuclear', 'military', 'persian', 'tehran', 'bomb'],
+    greeting: "Big story today 👀",
+    context: "The U.S. and Israel launched coordinated strikes on Iranian nuclear facilities. Trump is calling it \"a necessary step\" — and alluding to wider conflict.",
+    storyIdx: 1,
+    relatedTopics: ['Breaking', 'World']
+  },
+  'bridge': {
+    keywords: ['bridge', 'canada', 'gordie', 'howe', 'detroit', 'windsor', 'ownership', 'tariff'],
+    greeting: "Oh yeah, this one's wild 🌉",
+    context: "Trump wants half ownership of a $5.7 billion bridge that Canada paid for entirely. It connects Detroit to Windsor and opens late 2026.",
+    storyIdx: 0,
+    relatedTopics: ['Politics', 'Expo']
+  },
+  'climate': {
+    keywords: ['climate', 'arctic', 'ice', 'warming', 'melt', 'sea level', 'environment', 'ocean', 'temperature', 'un report'],
+    greeting: "Important one 🌍",
+    context: "A new UN report says Arctic ice is melting 40% faster than anyone expected. Sea levels could rise significantly by 2050 — and ocean currents are making it worse from below.",
+    storyIdx: 2,
+    relatedTopics: ['Climate', 'Science']
+  },
+  'trump': {
+    keywords: ['trump', 'president', 'white house', 'administration'],
+    greeting: "He's all over today's news 🇺🇸",
+    context: "Trump's in two big stories today — threatening to block a Canadian bridge unless the U.S. gets half, and alluding to \"war\" after strikes on Iran.",
+    storyIdx: null,
+    relatedTopics: ['Politics', 'Breaking']
+  }
+};
+
+let nlpDebounce = null;
+
+function handleNLPSearch(query) {
+  clearTimeout(nlpDebounce);
+  const clear = document.getElementById('topicsSearchClear');
+  const results = document.getElementById('topicsNLPResults');
+  const grid = document.getElementById('topicsGrid');
+
+  if (!query.trim()) {
+    clear.style.display = 'none';
+    results.style.display = 'none';
+    grid.classList.remove('search-active');
+    return;
+  }
+
+  clear.style.display = 'block';
+
+  nlpDebounce = setTimeout(function() {
+    const q = query.toLowerCase().trim();
+
+    // 1) Check hardcoded smart responses first
+    let matched = null;
+    for (var key in NLP_RESPONSES) {
+      var resp = NLP_RESPONSES[key];
+      if (resp.keywords.some(function(kw) { return q.includes(kw); })) {
+        matched = resp;
+        break;
+      }
+    }
+
+    // 2) Build result HTML
+    var html = '';
+
+    if (matched) {
+      // Chat bubble response — feels like talking to Newsreel
+      html += '<div class="nlp-chat">';
+      html += '<div class="nlp-avatar">n</div>';
+      html += '<div class="nlp-bubble">';
+      html += '<div class="nlp-bubble-greeting">' + (matched.greeting || 'Here\'s what we found') + '</div>';
+      html += '<div class="nlp-bubble-text">' + matched.context + '</div>';
+      html += '</div>';
+      html += '</div>';
+
+      // Story card(s)
+      if (matched.storyIdx !== null) {
+        html += renderNLPCard(matched.storyIdx);
+      } else {
+        var matchedIdxs = keywordMatchStories(q);
+        matchedIdxs.forEach(function(idx) { html += renderNLPCard(idx); });
+      }
+
+      // "More on this" suggestions
+      if (matched.relatedTopics && matched.relatedTopics.length) {
+        html += '<div class="nlp-more">';
+        html += '<span class="nlp-more-label">More on this →</span>';
+        matched.relatedTopics.forEach(function(t) {
+          html += '<span class="nlp-more-chip" onclick="nlpSelectTopic(\'' + t + '\')">' + t + '</span>';
+        });
+        html += '</div>';
+      }
+    } else {
+      // Keyword fallback — match against story data
+      var fallbackIdxs = keywordMatchStories(q);
+      if (fallbackIdxs.length > 0) {
+        // Light chat intro for fallback
+        html += '<div class="nlp-chat">';
+        html += '<div class="nlp-avatar">n</div>';
+        html += '<div class="nlp-bubble">';
+        html += '<div class="nlp-bubble-greeting">Found something 👇</div>';
+        html += '<div class="nlp-bubble-text">Here are stories that match your search.</div>';
+        html += '</div>';
+        html += '</div>';
+        fallbackIdxs.forEach(function(idx) { html += renderNLPCard(idx); });
+      } else {
+        // No results — friendly, not cold
+        html += '<div class="nlp-empty">';
+        html += '<div class="nlp-empty-face">🤷</div>';
+        html += '<div class="nlp-empty-text">Nothing on that today — try a topic instead?</div>';
+        html += '<div class="nlp-empty-hint">We publish new stories every morning at 5 AM</div>';
+        html += '</div>';
+        grid.classList.remove('search-active');
+        results.style.display = 'block';
+        results.innerHTML = html;
+        return;
+      }
+    }
+
+    grid.classList.add('search-active');
+    results.style.display = 'block';
+    results.innerHTML = html;
+  }, 250);
+}
+
+function renderNLPCard(idx) {
+  var s = STORIES[idx];
+  if (!s) return '';
+  return '<div class="nlp-card" onclick="openFromNLP(' + idx + ')">' +
+    '<img class="nlp-card-thumb" src="' + s.image + '" alt="">' +
+    '<div class="nlp-card-info">' +
+    '<div class="nlp-card-title">' + s.headline + '</div>' +
+    '<div class="nlp-card-meta">' + s.author.name + ' · ' + s.slides.length + ' slides</div>' +
+    '</div>' +
+    '<span class="nlp-card-read">READ</span>' +
+    '</div>';
+}
+
+function keywordMatchStories(q) {
+  var words = q.split(/\s+/).filter(function(w) { return w.length > 2; });
+  if (!words.length) return [];
+  var results = [];
+  STORIES.forEach(function(s, i) {
+    var haystack = (s.headline + ' ' + s.subtitle + ' ' + s.tags.join(' ')).toLowerCase();
+    // Also search slide text
+    s.slides.forEach(function(sl) { haystack += ' ' + sl.text.toLowerCase(); });
+    var match = words.some(function(w) { return haystack.includes(w); });
+    if (match) results.push(i);
+  });
+  return results;
+}
+
+function clearNLPSearch() {
+  var input = document.getElementById('topicsSearchInput');
+  input.value = '';
+  document.getElementById('topicsSearchClear').style.display = 'none';
+  document.getElementById('topicsNLPResults').style.display = 'none';
+  document.getElementById('topicsGrid').classList.remove('search-active');
+  input.focus();
+}
+
+function openFromNLP(idx) {
+  closeTopics();
+  currentStoryIdx = idx;
+  openCarousel(idx);
+}
+
+function nlpSelectTopic(label) {
+  clearNLPSearch();
+  // Select the topic chip
+  if (!selectedTopics.has(label)) {
+    selectedTopics.add(label);
+  }
+  // Re-render chips with selection
+  var grid = document.getElementById('topicsGrid');
+  grid.innerHTML = TOPICS.map(function(t) {
+    return '<div class="topic-chip' + (selectedTopics.has(t.label) ? ' selected' : '') + '"' +
+      ' onclick="toggleTopic(\'' + t.label + '\', this)" data-topic="' + t.label + '">' +
+      '<span class="chip-icon">' + t.icon + '</span>' +
+      '<span>' + t.label + '</span>' +
+      '<span class="chip-check"></span>' +
+      '</div>';
+  }).join('');
+  updateTopicsSave();
+}
+
+function escapeHTML(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 /* ═══════════════════════════════════════════════
