@@ -1023,9 +1023,13 @@ body {
 .briefing-overlay.classroom-mode .briefing-date {
   color:var(--nr-smoke); font-family:var(--font-body);
   font-size:14px; text-transform:none; letter-spacing:0;
+  line-height:1.4;
+}
+.briefing-overlay.classroom-mode .briefing-date strong {
+  color:var(--nr-white); font-weight:700;
 }
 .briefing-overlay.classroom-mode .briefing-prog {
-  color:var(--nr-teal);
+  color:var(--nr-teal); margin-top:2px;
 }
 .briefing-list {
   flex:1; overflow-y:auto; padding:0 20px 40px;
@@ -2966,9 +2970,9 @@ function openBriefing() {
 
   // Update header based on classroom vs regular
   if (isClassroom) {
-    document.querySelector('.briefing-h').textContent = classStory.classroom.course;
-    document.querySelector('.briefing-date').textContent = classStory.classroom.professor.name;
-    document.getElementById('briefingProg').textContent = `${briefingRead.size}/${count} assigned · ${classStory.classroom.due}`;
+    document.querySelector('.briefing-h').innerHTML = classStory.classroom.course;
+    document.querySelector('.briefing-date').innerHTML = classStory.classroom.professor.name + ' assigned <strong>' + count + ' stories</strong> for today';
+    document.getElementById('briefingProg').textContent = `${briefingRead.size}/${count} read · ${classStory.classroom.due}`;
     el.classList.add('classroom-mode');
   } else {
     document.querySelector('.briefing-h').textContent = "Today's Briefing";
