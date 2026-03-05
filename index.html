@@ -114,7 +114,7 @@ body {
   color:var(--nr-smoke); text-transform:uppercase; letter-spacing:1px;
 }
 .today-progress {
-  width:36px; height:36px; position:relative; cursor:pointer;
+  width:40px; height:40px; position:relative; cursor:pointer;
   -webkit-tap-highlight-color:transparent;
   animation:progressBounce 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.8s both;
 }
@@ -123,14 +123,21 @@ body {
   60%  { transform:scale(1.15); }
   100% { transform:scale(1); opacity:1; }
 }
+@keyframes progressPulse {
+  0%, 100% { filter:drop-shadow(0 0 0px var(--nr-red)); }
+  50% { filter:drop-shadow(0 0 6px var(--nr-red)); }
+}
+.today-progress.has-progress { animation:progressBounce 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.8s both, progressPulse 2s ease-in-out 1.5s 3; }
+.today-progress.all-done svg circle:last-child { stroke:var(--nr-green) !important; }
+.today-progress.all-done .today-progress-count { color:var(--nr-green); }
 .today-progress svg { width:100%; height:100%; }
 .today-progress svg circle:last-child {
   transition:stroke-dasharray 0.8s cubic-bezier(0.4,0,0.2,1);
 }
 .today-progress-count {
   position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  font-family:var(--font-mono); font-size:8px; font-weight:600;
-  color:var(--nr-smoke); letter-spacing:-0.3px; pointer-events:none;
+  font-family:var(--font-mono); font-size:10px; font-weight:700;
+  color:var(--nr-white); letter-spacing:-0.3px; pointer-events:none;
 }
 .today-tabs {
   display:flex; gap:20px; height:34px; align-items:center;
@@ -556,12 +563,12 @@ body {
    ═══════════════════════════════════════════════ */
 .celebrate {
   position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
-  background:rgba(0,0,0,0.92); z-index:3500;
+  background:var(--nr-black); z-index:3500;
   display:none; flex-direction:column;
   align-items:center; justify-content:center;
   opacity:0;
 }
-.celebrate.on { display:flex; animation:xpFadeIn 0.3s ease forwards; }
+.celebrate.on { display:flex; opacity:1; animation:xpFadeIn 0.3s ease forwards; }
 
 /* Big progress ring */
 .cel-ring {
@@ -587,9 +594,34 @@ body {
   opacity:0; animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 0.9s both;
 }
 .cel-msg {
-  font-family:var(--font-body); font-size:15px; color:var(--nr-ash);
+  font-family:var(--font-headline); font-size:20px; color:var(--nr-white);
   margin-top:6px; opacity:0;
   animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1.05s both;
+}
+.cel-streak {
+  font-family:var(--font-mono); font-size:14px; color:var(--nr-yellow);
+  margin-top:16px; opacity:0;
+  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1.2s both;
+}
+.cel-sub {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-ash);
+  margin-top:4px; opacity:0;
+  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1.3s both;
+}
+.cel-btn {
+  margin-top:32px; padding:14px 32px; background:var(--nr-red); border:none;
+  border-radius:var(--radius); color:var(--nr-white);
+  font-family:var(--font-mono); font-size:13px; font-weight:600;
+  letter-spacing:0.5px; cursor:pointer; opacity:0;
+  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1.5s both;
+  transition:opacity 0.15s, transform 0.15s;
+}
+.cel-btn:active { opacity:0.85; transform:scale(0.97); }
+.cel-dismiss {
+  margin-top:12px; padding:10px 24px; background:none; border:none;
+  color:var(--nr-ash); font-family:var(--font-body); font-size:14px;
+  cursor:pointer; opacity:0;
+  animation:xpSlideUp 0.4s cubic-bezier(0.2,0,0.2,1) 1.6s both;
 }
 
 /* Confetti particles */
@@ -918,16 +950,13 @@ body {
       <div class="today-right">
         <span class="today-date" id="todayDate">MAR 3</span>
         <div class="today-progress" id="todayProgress" onclick="openBriefing()">
-          <svg viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="15" fill="none" stroke="var(--nr-iron)" stroke-width="2.5"/>
-            <circle id="progressRing" cx="18" cy="18" r="15" fill="none" stroke="var(--nr-red)" stroke-width="2.5" stroke-dasharray="0 94.25" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+          <svg viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="17" fill="none" stroke="var(--nr-iron)" stroke-width="3"/>
+            <circle id="progressRing" cx="20" cy="20" r="17" fill="none" stroke="var(--nr-red)" stroke-width="3" stroke-dasharray="0 106.81" stroke-linecap="round" transform="rotate(-90 20 20)"/>
           </svg>
           <span class="today-progress-count" id="progressCount">0/3</span>
         </div>
       </div>
-    </div>
-    <div class="today-tabs">
-      <button class="today-tab active">Stack</button>
     </div>
   </div>
 
@@ -1043,6 +1072,24 @@ body {
     </div>
   </div>
   <div class="inapp-browser-content" id="browserContent"></div>
+</div>
+
+<!-- CELEBRATION OVERLAY -->
+<div class="celebrate" id="celebrateScreen" onclick="closeCelebrate()">
+  <div class="cel-confetti" id="celConfetti"></div>
+  <div class="cel-ring">
+    <svg viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="50" class="cel-ring-bg"/>
+      <circle id="celRingFill" cx="60" cy="60" r="50" class="cel-ring-fill"/>
+    </svg>
+    <div class="cel-ring-check">🔥</div>
+  </div>
+  <div class="cel-xp-badge" id="celXp">+15 XP</div>
+  <div class="cel-msg">Daily Briefing Complete!</div>
+  <div class="cel-streak" id="celStreak">🔥 1 day streak</div>
+  <div class="cel-sub">Come back tomorrow to keep it going</div>
+  <button class="cel-btn" onclick="event.stopPropagation();shareCelebrate()">SHARE YOUR STREAK</button>
+  <button class="cel-dismiss" onclick="event.stopPropagation();closeCelebrate()">Done</button>
 </div>
 
 <!-- BOTTOM NAV -->
@@ -1671,7 +1718,71 @@ function xpTapDismiss(e) {
   closeXP();
 }
 
-function closeXP() { document.getElementById('xpScreen').classList.remove('on'); closeCarousel(); }
+function closeXP() {
+  document.getElementById('xpScreen').classList.remove('on');
+  closeCarousel();
+  // Check if all stories JUST completed → trigger celebration!
+  const count = Math.min(STORIES.length, 4);
+  if (briefingRead.size >= count && !celebrateShown) {
+    setTimeout(() => openCelebrate(), 400);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   CELEBRATION SCREEN
+   ═══════════════════════════════════════════════ */
+let celebrateShown = false;
+function openCelebrate() {
+  if (celebrateShown) return; // only once per session
+  celebrateShown = true;
+
+  const count = Math.min(STORIES.length, 4);
+  const totalXP = count * 5;
+  document.getElementById('celXp').textContent = `+${totalXP} XP`;
+
+  // Spawn confetti
+  const confettiEl = document.getElementById('celConfetti');
+  confettiEl.innerHTML = '';
+  const colors = ['var(--nr-red)','var(--nr-yellow)','var(--nr-purple)','var(--nr-teal)','var(--nr-pink)','var(--nr-green)'];
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'cel-particle';
+    const angle = (Math.random() * 360) * (Math.PI / 180);
+    const dist = 120 + Math.random() * 200;
+    p.style.setProperty('--cx', `${Math.cos(angle) * dist}px`);
+    p.style.setProperty('--cy', `${Math.sin(angle) * dist}px`);
+    p.style.setProperty('--cr', `${Math.random() * 720 - 360}deg`);
+    p.style.background = colors[i % colors.length];
+    p.style.animationDelay = `${0.1 + Math.random() * 0.4}s`;
+    p.style.width = `${6 + Math.random() * 6}px`;
+    p.style.height = `${6 + Math.random() * 6}px`;
+    confettiEl.appendChild(p);
+  }
+
+  // Show overlay
+  document.getElementById('celebrateScreen').classList.add('on');
+
+  // Animate ring to full (green)
+  requestAnimationFrame(() => {
+    const ring = document.getElementById('celRingFill');
+    ring.style.strokeDasharray = '314 0';
+    ring.style.stroke = 'var(--nr-green)';
+  });
+}
+
+function closeCelebrate() {
+  document.getElementById('celebrateScreen').classList.remove('on');
+}
+
+function shareCelebrate() {
+  const btn = document.querySelector('.cel-btn');
+  btn.textContent = 'SHARED ✓';
+  btn.style.background = 'var(--nr-green)';
+  setTimeout(() => {
+    btn.textContent = 'SHARE YOUR STREAK';
+    btn.style.background = 'var(--nr-red)';
+  }, 2000);
+}
 
 /* ═══════════════════════════════════════════════
    IN-APP BROWSER
@@ -1765,16 +1876,22 @@ function openFromBriefing(idx) {
 function updateBriefingCard() {
   const count = Math.min(STORIES.length, 4);
   const done = briefingRead.size;
+  const circ = 106.81; // 2π×17
   // Update circle counter
   const label = document.getElementById('progressCount');
   if (label) label.textContent = done >= count ? '✓' : `${done}/${count}`;
-  // Fill ring proportionally (circumference = 2π×15 ≈ 94.25)
+  // Fill ring proportionally
   const ring = document.getElementById('progressRing');
   if (ring) {
-    const fill = (done / count) * 94.25;
-    ring.style.strokeDasharray = `${fill} ${94.25 - fill}`;
-    // Turn green when complete
+    const fill = (done / count) * circ;
+    ring.style.strokeDasharray = `${fill} ${circ - fill}`;
     ring.style.stroke = done >= count ? 'var(--nr-green)' : 'var(--nr-red)';
+  }
+  // Update progress element classes
+  const prog = document.getElementById('todayProgress');
+  if (prog) {
+    prog.classList.toggle('has-progress', done > 0 && done < count);
+    prog.classList.toggle('all-done', done >= count);
   }
 }
 
