@@ -3257,13 +3257,17 @@ let carSlide = 0;
 let carTotal = 0;
 let carTouchX = 0;
 let carDragging = false;
+let carShareSlideIdx = 0;  // which slide is the share/completion card
+let carStoryCompleted = false;  // has this story been registered as complete during this carousel session
 
 function openCarousel(idx, startSlide) {
   const story = STORIES[idx];
   currentStoryIdx = idx;
   carSlide = startSlide || 0;
   const hasDiscuss = !!story.discussion && !story.classroom;
-  carTotal = story.slides.length + 1 + (hasDiscuss ? 1 : 0) + 1; // +poll +discuss? +share
+  carShareSlideIdx = story.slides.length;  // share card comes right after content
+  carStoryCompleted = false;
+  carTotal = story.slides.length + 1 + 1 + (hasDiscuss ? 1 : 0); // +share +poll +discuss?
   const el = document.getElementById('carousel');
   el.innerHTML = `
     <div class="car-top">
@@ -3289,6 +3293,18 @@ function openCarousel(idx, startSlide) {
           </div>
           <div class="car-journalist"><div class="car-j-av">${story.author.initials}</div><span class="car-j-name">${story.author.name}</span></div>
         </div>`).join('')}
+        <div class="car-slide">
+          <div class="car-share">
+            <div class="car-share-emoji">✓</div>
+            <div class="car-share-title">You finished this story</div>
+            <div class="car-share-sub">Share with your circle so they can see what you've been reading</div>
+            <div class="car-share-faces">
+              ${WIRE_FRIENDS.slice(0,4).map(f => '<div class="car-share-face" style="background:' + f.bg + '">' + f.av + '</div>').join('')}
+            </div>
+            <button class="car-share-btn" id="carShareBtn" onclick="shareFromCarousel()">SHARE TO CIRCLE</button>
+            <button class="car-share-skip" onclick="skipShareAndComplete()">skip</button>
+          </div>
+        </div>
         <div class="car-slide" style="align-items:center;justify-content:center;cursor:pointer" onclick="openPoll(${idx})">
           <div style="text-align:center;padding:40px"><div style="font-family:var(--font-headline);font-size:30px;color:var(--nr-white);margin-bottom:10px">Where do you stand?</div><div style="color:var(--nr-ash);font-size:14px">Tap to share your opinion</div></div>
         </div>
@@ -3304,18 +3320,6 @@ function openCarousel(idx, startSlide) {
             }
           </div>
         </div>` : ''}
-        <div class="car-slide">
-          <div class="car-share">
-            <div class="car-share-emoji">✓</div>
-            <div class="car-share-title">You finished this story</div>
-            <div class="car-share-sub">Share with your circle so they can see what you've been reading</div>
-            <div class="car-share-faces">
-              ${WIRE_FRIENDS.slice(0,4).map(f => '<div class="car-share-face" style="background:' + f.bg + '">' + f.av + '</div>').join('')}
-            </div>
-            <button class="car-share-btn" id="carShareBtn" onclick="shareFromCarousel()">SHARE TO CIRCLE</button>
-            <button class="car-share-skip" onclick="skipShareAndComplete()">not now</button>
-          </div>
-        </div>
       </div>
     </div>
   `;
@@ -3368,9 +3372,13 @@ function carGo(dir) {
   if (next >= 0 && next < carTotal) {
     carSlide = next;
     updateCar();
+    // Auto-register completion when user reaches the share card
+    if (carSlide === carShareSlideIdx && !carStoryCompleted) {
+      registerStoryComplete();
+    }
   } else if (dir === 1 && next >= carTotal) {
-    // Swiped past the last slide → complete the story
-    completeStory();
+    // Swiped past the very last slide → just close carousel
+    closeCarousel();
   }
 }
 function updateCar() {
@@ -3390,6 +3398,11 @@ function closeCarousel() {
   const el = document.getElementById('carousel');
   el.classList.remove('on');
   if (el._keyHandler) document.removeEventListener('keydown', el._keyHandler);
+  // If story was registered as complete during this carousel session, show the ring
+  if (carStoryCompleted) {
+    carStoryCompleted = false; // reset so we don't double-fire
+    showCompletionRing();
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -3757,16 +3770,18 @@ let cameFromBrowser = false;
 /* ═══════════════════════════════════════════════
    STORY COMPLETION — ring fills center then docks to header
    ═══════════════════════════════════════════════ */
-function completeStory() {
-  // Mark story as read
+/* ─── registerStoryComplete: silently mark story as read (no animation) ─── */
+function registerStoryComplete() {
+  if (briefingRead.has(currentStoryIdx)) return; // already registered
   briefingRead.add(currentStoryIdx);
   pushActivity('story', currentStoryIdx);
+  carStoryCompleted = true;
+}
 
+/* ─── showCompletionRing: the visual ring pop → fill → dock animation ─── */
+function showCompletionRing() {
   const count = Math.min(STORIES.length, 4);
   const done = briefingRead.size;
-
-  // Close carousel first
-  closeCarousel();
 
   // Setup the floating ring
   const overlay = document.getElementById('compRingOverlay');
@@ -3827,17 +3842,35 @@ function completeStory() {
   }, 1400);
 }
 
-/* ─── Share from carousel last slide ─── */
+/* ─── completeStory: legacy wrapper — register + close + ring ─── */
+function completeStory() {
+  registerStoryComplete();
+  closeCarousel();
+}
+
+/* ─── Share from carousel share card ─── */
 function shareFromCarousel() {
   var btn = document.getElementById('carShareBtn');
   btn.textContent = 'SHARED ✓';
   btn.classList.add('shared');
-  // Brief pause to show confirmation, then complete
-  setTimeout(function() { completeStory(); }, 600);
+  // Completion already registered when user arrived at this slide
+  // Show confirmation briefly, then advance to poll/discussion or close
+  setTimeout(function() {
+    if (carSlide + 1 < carTotal) {
+      carGo(1); // advance to optional poll/discussion
+    } else {
+      closeCarousel();
+    }
+  }, 800);
 }
 
 function skipShareAndComplete() {
-  completeStory();
+  // Completion already registered — advance to poll or close
+  if (carSlide + 1 < carTotal) {
+    carGo(1); // advance to optional poll/discussion
+  } else {
+    closeCarousel();
+  }
 }
 
 // Keep openXP as alias for backward compat (carousel onclick refs)
