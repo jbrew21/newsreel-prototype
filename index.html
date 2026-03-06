@@ -738,6 +738,35 @@ body {
 }
 @keyframes compFadeOut { to { opacity:0; } }
 
+/* ─── Share to Circle toast ─── */
+.share-toast { position:fixed; bottom:100px; left:50%; width:393px; padding:0 16px; z-index:2500; box-sizing:border-box; pointer-events:none; opacity:0; transform:translateX(-50%) translateY(16px); transition:opacity 0.3s ease, transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+.share-toast.on { opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(0); }
+.share-toast-inner { display:flex; align-items:center; gap:10px; background:var(--nr-lead); border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius); padding:12px 14px; }
+.share-toast-icon { flex-shrink:0; color:var(--nr-ash); }
+.share-toast-text { flex:1; font-size:13px; color:var(--nr-smoke); line-height:1.3; }
+.share-toast-btn { flex-shrink:0; background:var(--nr-red); color:var(--nr-white); border:none; border-radius:6px; padding:8px 14px; font-family:var(--font-mono); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; transition:background 0.2s, transform 0.1s; }
+.share-toast-btn:active { transform:scale(0.95); }
+.share-toast-btn.shared { background:var(--nr-green); pointer-events:none; }
+.share-toast-x { position:absolute; top:8px; right:22px; background:none; border:none; color:var(--nr-ash); font-size:14px; cursor:pointer; padding:4px; opacity:0.6; }
+.share-toast-x:active { opacity:1; }
+
+/* Poll confirmed state */
+.poll-note.confirmed { color:var(--nr-green) !important; font-weight:500; transition:color 0.3s ease; }
+
+/* ─── Share to Circle slide (last carousel slide) ─── */
+.car-share { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px 32px; height:100%; }
+.car-share-emoji { font-size:40px; margin-bottom:16px; color:var(--nr-red); font-weight:700; }
+.car-share-title { font-family:var(--font-headline); font-size:22px; color:var(--nr-white); margin-bottom:8px; }
+.car-share-sub { font-size:14px; color:var(--nr-ash); margin-bottom:28px; line-height:1.4; }
+.car-share-faces { display:flex; gap:-4px; justify-content:center; margin-bottom:24px; }
+.car-share-face { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:var(--nr-white); margin-left:-6px; border:2px solid var(--nr-black); }
+.car-share-face:first-child { margin-left:0; }
+.car-share-btn { padding:14px 32px; background:var(--nr-red); border:none; border-radius:var(--radius); font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--nr-white); text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; transition:all 0.15s; }
+.car-share-btn:active { transform:scale(0.96); opacity:0.9; }
+.car-share-btn.shared { background:var(--nr-green); pointer-events:none; }
+.car-share-skip { margin-top:16px; font-size:13px; color:var(--nr-ash); background:none; border:none; cursor:pointer; font-family:var(--font-body); }
+.car-share-skip:active { color:var(--nr-smoke); }
+
 /* Header ring animation */
 .today-progress svg circle:last-child {
   transition:stroke-dasharray 1s cubic-bezier(0.4,0,0.2,1);
@@ -1810,7 +1839,7 @@ body {
     <div class="discuss-share-cta">
       <div class="discuss-share-row">
         <div class="discuss-share-text"><strong>3 friends</strong> haven't weighed in yet</div>
-        <button class="discuss-share-btn" onclick="shareDiscuss()">SHARE</button>
+        <button class="discuss-share-btn" onclick="shareDiscuss()">SHARE TO CIRCLE</button>
       </div>
     </div>
   </div>
@@ -1844,6 +1873,16 @@ body {
     <div class="comp-ring-count" id="compRingCount">1/3</div>
   </div>
   <div class="comp-ring-label" id="compRingLabel">Story complete</div>
+</div>
+
+<!-- SHARE TO CIRCLE TOAST -->
+<div class="share-toast" id="shareToast">
+  <div class="share-toast-inner">
+    <div class="share-toast-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></div>
+    <div class="share-toast-text" id="shareToastText">Share to your Circle</div>
+    <button class="share-toast-btn" id="shareToastBtn" onclick="confirmShareToast()">SHARE</button>
+  </div>
+  <button class="share-toast-x" onclick="dismissShareToast()">✕</button>
 </div>
 
 <!-- IN-APP BROWSER -->
@@ -3008,6 +3047,17 @@ function renderFriendSlide(activity) {
         '<div class="stories-activity-card-sub">Poll · Voted "' + stance + '"</div>' +
         '</div></div>';
     }
+  } else if (activity.type === 'discuss') {
+    icon = '💬';
+    label = firstName + ' shared a take';
+    if (story) {
+      cardHTML = '<div class="stories-activity-card">' +
+        '<img src="' + story.image + '" alt="">' +
+        '<div class="stories-activity-card-info">' +
+        '<div class="stories-activity-card-title">' + story.headline + '</div>' +
+        '<div class="stories-activity-card-sub">Discussion · shared a take</div>' +
+        '</div></div>';
+    }
   } else if (activity.type === 'streak') {
     icon = '🔥';
     label = firstName + ' hit a ' + activity.detail.days + '-day streak';
@@ -3213,7 +3263,7 @@ function openCarousel(idx, startSlide) {
   currentStoryIdx = idx;
   carSlide = startSlide || 0;
   const hasDiscuss = !!story.discussion && !story.classroom;
-  carTotal = story.slides.length + 1 + (hasDiscuss ? 1 : 0); // +poll +discuss? (classroom discuss is in feed)
+  carTotal = story.slides.length + 1 + (hasDiscuss ? 1 : 0) + 1; // +poll +discuss? +share
   const el = document.getElementById('carousel');
   el.innerHTML = `
     <div class="car-top">
@@ -3254,6 +3304,18 @@ function openCarousel(idx, startSlide) {
             }
           </div>
         </div>` : ''}
+        <div class="car-slide">
+          <div class="car-share">
+            <div class="car-share-emoji">✓</div>
+            <div class="car-share-title">You finished this story</div>
+            <div class="car-share-sub">Share with your circle so they can see what you've been reading</div>
+            <div class="car-share-faces">
+              ${WIRE_FRIENDS.slice(0,4).map(f => '<div class="car-share-face" style="background:' + f.bg + '">' + f.av + '</div>').join('')}
+            </div>
+            <button class="car-share-btn" id="carShareBtn" onclick="shareFromCarousel()">SHARE TO CIRCLE</button>
+            <button class="car-share-skip" onclick="skipShareAndComplete()">not now</button>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -3341,10 +3403,21 @@ function openPoll(idx) {
   document.getElementById('pollThumb').style.left = '50%';
   document.getElementById('poll').classList.add('on');
 }
-function closePoll() { document.getElementById('poll').classList.remove('on'); }
+function closePoll() {
+  document.getElementById('poll').classList.remove('on');
+  // Reset poll note for next open
+  var note = document.querySelector('.poll-note');
+  if (note) { note.classList.remove('confirmed'); note.textContent = 'Visible only to your Close Circle.'; }
+}
 function setPoll(i) {
   document.getElementById('pollThumb').style.left = [0,25,50,75,100][i]+'%';
   document.querySelectorAll('.poll-lbl').forEach((l,j) => l.classList.toggle('sel', j===i));
+  // Confirm sharing to circle
+  var note = document.querySelector('.poll-note');
+  if (note && !note.classList.contains('confirmed')) {
+    note.classList.add('confirmed');
+    note.textContent = '✓ Shared to your Close Circle';
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -3621,16 +3694,59 @@ function submitDiscuss() {
 }
 
 function shareDiscuss() {
-  // In a real app, this generates a share card. For prototype, show feedback.
-  const btn = document.querySelector('.discuss-share-btn');
-  btn.textContent = 'SHARED ✓';
+  var btn = document.querySelector('.discuss-share-btn');
+  btn.textContent = 'SHARED TO CIRCLE ✓';
   btn.style.background = 'var(--nr-green)';
   btn.style.color = 'var(--nr-white)';
-  setTimeout(() => {
-    btn.textContent = 'SHARE';
-    btn.style.background = 'var(--nr-white)';
-    btn.style.color = 'var(--nr-black)';
-  }, 2000);
+  btn.style.pointerEvents = 'none';
+  var textEl = document.querySelector('.discuss-share-text');
+  if (textEl) textEl.innerHTML = 'Your circle will see your take';
+}
+
+/* ═══════════════════════════════════════════════
+   SHARE TO CIRCLE — toast component
+   ═══════════════════════════════════════════════ */
+let shareToastTimer = null;
+
+function showShareToast(type, storyIdx) {
+  var toast = document.getElementById('shareToast');
+  var textEl = document.getElementById('shareToastText');
+  var btn = document.getElementById('shareToastBtn');
+
+  // Reset button state
+  btn.textContent = 'SHARE';
+  btn.classList.remove('shared');
+  btn.style.pointerEvents = '';
+
+  // Set contextual text
+  if (type === 'story') {
+    textEl.textContent = 'Share that you finished this story';
+  } else if (type === 'discuss') {
+    textEl.textContent = 'Share your take with your Circle';
+  } else {
+    textEl.textContent = 'Share to your Circle';
+  }
+
+  // Show
+  toast.classList.add('on');
+
+  // Auto-dismiss after 4s
+  clearTimeout(shareToastTimer);
+  shareToastTimer = setTimeout(function() { dismissShareToast(); }, 4000);
+}
+
+function confirmShareToast() {
+  clearTimeout(shareToastTimer);
+  var btn = document.getElementById('shareToastBtn');
+  btn.textContent = 'SHARED ✓';
+  btn.classList.add('shared');
+  document.getElementById('shareToastText').textContent = 'Your circle will see this';
+  shareToastTimer = setTimeout(function() { dismissShareToast(); }, 1500);
+}
+
+function dismissShareToast() {
+  clearTimeout(shareToastTimer);
+  document.getElementById('shareToast').classList.remove('on');
 }
 
 /* ═══════════════════════════════════════════════
@@ -3709,6 +3825,19 @@ function completeStory() {
       }
     }, 700);
   }, 1400);
+}
+
+/* ─── Share from carousel last slide ─── */
+function shareFromCarousel() {
+  var btn = document.getElementById('carShareBtn');
+  btn.textContent = 'SHARED ✓';
+  btn.classList.add('shared');
+  // Brief pause to show confirmation, then complete
+  setTimeout(function() { completeStory(); }, 600);
+}
+
+function skipShareAndComplete() {
+  completeStory();
 }
 
 // Keep openXP as alias for backward compat (carousel onclick refs)
@@ -3843,6 +3972,7 @@ const WIRE_FRIENDS = [
   ]},
   { name:'Sarah M.', av:'S', bg:'linear-gradient(135deg,#FF6B9D,var(--nr-purple))', status:'done', stories:[
     { type:'read', storyIdx:0, time:'2h ago' },
+    { type:'discuss', storyIdx:0, time:'2h ago' },
     { type:'streak', detail:{days:7}, time:'3h ago' },
   ]},
   { name:'Kai', av:'K', bg:'linear-gradient(135deg,var(--nr-blue,#4A90D9),var(--nr-teal))', status:'idle', stories:[] },
