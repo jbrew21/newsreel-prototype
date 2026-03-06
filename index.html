@@ -808,6 +808,8 @@ body {
 /* Shared confirmation text */
 .car-share-confirmed { font-family:var(--font-body); font-size:13px; color:var(--nr-green); text-align:center; margin-top:12px; opacity:0; transition:opacity 0.3s ease; }
 .car-share-confirmed.show { opacity:1; }
+.car-share-done { margin-top:16px; background:none; border:none; font-family:var(--font-body); font-size:14px; color:var(--nr-ash); cursor:pointer; opacity:0; padding:8px 16px; transition:color 0.2s; }
+.car-share-done:active { color:var(--nr-smoke); }
 
 /* Header ring animation */
 .today-progress svg circle:last-child {
@@ -3387,6 +3389,7 @@ function openCarousel(idx, startSlide) {
               }).join('')}
             </div>
             <button class="car-share-btn" id="carShareBtn" data-share-stagger="3" onclick="shareFromCarousel()">SHARE TO CIRCLE</button>
+            <button class="car-share-done" data-share-stagger="3" onclick="closeCarousel()">done</button>
           </div>
         </div>
       </div>
@@ -3493,6 +3496,7 @@ function openPoll(idx) {
   document.getElementById('pollLabels').innerHTML = labels.map((l,i)=>`<div class="poll-lbl${i===2?' sel':''}" onclick="setPoll(${i})">${l}</div>`).join('');
   document.getElementById('pollThumb').style.left = '50%';
   document.getElementById('poll').classList.add('on');
+  initPollDrag();
 }
 function closePoll() {
   document.getElementById('poll').classList.remove('on');
@@ -3509,6 +3513,81 @@ function setPoll(i) {
     note.classList.add('confirmed');
     note.textContent = '✓ Shared to your Close Circle';
   }
+}
+
+/* ─── Poll drag + track click support ─── */
+function initPollDrag() {
+  var track = document.querySelector('.poll-track');
+  var thumb = document.getElementById('pollThumb');
+  if (!track || !thumb) return;
+
+  var dragging = false;
+  var snaps = [0, 25, 50, 75, 100];
+
+  function pctFromEvent(e) {
+    var pt = e.touches ? e.touches[0] : e;
+    var rect = track.getBoundingClientRect();
+    var pct = ((pt.clientX - rect.left) / rect.width) * 100;
+    return Math.max(0, Math.min(100, pct));
+  }
+
+  function snapToNearest(pct) {
+    var closest = 0, minDist = Infinity;
+    snaps.forEach(function(s, i) {
+      var d = Math.abs(pct - s);
+      if (d < minDist) { minDist = d; closest = i; }
+    });
+    return closest;
+  }
+
+  function onStart(e) {
+    dragging = true;
+    thumb.style.transition = 'none';
+    thumb.style.cursor = 'grabbing';
+    e.preventDefault();
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    var pct = pctFromEvent(e);
+    thumb.style.left = pct + '%';
+    // Highlight nearest label while dragging
+    var nearest = snapToNearest(pct);
+    document.querySelectorAll('.poll-lbl').forEach(function(l, j) { l.classList.toggle('sel', j === nearest); });
+  }
+
+  function onEnd(e) {
+    if (!dragging) return;
+    dragging = false;
+    thumb.style.transition = 'left 0.2s';
+    thumb.style.cursor = 'grab';
+    var pct = parseFloat(thumb.style.left);
+    var idx = snapToNearest(pct);
+    setPoll(idx);
+  }
+
+  // Click anywhere on track to snap
+  track.addEventListener('click', function(e) {
+    if (dragging) return;
+    var pct = pctFromEvent(e);
+    var idx = snapToNearest(pct);
+    setPoll(idx);
+  });
+
+  // Mouse events
+  thumb.addEventListener('mousedown', onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+
+  // Touch events
+  thumb.addEventListener('touchstart', onStart, {passive:false});
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('touchend', onEnd);
+
+  // Pointer events (for stylus, etc.)
+  thumb.addEventListener('pointerdown', onStart);
+  document.addEventListener('pointermove', onMove);
+  document.addEventListener('pointerup', onEnd);
 }
 
 /* ═══════════════════════════════════════════════
