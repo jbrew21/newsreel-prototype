@@ -290,28 +290,27 @@ body {
   overflow:hidden;
 }
 
-/* Social proof — overlapping friend avatars ON the story image */
+/* Social proof — friend face photos + reaction on story images */
 .card-readers {
   position:absolute; bottom:10px; left:10px; z-index:3;
-  display:flex; align-items:center;
+  display:flex; align-items:flex-end; gap:4px;
 }
-.card-readers-stack {
-  display:flex;
+.card-reader {
+  position:relative; flex-shrink:0;
 }
-.card-readers-av {
-  width:24px; height:24px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-size:9px; font-weight:600; color:var(--nr-white);
+.card-reader + .card-reader {
+  margin-left:-6px;
+}
+.card-reader-photo {
+  width:28px; height:28px; border-radius:50%;
+  object-fit:cover;
   border:2px solid var(--nr-black);
-  flex-shrink:0;
+  display:block;
 }
-.card-readers-av + .card-readers-av {
-  margin-left:-8px;
-}
-.card-readers-label {
-  font-family:var(--font-body); font-size:11px; font-weight:500;
-  color:rgba(255,255,255,0.85); margin-left:6px;
-  text-shadow:0 1px 3px rgba(0,0,0,0.6);
+.card-reader-reaction {
+  position:absolute; bottom:-3px; right:-4px;
+  font-size:11px; line-height:1;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));
 }
 
 /* ═══════════════════════════════════════════════
@@ -805,7 +804,7 @@ body {
 .car-share-friends { width:100%; max-width:345px; margin-bottom:28px; display:flex; flex-direction:column; gap:12px; opacity:0; }
 .car-share-friends-label { font-family:var(--font-mono); font-size:10px; color:var(--nr-steel); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:2px; }
 .car-share-friend { display:flex; align-items:center; gap:12px; }
-.car-share-friend-av { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:600; color:var(--nr-white); flex-shrink:0; border:2px solid transparent; transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275), border-color 0.3s ease, box-shadow 0.3s ease; }
+.car-share-friend-av { width:40px; height:40px; border-radius:50%; object-fit:cover; flex-shrink:0; border:2px solid transparent; transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275), border-color 0.3s ease, box-shadow 0.3s ease; }
 .car-share-friend-info { flex:1; }
 .car-share-friend-name { font-size:14px; font-weight:500; color:var(--nr-white); line-height:1.2; }
 .car-share-friend-status { font-size:12px; color:var(--nr-ash); margin-top:1px; }
@@ -997,7 +996,7 @@ body {
 .wire-friend-ring.progress { background:var(--nr-red); }
 .wire-friend-ring.idle { background:#333; }
 .wire-friend-ring.seen { opacity:0.5; }
-.wire-friend-av { width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:var(--nr-white); border:2.5px solid var(--nr-black); }
+.wire-friend-av { width:100%; height:100%; border-radius:50%; object-fit:cover; border:2.5px solid var(--nr-black); }
 .wire-friend-nm { font-size:10px; color:var(--nr-silver); font-weight:500; max-width:60px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .wire-friend-status { font-size:9px; color:var(--nr-ash); font-family:var(--font-mono); }
 .wire-friend-card:active .wire-friend-ring { transform:scale(0.92); }
@@ -2254,14 +2253,19 @@ function renderFeed() {
       : storyItems.filter(({ s }) => s.tags.some(t => selectedTopics.has(t)));
 
   el.innerHTML = filtered.map(({ s, i }, filteredIdx) => {
-    // Social proof: overlapping friend avatars ON the image
+    // Social proof: friend face photos + their reaction ON the image
     const readers = getStoryReaders(i);
     let readerBadge = '';
     if (readers.length > 0) {
-      const avs = readers.slice(0,3).map(f =>
-        '<div class="card-readers-av" style="background:' + f.bg + '">' + f.av + '</div>'
-      ).join('');
-      readerBadge = '<div class="card-readers"><div class="card-readers-stack">' + avs + '</div></div>';
+      const faces = readers.slice(0,3).map(function(f) {
+        var readEntry = f.stories.find(function(st) { return st.type === 'read' && st.storyIdx === i; });
+        var reaction = (readEntry && readEntry.reaction) ? '<span class="card-reader-reaction">' + readEntry.reaction + '</span>' : '';
+        return '<div class="card-reader">' +
+          '<img class="card-reader-photo" src="' + f.photo + '" alt="' + f.name + '">' +
+          reaction +
+        '</div>';
+      }).join('');
+      readerBadge = '<div class="card-readers">' + faces + '</div>';
     }
 
     return `
@@ -2865,7 +2869,7 @@ function renderWire() {
       var seenClass = friendStoriesSeen[i] ? ' seen' : '';
       var statusLabel = f.status === 'done' ? '✓ done' : f.status === 'progress' ? 'reading' : 'idle';
       return '<div class="wire-friend-card" onclick="openFriendStory(' + i + ')">' +
-        '<div class="wire-friend-ring ' + f.status + seenClass + '"><div class="wire-friend-av" style="background:' + f.bg + '">' + f.av + '</div></div>' +
+        '<div class="wire-friend-ring ' + f.status + seenClass + '"><img class="wire-friend-av" src="' + f.photo + '" alt="' + f.name + '" style="background:' + f.bg + '">' + '</div>' +
         '<div class="wire-friend-nm">' + f.name.split(' ')[0] + '</div>' +
         '<div class="wire-friend-status">' + statusLabel + '</div></div>';
     }).join('') +
@@ -3429,7 +3433,7 @@ function openCarousel(idx, startSlide) {
                 var statusClass = hasRead ? 'car-share-friend--read' : 'car-share-friend--unseen';
                 var nudgeBtn = hasRead ? '' : '<button class="car-share-nudge" onclick="nudgeFromShare(this,' + fi + ')">nudge</button>';
                 return '<div class="car-share-friend ' + statusClass + '">' +
-                  '<div class="car-share-friend-av" style="background:' + f.bg + '">' + f.av + '</div>' +
+                  '<img class="car-share-friend-av" src="' + f.photo + '" alt="' + f.name + '" style="background:' + f.bg + '">' +
                   '<div class="car-share-friend-info">' +
                     '<div class="car-share-friend-name">' + f.name + '</div>' +
                     '<div class="car-share-friend-status">' + statusText + '</div>' +
@@ -3457,11 +3461,22 @@ function openCarousel(idx, startSlide) {
   // Swipe handling — supports touch, mouse, and pointer events
   const body = document.getElementById('carBody');
 
+  var carSwipeMoved = false;
+
   function onStart(e) {
     carDragging = true;
+    carSwipeMoved = false;
     const pt = e.touches ? e.touches[0] : e;
     carTouchX = pt.clientX;
-    e.preventDefault();
+    // Don't call e.preventDefault() here — it kills onclick on mobile
+  }
+  function onMove(e) {
+    if (!carDragging) return;
+    const pt = e.touches ? e.touches[0] : e;
+    if (Math.abs(pt.clientX - carTouchX) > 10) {
+      carSwipeMoved = true;
+      e.preventDefault(); // only prevent default during actual swipe
+    }
   }
   function onEnd(e) {
     if (!carDragging) return;
@@ -3474,7 +3489,8 @@ function openCarousel(idx, startSlide) {
   }
 
   body.addEventListener('mousedown', onStart);
-  body.addEventListener('touchstart', onStart, {passive:false});
+  body.addEventListener('touchstart', onStart, {passive:true});
+  body.addEventListener('touchmove', onMove, {passive:false});
   document.addEventListener('mouseup', onEnd);
   document.addEventListener('touchend', onEnd);
 
@@ -3624,20 +3640,23 @@ function initPollDrag() {
     setPoll(idx);
   });
 
-  // Mouse events
-  thumb.addEventListener('mousedown', onStart);
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onEnd);
+  // Use pointer events (unified API for mouse + touch + stylus)
+  // Fallback to touch events for older mobile Safari
+  if (window.PointerEvent) {
+    thumb.addEventListener('pointerdown', function(e) { onStart(e); thumb.setPointerCapture(e.pointerId); });
+    thumb.addEventListener('pointermove', onMove);
+    thumb.addEventListener('pointerup', onEnd);
+  } else {
+    thumb.addEventListener('touchstart', onStart, {passive:false});
+    document.addEventListener('touchmove', onMove, {passive:false});
+    document.addEventListener('touchend', onEnd);
+    thumb.addEventListener('mousedown', onStart);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+  }
 
-  // Touch events
-  thumb.addEventListener('touchstart', onStart, {passive:false});
-  document.addEventListener('touchmove', onMove, {passive:false});
-  document.addEventListener('touchend', onEnd);
-
-  // Pointer events (for stylus, etc.)
-  thumb.addEventListener('pointerdown', onStart);
-  document.addEventListener('pointermove', onMove);
-  document.addEventListener('pointerup', onEnd);
+  // Prevent browser scroll/pan on the thumb
+  thumb.style.touchAction = 'none';
 }
 
 /* ═══════════════════════════════════════════════
@@ -4228,22 +4247,32 @@ const WIRE_POSTS = [
 ];
 
 const WIRE_FRIENDS = [
-  { name:'Alex Chen', av:'A', bg:'linear-gradient(135deg,var(--nr-teal),var(--nr-purple))', status:'done', stories:[
-    { type:'read', storyIdx:0, time:'1h ago' },
-    { type:'read', storyIdx:1, time:'1h ago' },
+  { name:'Alex Chen', av:'A', bg:'linear-gradient(135deg,var(--nr-teal),var(--nr-purple))',
+    photo:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
+    status:'done', stories:[
+    { type:'read', storyIdx:0, time:'1h ago', reaction:'\uD83E\uDD14' },
+    { type:'read', storyIdx:1, time:'1h ago', reaction:'\uD83D\uDE31' },
     { type:'quiz', storyIdx:1, detail:{score:3,total:3}, time:'1h ago' },
   ]},
-  { name:'Sarah M.', av:'S', bg:'linear-gradient(135deg,#FF6B9D,var(--nr-purple))', status:'done', stories:[
-    { type:'read', storyIdx:0, time:'2h ago' },
+  { name:'Sarah M.', av:'S', bg:'linear-gradient(135deg,#FF6B9D,var(--nr-purple))',
+    photo:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face',
+    status:'done', stories:[
+    { type:'read', storyIdx:0, time:'2h ago', reaction:'\uD83D\uDD25' },
     { type:'discuss', storyIdx:0, time:'2h ago' },
     { type:'streak', detail:{days:7}, time:'3h ago' },
   ]},
-  { name:'Kai', av:'K', bg:'linear-gradient(135deg,var(--nr-blue,#4A90D9),var(--nr-teal))', status:'idle', stories:[] },
-  { name:'Maya R.', av:'M', bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))', status:'progress', stories:[
-    { type:'read', storyIdx:2, time:'4h ago' },
+  { name:'Kai', av:'K', bg:'linear-gradient(135deg,var(--nr-blue,#4A90D9),var(--nr-teal))',
+    photo:'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=80&h=80&fit=crop&crop=face',
+    status:'idle', stories:[] },
+  { name:'Maya R.', av:'M', bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))',
+    photo:'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&h=80&fit=crop&crop=face',
+    status:'progress', stories:[
+    { type:'read', storyIdx:2, time:'4h ago', reaction:'\uD83D\uDE14' },
     { type:'poll', storyIdx:2, detail:{stance:'Agree'}, time:'4h ago' },
   ]},
-  { name:'Riley', av:'R', bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))', status:'done', stories:[
+  { name:'Riley', av:'R', bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))',
+    photo:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=face',
+    status:'done', stories:[
     { type:'joined', time:'8h ago' },
   ]},
 ];
