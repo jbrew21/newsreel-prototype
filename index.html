@@ -811,6 +811,11 @@ body {
 .car-share-done { margin-top:16px; background:none; border:none; font-family:var(--font-body); font-size:14px; color:var(--nr-ash); cursor:pointer; opacity:0; padding:8px 16px; transition:color 0.2s; }
 .car-share-done:active { color:var(--nr-smoke); }
 
+/* Nudge button on unseen friends */
+.car-share-nudge { margin-left:auto; padding:6px 14px; background:none; border:1px solid var(--nr-iron); border-radius:var(--radius-sm); font-family:var(--font-mono); font-size:10px; font-weight:600; color:var(--nr-ash); text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; transition:all 0.2s ease; flex-shrink:0; }
+.car-share-nudge:active { transform:scale(0.95); }
+.car-share-nudge.sent { border-color:var(--nr-teal); color:var(--nr-teal); pointer-events:none; }
+
 /* Header ring animation */
 .today-progress svg circle:last-child {
   transition:stroke-dasharray 1s cubic-bezier(0.4,0,0.2,1);
@@ -3375,21 +3380,23 @@ function openCarousel(idx, startSlide) {
             </div>
             <div class="car-share-friends" data-share-stagger="2">
               <div class="car-share-friends-label">YOUR CIRCLE</div>
-              ${WIRE_FRIENDS.slice(0,3).map(function(f) {
+              ${WIRE_FRIENDS.slice(0,3).map(function(f, fi) {
                 var hasRead = f.stories.some(function(s) { return s.type === 'read' && s.storyIdx === idx; });
                 var statusText = hasRead ? 'Read this' : "Hasn't seen this yet";
                 var statusClass = hasRead ? 'car-share-friend--read' : 'car-share-friend--unseen';
+                var nudgeBtn = hasRead ? '' : '<button class="car-share-nudge" onclick="nudgeFromShare(this,' + fi + ')">nudge</button>';
                 return '<div class="car-share-friend ' + statusClass + '">' +
                   '<div class="car-share-friend-av" style="background:' + f.bg + '">' + f.av + '</div>' +
                   '<div class="car-share-friend-info">' +
                     '<div class="car-share-friend-name">' + f.name + '</div>' +
                     '<div class="car-share-friend-status">' + statusText + '</div>' +
                   '</div>' +
+                  nudgeBtn +
                 '</div>';
               }).join('')}
             </div>
             <button class="car-share-btn" id="carShareBtn" data-share-stagger="3" onclick="shareFromCarousel()">SHARE TO CIRCLE</button>
-            <button class="car-share-done" data-share-stagger="3" onclick="closeCarousel()">done</button>
+            <button class="car-share-done" data-share-stagger="3" onclick="closeCarousel()">back to briefing</button>
           </div>
         </div>
       </div>
@@ -4046,6 +4053,11 @@ function shareFromCarousel() {
       closeCarousel();
     }
   }, 1600);
+}
+
+function nudgeFromShare(btn, friendIdx) {
+  btn.textContent = 'nudged ✓';
+  btn.classList.add('sent');
 }
 
 // Keep openXP as alias for backward compat (carousel onclick refs)
