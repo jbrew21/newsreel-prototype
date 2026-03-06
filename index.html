@@ -114,7 +114,7 @@ body {
   color:var(--nr-smoke); text-transform:uppercase; letter-spacing:1px;
 }
 .today-progress {
-  width:40px; height:40px; position:relative; cursor:pointer;
+  width:48px; height:48px; position:relative; cursor:pointer;
   -webkit-tap-highlight-color:transparent;
   animation:progressBounce 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.8s both;
 }
@@ -125,7 +125,7 @@ body {
 }
 @keyframes progressPulse {
   0%, 100% { filter:drop-shadow(0 0 0px var(--nr-red)); }
-  50% { filter:drop-shadow(0 0 6px var(--nr-red)); }
+  50% { filter:drop-shadow(0 0 10px var(--nr-red)); }
 }
 .today-progress.has-progress { animation:progressBounce 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.8s both, progressPulse 2s ease-in-out 1.5s 3; }
 .today-progress.all-done svg circle:last-child { stroke:var(--nr-green) !important; }
@@ -136,7 +136,7 @@ body {
 }
 .today-progress-count {
   position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  font-family:var(--font-mono); font-size:10px; font-weight:700;
+  font-family:var(--font-mono); font-size:12px; font-weight:700;
   color:var(--nr-white); letter-spacing:-0.3px; pointer-events:none;
 }
 .today-tabs {
@@ -288,6 +288,30 @@ body {
   flex-shrink:0;
   display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
   overflow:hidden;
+}
+
+/* Social proof — overlapping friend avatars ON the story image */
+.card-readers {
+  position:absolute; bottom:10px; left:10px; z-index:3;
+  display:flex; align-items:center;
+}
+.card-readers-stack {
+  display:flex;
+}
+.card-readers-av {
+  width:24px; height:24px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:600; color:var(--nr-white);
+  border:2px solid var(--nr-black);
+  flex-shrink:0;
+}
+.card-readers-av + .card-readers-av {
+  margin-left:-8px;
+}
+.card-readers-label {
+  font-family:var(--font-body); font-size:11px; font-weight:500;
+  color:rgba(255,255,255,0.85); margin-left:6px;
+  text-shadow:0 1px 3px rgba(0,0,0,0.6);
 }
 
 /* ═══════════════════════════════════════════════
@@ -2211,6 +2235,13 @@ let activeFilter = 'all';
    ═══════════════════════════════════════════════ */
 
 // — TODAY FEED (TikTok snap) —
+/* ─── Social proof: which friends read a given story ─── */
+function getStoryReaders(storyIdx) {
+  return WIRE_FRIENDS.filter(function(f) {
+    return f.stories.some(function(s) { return s.type === 'read' && s.storyIdx === storyIdx; });
+  });
+}
+
 function renderFeed() {
   const el = document.getElementById('feedSnap');
 
@@ -2222,7 +2253,18 @@ function renderFeed() {
       ? storyItems.filter(({ s }) => s.tags.includes(activeFilter))
       : storyItems.filter(({ s }) => s.tags.some(t => selectedTopics.has(t)));
 
-  el.innerHTML = filtered.map(({ s, i }) => `
+  el.innerHTML = filtered.map(({ s, i }, filteredIdx) => {
+    // Social proof: overlapping friend avatars ON the image
+    const readers = getStoryReaders(i);
+    let readerBadge = '';
+    if (readers.length > 0) {
+      const avs = readers.slice(0,3).map(f =>
+        '<div class="card-readers-av" style="background:' + f.bg + '">' + f.av + '</div>'
+      ).join('');
+      readerBadge = '<div class="card-readers"><div class="card-readers-stack">' + avs + '</div></div>';
+    }
+
+    return `
     <div class="feed-page" data-story="${i}">
       <div class="card-content-row">
         <div class="card-img-wrap${s.premium ? ' premium' : ''}" id="imgWrap-${i}" data-slide="0" data-total="${s.slides.length}">
@@ -2230,6 +2272,7 @@ function renderFeed() {
           <div class="card-slide-track" id="slideTrack-${i}">
             ${s.slides.map(sl => `<img src="${sl.img}" alt="">`).join('')}
           </div>
+          ${readerBadge}
           <div class="card-img-credit" id="imgCredit-${i}">@${s.slides[0].credit}</div>
           <button class="card-expand-btn" onclick="event.stopPropagation();openCarousel(${i})">${ICONS.expand}</button>
         </div>
@@ -2250,7 +2293,7 @@ function renderFeed() {
       <div class="card-headline">${s.headline}</div>
       <div class="card-sub">${s.subtitle}</div>
     </div>
-  `).join('');
+  `}).join('');
 
   // Append "You're Caught Up" card at end of feed
   const caughtUpCount = Math.min(STORIES.length, 4);
