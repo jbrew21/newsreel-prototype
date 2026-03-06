@@ -307,11 +307,21 @@ body {
   border:2px solid var(--nr-black);
   display:block;
 }
-.card-reader-reaction {
-  position:absolute; bottom:-3px; right:-4px;
-  font-size:11px; line-height:1;
-  filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+.card-reader-badge {
+  position:absolute; bottom:-2px; right:-3px;
+  width:14px; height:14px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  border:1.5px solid var(--nr-black);
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4));
 }
+.card-reader-badge--read { background:var(--nr-green); }
+.card-reader-badge--quiz { background:var(--nr-yellow); }
+.card-reader-badge--poll { background:var(--nr-red); }
+.card-reader-badge svg { width:8px; height:8px; }
+.card-reader-badge svg path,
+.card-reader-badge svg line,
+.card-reader-badge svg polyline,
+.card-reader-badge svg circle { stroke:var(--nr-black); fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
 
 /* ═══════════════════════════════════════════════
    STORY CAROUSEL — Opens when you tap expand
@@ -423,6 +433,35 @@ body {
 .poll-labels { display:flex; justify-content:space-between; }
 .poll-lbl { font-size:10px; color:var(--nr-white); text-align:center; cursor:pointer; flex:1; padding:4px 0; transition:color 0.2s; }
 .poll-lbl.sel { color:var(--nr-yellow); font-weight:600; }
+.poll-circle {
+  width:100%; margin-top:24px;
+}
+.poll-circle-label {
+  font-family:var(--font-mono); font-size:10px; color:var(--nr-steel);
+  text-transform:uppercase; letter-spacing:1.2px; margin-bottom:10px;
+}
+.poll-circle-row {
+  display:flex; align-items:center; gap:10px; margin-bottom:8px;
+}
+.poll-circle-av {
+  width:28px; height:28px; border-radius:50%; object-fit:cover; flex-shrink:0;
+  border:1.5px solid rgba(255,255,255,0.1);
+}
+.poll-circle-name {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-white); font-weight:500;
+  flex:1;
+}
+.poll-circle-stance {
+  font-family:var(--font-mono); font-size:11px; font-weight:600;
+  padding:3px 10px; border-radius:12px; text-transform:uppercase; letter-spacing:0.3px;
+}
+.poll-circle-stance--agree { background:rgba(26,173,23,0.15); color:var(--nr-green); }
+.poll-circle-stance--disagree { background:rgba(255,99,67,0.15); color:var(--nr-red); }
+.poll-circle-stance--neutral { background:rgba(255,255,255,0.08); color:var(--nr-ash); }
+.poll-circle-empty {
+  font-family:var(--font-body); font-size:12px; color:var(--nr-steel);
+  text-align:center; padding:8px 0;
+}
 .poll-note { margin-top:20px; font-size:12px; color:var(--nr-ash); text-align:center; }
 .poll-link { margin-top:10px; font-size:12px; color:var(--nr-yellow); text-decoration:underline; text-underline-offset:3px; cursor:pointer; text-align:center; }
 
@@ -1875,6 +1914,7 @@ body {
     <div class="poll-track"><div class="poll-ticks"><div class="poll-tick"></div><div class="poll-tick"></div><div class="poll-tick"></div><div class="poll-tick"></div><div class="poll-tick"></div></div><div class="poll-thumb" id="pollThumb"></div></div>
     <div class="poll-labels" id="pollLabels"></div>
   </div>
+  <div class="poll-circle" id="pollCircle"></div>
   <div class="poll-note">Visible only to your Close Circle.</div>
   <div class="poll-link">Have more you want to say? Write to us!</div>
 </div>
@@ -2253,16 +2293,26 @@ function renderFeed() {
       : storyItems.filter(({ s }) => s.tags.some(t => selectedTopics.has(t)));
 
   el.innerHTML = filtered.map(({ s, i }, filteredIdx) => {
-    // Social proof: friend face photos + their reaction ON the image
+    // Social proof: friend face photos + activity badge ON the image
     const readers = getStoryReaders(i);
     let readerBadge = '';
     if (readers.length > 0) {
       const faces = readers.slice(0,3).map(function(f) {
-        var readEntry = f.stories.find(function(st) { return st.type === 'read' && st.storyIdx === i; });
-        var reaction = (readEntry && readEntry.reaction) ? '<span class="card-reader-reaction">' + readEntry.reaction + '</span>' : '';
+        // Find highest-engagement activity for this story: quiz > poll > read
+        var acts = f.stories.filter(function(st) { return st.storyIdx === i; });
+        var badge = '';
+        var hasQuiz = acts.some(function(a) { return a.type === 'quiz'; });
+        var hasPoll = acts.some(function(a) { return a.type === 'poll'; });
+        if (hasQuiz) {
+          badge = '<div class="card-reader-badge card-reader-badge--quiz"><svg viewBox="0 0 12 12"><polyline points="2.5 6.5 5 9 9.5 3.5"/></svg></div>';
+        } else if (hasPoll) {
+          badge = '<div class="card-reader-badge card-reader-badge--poll"><svg viewBox="0 0 12 12"><line x1="3" y1="8" x2="3" y2="4"/><line x1="6" y1="8" x2="6" y2="3"/><line x1="9" y1="8" x2="9" y2="5.5"/></svg></div>';
+        } else {
+          badge = '<div class="card-reader-badge card-reader-badge--read"><svg viewBox="0 0 12 12"><polyline points="3 6.5 5 8.5 9 3.5"/></svg></div>';
+        }
         return '<div class="card-reader">' +
           '<img class="card-reader-photo" src="' + f.photo + '" alt="' + f.name + '">' +
-          reaction +
+          badge +
         '</div>';
       }).join('');
       readerBadge = '<div class="card-readers">' + faces + '</div>';
@@ -3561,6 +3611,30 @@ function openPoll(idx) {
   const labels = ['Strongly Agree','Agree','Neutral','Disagree','Strongly Disagree'];
   document.getElementById('pollLabels').innerHTML = labels.map((l,i)=>`<div class="poll-lbl${i===2?' sel':''}" onclick="setPoll(${i})">${l}</div>`).join('');
   document.getElementById('pollThumb').style.left = '50%';
+
+  // Populate friend circle stances for this story's poll
+  var circleEl = document.getElementById('pollCircle');
+  var friendPolls = [];
+  WIRE_FRIENDS.forEach(function(f) {
+    var pollEntry = f.stories.find(function(st) { return st.type === 'poll' && st.storyIdx === idx; });
+    if (pollEntry) friendPolls.push({ friend: f, stance: pollEntry.detail.stance });
+  });
+  if (friendPolls.length > 0) {
+    var stanceMap = { 'Strongly Agree':'agree', 'Agree':'agree', 'Neutral':'neutral', 'Disagree':'disagree', 'Strongly Disagree':'disagree' };
+    circleEl.innerHTML = '<div class="poll-circle-label">Your Circle</div>' +
+      friendPolls.map(function(p) {
+        var cls = stanceMap[p.stance] || 'neutral';
+        return '<div class="poll-circle-row">' +
+          '<img class="poll-circle-av" src="' + p.friend.photo + '" alt="' + p.friend.name + '">' +
+          '<div class="poll-circle-name">' + p.friend.name + '</div>' +
+          '<div class="poll-circle-stance poll-circle-stance--' + cls + '">' + p.stance + '</div>' +
+        '</div>';
+      }).join('');
+  } else {
+    circleEl.innerHTML = '<div class="poll-circle-label">Your Circle</div>' +
+      '<div class="poll-circle-empty">No one in your circle has voted yet. Be the first.</div>';
+  }
+
   document.getElementById('poll').classList.add('on');
   initPollDrag();
 }
@@ -4250,14 +4324,17 @@ const WIRE_FRIENDS = [
   { name:'Alex Chen', av:'A', bg:'linear-gradient(135deg,var(--nr-teal),var(--nr-purple))',
     photo:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
     status:'done', stories:[
-    { type:'read', storyIdx:0, time:'1h ago', reaction:'\uD83E\uDD14' },
-    { type:'read', storyIdx:1, time:'1h ago', reaction:'\uD83D\uDE31' },
+    { type:'read', storyIdx:0, time:'1h ago' },
+    { type:'quiz', storyIdx:0, detail:{score:2,total:3}, time:'1h ago' },
+    { type:'read', storyIdx:1, time:'1h ago' },
     { type:'quiz', storyIdx:1, detail:{score:3,total:3}, time:'1h ago' },
+    { type:'poll', storyIdx:0, detail:{stance:'Disagree'}, time:'1h ago' },
   ]},
   { name:'Sarah M.', av:'S', bg:'linear-gradient(135deg,#FF6B9D,var(--nr-purple))',
     photo:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face',
     status:'done', stories:[
-    { type:'read', storyIdx:0, time:'2h ago', reaction:'\uD83D\uDD25' },
+    { type:'read', storyIdx:0, time:'2h ago' },
+    { type:'poll', storyIdx:0, detail:{stance:'Agree'}, time:'2h ago' },
     { type:'discuss', storyIdx:0, time:'2h ago' },
     { type:'streak', detail:{days:7}, time:'3h ago' },
   ]},
@@ -4267,7 +4344,7 @@ const WIRE_FRIENDS = [
   { name:'Maya R.', av:'M', bg:'linear-gradient(135deg,var(--nr-green),var(--nr-teal))',
     photo:'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&h=80&fit=crop&crop=face',
     status:'progress', stories:[
-    { type:'read', storyIdx:2, time:'4h ago', reaction:'\uD83D\uDE14' },
+    { type:'read', storyIdx:2, time:'4h ago' },
     { type:'poll', storyIdx:2, detail:{stance:'Agree'}, time:'4h ago' },
   ]},
   { name:'Riley', av:'R', bg:'linear-gradient(135deg,var(--nr-yellow),var(--nr-red))',
