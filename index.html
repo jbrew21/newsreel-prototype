@@ -181,14 +181,15 @@ body {
 
 /* Image + side actions layout */
 .card-content-row {
-  display:flex; gap:0; padding:4px 0 0 16px; flex:1 1 0; min-height:0;
-  max-height:55%; overflow:hidden;
+  display:flex; gap:0; padding:4px 0 0 16px; flex:0 0 auto; min-height:0;
+  overflow:hidden;
 }
 
-/* Main image area — swipeable slide track */
+/* Main image area — swipeable slide track, 4:5 like the phone in mini */
 .card-img-wrap {
   position:relative;
   flex:1;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   background: var(--nr-lead);
   border-radius: 12px;
