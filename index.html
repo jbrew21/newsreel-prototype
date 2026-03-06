@@ -211,27 +211,9 @@ body {
   display:flex; height:100%;
   transition:transform 0.3s cubic-bezier(0.2,0,0.2,1);
 }
-.card-slide-item {
-  position:relative; height:100%; flex:0 0 auto; overflow:hidden;
-}
-.card-slide-item img {
-  width:100%; height:100%; object-fit:cover;
+.card-slide-track img {
+  height:100%; object-fit:cover; flex:0 0 auto;
   -webkit-user-drag:none; user-select:none; pointer-events:none;
-}
-.card-slide-text {
-  position:absolute; bottom:0; left:0; right:0;
-  padding:32px 12px 10px;
-  background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
-  font-family:var(--font-body); font-size:12.5px; font-weight:400;
-  color:rgba(255,255,255,0.92); line-height:1.4;
-  pointer-events:none;
-  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
-  overflow:hidden;
-}
-.card-slide-label {
-  display:inline-block; font-family:var(--font-mono); font-size:9px;
-  font-weight:600; color:var(--nr-yellow); text-transform:uppercase;
-  letter-spacing:0.5px; margin-bottom:3px;
 }
 .card-img-credit {
   position:absolute; bottom:8px; right:10px;
@@ -2342,7 +2324,7 @@ function renderFeed() {
         <div class="card-img-wrap${s.premium ? ' premium' : ''}" id="imgWrap-${i}" data-slide="0" data-total="${s.slides.length}">
           ${s.premium ? '<div class="premium-badge">★ Premium</div>' : ''}
           <div class="card-slide-track" id="slideTrack-${i}">
-            ${s.slides.map(sl => `<div class="card-slide-item"><img src="${sl.img}" alt="">${sl.text ? `<div class="card-slide-text">${sl.label ? '<div class="card-slide-label">' + sl.label + '</div>' : ''}${sl.text}</div>` : ''}</div>`).join('')}
+            ${s.slides.map(sl => `<img src="${sl.img}" alt="">`).join('')}
           </div>
           ${readerBadge}
           <div class="card-img-credit" id="imgCredit-${i}">@${s.slides[0].credit}</div>
@@ -2413,10 +2395,10 @@ function renderFeed() {
   STORIES.forEach((s, i) => {
     const wrap = document.getElementById('imgWrap-' + i);
     if (!wrap) return;
-    const items = wrap.querySelectorAll('.card-slide-item');
+    const imgs = wrap.querySelectorAll('.card-slide-track img');
     const setWidths = () => {
       const w = wrap.offsetWidth;
-      items.forEach(item => { item.style.width = w + 'px'; });
+      imgs.forEach(img => { img.style.width = w + 'px'; });
     };
     // Set widths after layout
     requestAnimationFrame(setWidths);
