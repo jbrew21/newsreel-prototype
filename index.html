@@ -753,19 +753,61 @@ body {
 /* Poll confirmed state */
 .poll-note.confirmed { color:var(--nr-green) !important; font-weight:500; transition:color 0.3s ease; }
 
-/* ─── Share to Circle slide (last carousel slide) ─── */
-.car-share { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px 32px; height:100%; }
-.car-share-emoji { font-size:40px; margin-bottom:16px; color:var(--nr-red); font-weight:700; }
-.car-share-title { font-family:var(--font-headline); font-size:22px; color:var(--nr-white); margin-bottom:8px; }
-.car-share-sub { font-size:14px; color:var(--nr-ash); margin-bottom:28px; line-height:1.4; }
-.car-share-faces { display:flex; gap:-4px; justify-content:center; margin-bottom:24px; }
-.car-share-face { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:var(--nr-white); margin-left:-6px; border:2px solid var(--nr-black); }
-.car-share-face:first-child { margin-left:0; }
-.car-share-btn { padding:14px 32px; background:var(--nr-red); border:none; border-radius:var(--radius); font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--nr-white); text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; transition:all 0.15s; }
-.car-share-btn:active { transform:scale(0.96); opacity:0.9; }
-.car-share-btn.shared { background:var(--nr-green); pointer-events:none; }
-.car-share-skip { margin-top:16px; font-size:13px; color:var(--nr-ash); background:none; border:none; cursor:pointer; font-family:var(--font-body); }
-.car-share-skip:active { color:var(--nr-smoke); }
+/* ═══════════════════════════════════════════════
+   SHARE CARD — "Finish Line" Redesign
+   ═══════════════════════════════════════════════ */
+.car-slide--share { position:relative; overflow:hidden; }
+.car-share-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:blur(20px) brightness(0.35); transform:scale(1.1); }
+.car-share-bg-overlay { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.85) 100%); }
+.car-share-content { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; padding:0 24px; height:100%; justify-content:center; }
+
+/* Completion check SVG */
+.car-share-check { width:48px; height:48px; margin-bottom:24px; opacity:0; }
+.car-share-check svg { width:100%; height:100%; }
+.car-share-check-ring { transform-origin:center; transform:rotate(-90deg); transition:stroke-dasharray 0.6s cubic-bezier(0.4,0,0.2,1); }
+.car-share-check-mark { stroke-dasharray:30; stroke-dashoffset:30; transition:stroke-dashoffset 0.4s ease 0.5s; }
+.car-slide--share.active .car-share-check-ring { stroke-dasharray:138 0; }
+.car-slide--share.active .car-share-check-mark { stroke-dashoffset:0; }
+
+/* Story recap card (frosted glass) */
+.car-share-recap { display:flex; gap:12px; align-items:center; background:rgba(31,31,31,0.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-radius:var(--radius); padding:12px 14px; width:100%; max-width:345px; margin-bottom:28px; border:1px solid rgba(255,255,255,0.06); opacity:0; }
+.car-share-recap-thumb { width:56px; height:56px; border-radius:var(--radius-sm); object-fit:cover; flex-shrink:0; }
+.car-share-recap-info { flex:1; min-width:0; }
+.car-share-recap-label { font-family:var(--font-mono); font-size:10px; color:var(--nr-ash); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+.car-share-recap-headline { font-family:var(--font-headline); font-size:15px; color:var(--nr-white); line-height:1.25; margin-bottom:3px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.car-share-recap-author { font-size:12px; color:var(--nr-ash); }
+
+/* Friends section */
+.car-share-friends { width:100%; max-width:345px; margin-bottom:28px; display:flex; flex-direction:column; gap:12px; opacity:0; }
+.car-share-friends-label { font-family:var(--font-mono); font-size:10px; color:var(--nr-steel); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:2px; }
+.car-share-friend { display:flex; align-items:center; gap:12px; }
+.car-share-friend-av { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:600; color:var(--nr-white); flex-shrink:0; border:2px solid transparent; transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275), border-color 0.3s ease, box-shadow 0.3s ease; }
+.car-share-friend-info { flex:1; }
+.car-share-friend-name { font-size:14px; font-weight:500; color:var(--nr-white); line-height:1.2; }
+.car-share-friend-status { font-size:12px; color:var(--nr-ash); margin-top:1px; }
+.car-share-friend--read .car-share-friend-status { color:var(--nr-green); }
+.car-share-friend--read .car-share-friend-av { border-color:rgba(26,173,23,0.3); }
+
+/* Share button */
+.car-share-btn { padding:16px 40px; background:var(--nr-red); border:none; border-radius:var(--radius); font-family:var(--font-mono); font-size:13px; font-weight:600; color:var(--nr-white); text-transform:uppercase; letter-spacing:0.8px; cursor:pointer; width:100%; max-width:345px; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); opacity:0; }
+.car-share-btn:active { transform:scale(0.97); }
+.car-share-btn.shared { background:var(--nr-green); pointer-events:none; animation:shareBtnPulse 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+
+/* Stagger animations on arrival */
+@keyframes shareStaggerIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+.car-slide--share.active [data-share-stagger="0"] { animation:shareStaggerIn 0.5s cubic-bezier(0.2,0,0.2,1) 0.1s both; }
+.car-slide--share.active [data-share-stagger="1"] { animation:shareStaggerIn 0.5s cubic-bezier(0.2,0,0.2,1) 0.3s both; }
+.car-slide--share.active [data-share-stagger="2"] { animation:shareStaggerIn 0.5s cubic-bezier(0.2,0,0.2,1) 0.5s both; }
+.car-slide--share.active [data-share-stagger="3"] { animation:shareStaggerIn 0.5s cubic-bezier(0.2,0,0.2,1) 0.7s both; }
+
+/* Celebration animations */
+@keyframes shareBtnPulse { 0% { transform:scale(1); } 40% { transform:scale(1.04); } 100% { transform:scale(1); } }
+@keyframes friendBounce { 0% { transform:scale(1); } 40% { transform:scale(1.15); } 100% { transform:scale(1); } }
+.car-share-friend-av.celebrate { animation:friendBounce 0.5s cubic-bezier(0.175,0.885,0.32,1.275); border-color:rgba(26,173,23,0.5); box-shadow:0 0 12px rgba(26,173,23,0.3); }
+
+/* Shared confirmation text */
+.car-share-confirmed { font-family:var(--font-body); font-size:13px; color:var(--nr-green); text-align:center; margin-top:12px; opacity:0; transition:opacity 0.3s ease; }
+.car-share-confirmed.show { opacity:1; }
 
 /* Header ring animation */
 .today-progress svg circle:last-child {
@@ -3293,16 +3335,41 @@ function openCarousel(idx, startSlide) {
           </div>
           <div class="car-journalist"><div class="car-j-av">${story.author.initials}</div><span class="car-j-name">${story.author.name}</span></div>
         </div>`).join('')}
-        <div class="car-slide">
-          <div class="car-share">
-            <div class="car-share-emoji">✓</div>
-            <div class="car-share-title">You finished this story</div>
-            <div class="car-share-sub">Share with your circle so they can see what you've been reading</div>
-            <div class="car-share-faces">
-              ${WIRE_FRIENDS.slice(0,4).map(f => '<div class="car-share-face" style="background:' + f.bg + '">' + f.av + '</div>').join('')}
+        <div class="car-slide car-slide--share" id="carShareSlide">
+          <img class="car-share-bg" src="${story.image}" alt="">
+          <div class="car-share-bg-overlay"></div>
+          <div class="car-share-content">
+            <div class="car-share-check" data-share-stagger="0">
+              <svg viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="24" r="22" stroke="var(--nr-green)" stroke-width="2.5" opacity="0.3"/>
+                <circle class="car-share-check-ring" cx="24" cy="24" r="22" stroke="var(--nr-green)" stroke-width="2.5" stroke-dasharray="0 138" stroke-linecap="round"/>
+                <polyline points="15,24 22,31 33,18" stroke="var(--nr-green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" class="car-share-check-mark"/>
+              </svg>
             </div>
-            <button class="car-share-btn" id="carShareBtn" onclick="shareFromCarousel()">SHARE TO CIRCLE</button>
-            <button class="car-share-skip" onclick="skipShareAndComplete()">skip</button>
+            <div class="car-share-recap" data-share-stagger="1">
+              <img class="car-share-recap-thumb" src="${story.image}" alt="">
+              <div class="car-share-recap-info">
+                <div class="car-share-recap-label">${story.tags[0] || 'Story'} · ${story.readTime}</div>
+                <div class="car-share-recap-headline">${story.headline}</div>
+                <div class="car-share-recap-author">${story.author.name}</div>
+              </div>
+            </div>
+            <div class="car-share-friends" data-share-stagger="2">
+              <div class="car-share-friends-label">YOUR CIRCLE</div>
+              ${WIRE_FRIENDS.slice(0,3).map(function(f) {
+                var hasRead = f.stories.some(function(s) { return s.type === 'read' && s.storyIdx === idx; });
+                var statusText = hasRead ? 'Read this' : "Hasn't seen this yet";
+                var statusClass = hasRead ? 'car-share-friend--read' : 'car-share-friend--unseen';
+                return '<div class="car-share-friend ' + statusClass + '">' +
+                  '<div class="car-share-friend-av" style="background:' + f.bg + '">' + f.av + '</div>' +
+                  '<div class="car-share-friend-info">' +
+                    '<div class="car-share-friend-name">' + f.name + '</div>' +
+                    '<div class="car-share-friend-status">' + statusText + '</div>' +
+                  '</div>' +
+                '</div>';
+              }).join('')}
+            </div>
+            <button class="car-share-btn" id="carShareBtn" data-share-stagger="3" onclick="shareFromCarousel()">SHARE TO CIRCLE</button>
           </div>
         </div>
         <div class="car-slide" style="align-items:center;justify-content:center;cursor:pointer" onclick="openPoll(${idx})">
@@ -3375,6 +3442,15 @@ function carGo(dir) {
     // Auto-register completion when user reaches the share card
     if (carSlide === carShareSlideIdx && !carStoryCompleted) {
       registerStoryComplete();
+    }
+    // Trigger stagger animation when share slide becomes visible
+    var shareSlide = document.getElementById('carShareSlide');
+    if (shareSlide) {
+      if (carSlide === carShareSlideIdx) {
+        setTimeout(function() { shareSlide.classList.add('active'); }, 200);
+      } else {
+        shareSlide.classList.remove('active');
+      }
     }
   } else if (dir === 1 && next >= carTotal) {
     // Swiped past the very last slide → just close carousel
@@ -3848,29 +3924,47 @@ function completeStory() {
   closeCarousel();
 }
 
-/* ─── Share from carousel share card ─── */
+/* ─── Share from carousel — celebration micro-interaction ─── */
 function shareFromCarousel() {
   var btn = document.getElementById('carShareBtn');
-  btn.textContent = 'SHARED ✓';
+  var slide = document.getElementById('carShareSlide');
+
+  // Phase 1: Button snaps green (immediate)
+  btn.textContent = 'SHARED \u2713';
   btn.classList.add('shared');
-  // Completion already registered when user arrived at this slide
-  // Show confirmation briefly, then advance to poll/discussion or close
+
+  // Phase 2: Friend avatars bounce one by one
+  var avatars = slide.querySelectorAll('.car-share-friend-av');
+  avatars.forEach(function(av, i) {
+    setTimeout(function() { av.classList.add('celebrate'); }, 150 + (i * 120));
+  });
+
+  // Phase 3: Update friend status text
+  setTimeout(function() {
+    var statuses = slide.querySelectorAll('.car-share-friend-status');
+    statuses.forEach(function(s) {
+      s.textContent = 'Will see this';
+      s.style.color = 'var(--nr-green)';
+    });
+  }, 500);
+
+  // Phase 4: Warm confirmation text below button
+  setTimeout(function() {
+    var confirm = document.createElement('div');
+    confirm.className = 'car-share-confirmed';
+    confirm.textContent = 'Your circle will see this';
+    btn.parentNode.insertBefore(confirm, btn.nextSibling);
+    requestAnimationFrame(function() { confirm.classList.add('show'); });
+  }, 600);
+
+  // Phase 5: Auto-advance after the moment lands
   setTimeout(function() {
     if (carSlide + 1 < carTotal) {
-      carGo(1); // advance to optional poll/discussion
+      carGo(1);
     } else {
       closeCarousel();
     }
-  }, 800);
-}
-
-function skipShareAndComplete() {
-  // Completion already registered — advance to poll or close
-  if (carSlide + 1 < carTotal) {
-    carGo(1); // advance to optional poll/discussion
-  } else {
-    closeCarousel();
-  }
+  }, 1600);
 }
 
 // Keep openXP as alias for backward compat (carousel onclick refs)
