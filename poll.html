@@ -73,6 +73,21 @@ body {
   line-height:1.4; max-width:340px; margin:0 auto;
 }
 
+/* Vote confirmation (shown when auto-voting from newsletter) */
+.poll-your-vote {
+  display:none; text-align:center; margin-bottom:24px;
+  padding:14px 20px; background:var(--nr-lead); border-radius:12px;
+  border:1px solid var(--nr-green);
+}
+.poll-your-vote.visible { display:block; }
+.poll-your-vote-check {
+  font-size:24px; margin-bottom:4px;
+}
+.poll-your-vote-text {
+  font-family:var(--font-mono); font-size:12px; color:var(--nr-green);
+  text-transform:uppercase; letter-spacing:0.5px; font-weight:600;
+}
+
 /* Slider */
 .poll-slider-wrap {
   background:var(--nr-lead); border-radius:12px; padding:24px 20px 20px;
@@ -149,6 +164,22 @@ body {
 .poll-results-fill.disagree { background:var(--nr-red); }
 .poll-results-fill.neutral { background:var(--nr-yellow); }
 
+/* Live indicator */
+.poll-live-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--font-mono); font-size:10px; color:var(--nr-green);
+  text-transform:uppercase; letter-spacing:0.5px; font-weight:600;
+  margin-bottom:16px;
+}
+.poll-live-dot {
+  width:6px; height:6px; background:var(--nr-green); border-radius:50%;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity:1; }
+  50% { opacity:0.3; }
+}
+
 /* AI Take */
 .poll-ai-take {
   background:var(--nr-lead); border-radius:12px; padding:16px;
@@ -207,6 +238,21 @@ body {
   font-family:var(--font-mono); font-size:9px; color:#555;
   text-transform:uppercase; letter-spacing:1px;
 }
+
+/* Loading state */
+.poll-loading {
+  text-align:center; padding:40px 0;
+}
+.poll-loading-spinner {
+  width:24px; height:24px; border:2px solid var(--nr-iron);
+  border-top-color:var(--nr-yellow); border-radius:50%;
+  animation:spin 0.8s linear infinite; margin:0 auto 12px;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.poll-loading-text {
+  font-family:var(--font-mono); font-size:11px; color:var(--nr-steel);
+  text-transform:uppercase; letter-spacing:0.5px;
+}
 </style>
 </head>
 <body>
@@ -229,6 +275,12 @@ body {
   <div class="poll-question-wrap">
     <div class="poll-question-label">Where do you stand?</div>
     <div class="poll-question-text" id="pollQuestion">"The U.S. should receive partial ownership of the Gordie Howe Bridge."</div>
+  </div>
+
+  <!-- Your Vote Confirmation (shown on auto-vote from newsletter) -->
+  <div class="poll-your-vote" id="yourVote">
+    <div class="poll-your-vote-check">✓</div>
+    <div class="poll-your-vote-text" id="yourVoteText">You voted: Agree</div>
   </div>
 
   <!-- Slider (pre-vote) -->
@@ -258,6 +310,11 @@ body {
 
   <!-- Results (shown after vote) -->
   <div class="poll-results" id="pollResults">
+    <div class="poll-live-badge">
+      <span class="poll-live-dot"></span>
+      LIVE RESULTS
+    </div>
+
     <div class="poll-results-bar-wrap">
       <div class="poll-results-label-row">
         <span class="poll-results-label">Agree / Strongly Agree</span>
@@ -286,13 +343,14 @@ body {
       </div>
     </div>
 
-    <div class="poll-voter-count" id="voterCount">1,247 readers voted</div>
+    <div class="poll-voter-count" id="voterCount">0 readers voted</div>
 
     <!-- AI Take on results -->
     <div class="poll-ai-take">
-      <div class="poll-ai-take-label">Benny's take on the results</div>
-      <div class="poll-ai-take-text" id="aiTake">
-        Readers are sharply divided — but the disagree side has a slight edge. Younger readers (18-24) overwhelmingly oppose U.S. ownership claims, while 25+ readers are more split. This mirrors broader generational divides on trade policy we've tracked all year.
+      <div class="poll-ai-take-label">What your vote means</div>
+      <div class="poll-ai-take-text" id="aiTake"></div>
+      <div style="font-family:var(--font-mono); font-size:8px; color:var(--nr-steel); margin-top:10px; line-height:1.4;">
+        This analysis is AI-generated and was not reviewed by an editor. It may contain errors or oversimplifications. Always check the sources above.
       </div>
     </div>
 
@@ -311,53 +369,240 @@ body {
   </div>
 </div>
 
+<!-- Supabase JS Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
 <script>
-// Story data (would be dynamic in production)
+// ═══════════════════════════════════════════════════
+// SUPABASE CONFIG — Replace these with your project's values
+// Go to: supabase.com → Your Project → Settings → API
+// ═══════════════════════════════════════════════════
+var SUPABASE_URL = 'https://ajdxfupqveqypicealpw.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZHhmdXBxdmVxeXBpY2VhbHB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzExOTQxODYsImV4cCI6MjA0Njc3MDE4Nn0.hFnZFxmD548EPGzoy5E8_WZUp9xSOca7HYLnWFPuMj0';
+
+// Set to false to use hardcoded fallback data (for demo/prototype mode)
+var USE_SUPABASE = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
+
+// Init Supabase client
+var sb = null;
+if (USE_SUPABASE) {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+
+// ═══════════════════════════════════════════════════
+// STORY DATA (metadata only — results come from Supabase)
+// ═══════════════════════════════════════════════════
 var POLL_DATA = [
   {
     tag: "POLITICS · TRADE",
     headline: "Trump Threatens to Block New Bridge to Canada Unless U.S. Gets 'Half'",
     summary: "President Trump threatened to block the opening of the Gordie Howe International Bridge unless the U.S. receives half ownership of the $5.7 billion crossing.",
     question: '"The U.S. should receive partial ownership of the Gordie Howe Bridge."',
-    results: { agree:28, neutral:10, disagree:62 },
-    voters: 1247,
-    aiTake: "Readers are sharply divided — but the disagree side has a clear edge. Younger readers (18-24) overwhelmingly oppose U.S. ownership claims, while 25+ readers are more split. This mirrors broader generational divides on trade policy we've tracked all year."
+    fallbackResults: { agree:28, neutral:10, disagree:62, total:1247 },
+    aiTakes: {
+      agree: "You're in the minority on this one. Only 28% of readers think the U.S. deserves partial ownership. Those who agree with you tend to argue that the bridge benefits both countries equally, so shared ownership makes sense. But the 62% who disagree point out that Canada paid the full $5.7 billion. Their argument: you don't get to claim half of something you didn't pay for. That's a pretty hard case to argue against.",
+      neutral: "You're sitting this one out, and honestly, only 10% of readers are with you. Most people have strong feelings here. The 28% who agree with U.S. ownership say both countries benefit equally, so shared ownership is fair. The 62% who disagree say it's simple: Canada paid $5.7 billion, so it's Canada's bridge. Both sides have a point. The real question is whether trade leverage should work this way between allies.",
+      disagree: "You're with the majority. 62% of readers agree with you that the U.S. has no claim to a bridge Canada paid $5.7 billion to build. The 28% who disagree argue that since both countries benefit from the crossing, shared ownership is reasonable. But here's what's interesting: even among readers who support Trump's broader trade agenda, a significant chunk think the bridge claim goes too far. There's a difference between tough negotiation and claiming assets you didn't fund."
+    }
   },
   {
     tag: "BREAKING · WORLD",
     headline: "BREAKING: U.S. And Israel Strike Iran, Trump Alludes to 'War'",
     summary: "U.S. and Israeli forces launched coordinated strikes against Iranian nuclear facilities in what President Trump called 'a necessary step.'",
     question: '"Diplomacy between the U.S. and Iran will resume within the next month."',
-    results: { agree:18, neutral:22, disagree:60 },
-    voters: 2134,
-    aiTake: "Only 18% of readers think diplomacy is coming — a strikingly pessimistic outlook. This tracks with our previous polls: when military action starts, readers lose faith in negotiation fast. The 22% neutral bloc suggests many are waiting to see what Iran does next."
+    fallbackResults: { agree:18, neutral:22, disagree:60, total:2134 },
+    aiTakes: {
+      agree: "You're an optimist, and only 18% of readers are with you. Those who agree tend to point to historical precedent: even after military strikes, back-channel diplomacy usually starts fast. But the 60% who disagree say this is different. When a president uses the word 'war' publicly, it closes diplomatic doors. The 22% in the middle are watching Iran's response before making a call. History says you might be right eventually, but the timeline matters.",
+      neutral: "You're in a wait-and-see camp with 22% of readers. Makes sense, because the next 48 hours will tell us a lot. The 18% who think diplomacy is coming point to back-channel precedent. But the 60% who disagree say the 'war' language makes it nearly impossible. Here's what both sides are missing: it depends almost entirely on what Iran does next. If they escalate, the disagree camp is right. If they open a back channel, the agree camp wins.",
+      disagree: "You're with 60% of readers who don't see diplomacy happening anytime soon. The argument is straightforward: you don't strike a country's nuclear facilities and then sit down for peace talks the next week. The 18% who disagree with you point out that back-channel diplomacy has resumed after strikes before. They're not wrong historically, but the public 'war' framing makes this different. When a president says 'war' out loud, it changes the political calculus for everyone."
+    }
   },
   {
     tag: "CLIMATE · SCIENCE",
     headline: "Climate Report Warns of Accelerating Arctic Ice Loss",
     summary: "Arctic ice is melting 40% faster than previously projected, threatening significant sea level rise by 2050.",
     question: '"Climate change is the most urgent issue facing the next generation."',
-    results: { agree:71, neutral:12, disagree:17 },
-    voters: 983,
-    aiTake: "71% agree — the strongest consensus we've seen on any poll this month. Climate consistently polls as the #1 concern for readers under 25. The 17% who disagree tend to cite economic issues as more urgent, not climate skepticism."
+    fallbackResults: { agree:71, neutral:12, disagree:17, total:983 },
+    aiTakes: {
+      agree: "You're with 71% of readers, the strongest consensus we've seen on any poll this month. Climate consistently ranks as the #1 concern for readers under 25. But the 17% who disagree aren't denying climate change. Most of them argue that economic instability, AI disruption, or political polarization are more immediate threats. Their point: climate is slow-moving, but a recession hits your paycheck next month. It's a question of urgency, not denial.",
+      neutral: "Only 12% of readers are on the fence with you. The 71% who agree say the data is unambiguous and the timeline is shrinking. The 17% who disagree aren't climate deniers. They argue that economic instability and political breakdown are more immediate dangers. You're probably weighing both of those arguments. Here's what might help: the new data shows ice melting 40% faster than models predicted. When the models are that far off, the urgency argument gets harder to dismiss.",
+      disagree: "You're in the minority at 17%, but you're not alone, and this is worth understanding. The 71% who agree with urgency point to the 40% acceleration in ice loss as proof that the timeline is shorter than anyone thought. But readers who think like you tend to argue that economic instability, AI, and political polarization are more immediate threats to your generation. That's a fair argument about prioritization. The question is whether the 2050 projections just moved up to 2040."
+    }
   }
 ];
 
-// Get story from URL params
+// ═══════════════════════════════════════════════════
+// GET PARAMS & INIT
+// ═══════════════════════════════════════════════════
 var params = new URLSearchParams(window.location.search);
 var storyIdx = parseInt(params.get('story')) || 0;
+var autoVote = params.get('v'); // 'agree', 'neutral', 'disagree' from newsletter
 var data = POLL_DATA[Math.min(storyIdx, POLL_DATA.length - 1)];
 
-// Populate page
+// Populate story card
 document.getElementById('storyTag').textContent = data.tag;
 document.getElementById('storyHeadline').textContent = data.headline;
 document.getElementById('storySummary').textContent = data.summary;
 document.getElementById('pollQuestion').textContent = data.question;
-document.getElementById('aiTake').textContent = data.aiTake;
-document.getElementById('voterCount').textContent = data.voters.toLocaleString() + ' readers voted';
 
-// Slider logic
+// AI take gets set dynamically after vote — see setAiTake()
+function setAiTake(vote) {
+  var stance;
+  if (vote === 'strongly_agree' || vote === 'agree') stance = 'agree';
+  else if (vote === 'neutral') stance = 'neutral';
+  else stance = 'disagree';
+  document.getElementById('aiTake').textContent = data.aiTakes[stance];
+}
+
+// Map slider positions to vote values
+var VOTE_MAP = ['strongly_agree', 'agree', 'neutral', 'disagree', 'strongly_disagree'];
 var currentPos = 2; // Neutral
+
+// ═══════════════════════════════════════════════════
+// AUTO-VOTE FROM NEWSLETTER
+// ═══════════════════════════════════════════════════
+if (autoVote) {
+  // Check if already voted
+  var storageKey = 'nr_poll_' + storyIdx;
+  var previousVote = localStorage.getItem(storageKey);
+  if (previousVote) {
+    // Already voted — show results with their original stance
+    document.getElementById('pollVoteSection').style.display = 'none';
+    setAiTake(previousVote);
+    showResults();
+  } else {
+    // Record vote and show results
+    document.getElementById('pollVoteSection').style.display = 'none';
+    var voteLabel = autoVote.charAt(0).toUpperCase() + autoVote.slice(1);
+    document.getElementById('yourVoteText').textContent = 'You voted: ' + voteLabel;
+    document.getElementById('yourVote').classList.add('visible');
+    setAiTake(autoVote);
+    recordVote(autoVote).then(function() {
+      showResults();
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SUPABASE: RECORD VOTE
+// ═══════════════════════════════════════════════════
+async function recordVote(vote) {
+  var storageKey = 'nr_poll_' + storyIdx;
+  // Prevent double voting
+  if (localStorage.getItem(storageKey)) return;
+  localStorage.setItem(storageKey, vote);
+
+  if (!USE_SUPABASE) return;
+
+  try {
+    await sb.from('poll_votes').insert({
+      story_id: storyIdx,
+      vote: vote
+    });
+  } catch (err) {
+    console.error('Vote insert error:', err);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SUPABASE: FETCH LIVE RESULTS
+// ═══════════════════════════════════════════════════
+async function fetchLiveResults() {
+  if (!USE_SUPABASE) {
+    return data.fallbackResults;
+  }
+
+  try {
+    var resp = await sb
+      .from('poll_votes')
+      .select('vote')
+      .eq('story_id', storyIdx);
+
+    if (resp.error) throw resp.error;
+
+    var votes = resp.data;
+    var counts = { agree: 0, neutral: 0, disagree: 0 };
+
+    votes.forEach(function(row) {
+      if (row.vote === 'strongly_agree' || row.vote === 'agree') counts.agree++;
+      else if (row.vote === 'neutral') counts.neutral++;
+      else counts.disagree++;
+    });
+
+    var total = counts.agree + counts.neutral + counts.disagree;
+    if (total === 0) return { agree: 0, neutral: 0, disagree: 0, total: 0 };
+
+    return {
+      agree: Math.round(counts.agree / total * 100),
+      neutral: Math.round(counts.neutral / total * 100),
+      disagree: Math.round(counts.disagree / total * 100),
+      total: total
+    };
+  } catch (err) {
+    console.error('Fetch results error:', err);
+    // Fall back to hardcoded
+    return data.fallbackResults;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SHOW RESULTS (animated)
+// ═══════════════════════════════════════════════════
+async function showResults() {
+  var results = document.getElementById('pollResults');
+  results.classList.add('visible');
+
+  var liveData = await fetchLiveResults();
+
+  // Update voter count
+  document.getElementById('voterCount').textContent =
+    liveData.total.toLocaleString() + ' readers voted';
+
+  // Animate bars after short delay
+  setTimeout(function() {
+    document.getElementById('agPct').textContent = liveData.agree + '%';
+    document.getElementById('agBar').style.width = liveData.agree + '%';
+    document.getElementById('neuPct').textContent = liveData.neutral + '%';
+    document.getElementById('neuBar').style.width = liveData.neutral + '%';
+    document.getElementById('disPct').textContent = liveData.disagree + '%';
+    document.getElementById('disBar').style.width = liveData.disagree + '%';
+  }, 100);
+
+  // If Supabase is connected, subscribe to real-time updates
+  if (USE_SUPABASE) {
+    subscribeToUpdates();
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// REAL-TIME: Live vote updates via Supabase Realtime
+// ═══════════════════════════════════════════════════
+function subscribeToUpdates() {
+  if (!sb) return;
+
+  sb.channel('poll_votes_realtime')
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'poll_votes', filter: 'story_id=eq.' + storyIdx },
+      function() {
+        // Someone just voted! Refresh results
+        fetchLiveResults().then(function(liveData) {
+          document.getElementById('voterCount').textContent =
+            liveData.total.toLocaleString() + ' readers voted';
+          document.getElementById('agPct').textContent = liveData.agree + '%';
+          document.getElementById('agBar').style.width = liveData.agree + '%';
+          document.getElementById('neuPct').textContent = liveData.neutral + '%';
+          document.getElementById('neuBar').style.width = liveData.neutral + '%';
+          document.getElementById('disPct').textContent = liveData.disagree + '%';
+          document.getElementById('disBar').style.width = liveData.disagree + '%';
+        });
+      }
+    )
+    .subscribe();
+}
+
+// ═══════════════════════════════════════════════════
+// SLIDER LOGIC (for direct visitors, not from newsletter)
+// ═══════════════════════════════════════════════════
 var positions = [0, 25, 50, 75, 100];
 var thumb = document.getElementById('pollThumb');
 
@@ -382,7 +627,6 @@ document.addEventListener('pointermove', function(e) {
   var rect = track.getBoundingClientRect();
   var pct = Math.max(0, Math.min(100, ((e.clientX - rect.left - 12) / (rect.width - 24)) * 100));
   thumb.style.left = pct + '%';
-  // Snap to nearest label
   var nearest = 0;
   var minDist = Infinity;
   positions.forEach(function(p, i) {
@@ -401,21 +645,18 @@ document.addEventListener('pointerup', function() {
   thumb.style.left = positions[currentPos] + '%';
 });
 
-// Submit vote
-function submitVote() {
-  document.getElementById('pollVoteSection').style.display = 'none';
-  var results = document.getElementById('pollResults');
-  results.classList.add('visible');
+// Submit vote (from slider)
+async function submitVote() {
+  var voteValue = VOTE_MAP[currentPos];
+  var btn = document.getElementById('pollSubmit');
+  btn.disabled = true;
+  btn.textContent = 'RECORDING...';
 
-  // Animate bars
-  setTimeout(function() {
-    document.getElementById('agPct').textContent = data.results.agree + '%';
-    document.getElementById('agBar').style.width = data.results.agree + '%';
-    document.getElementById('neuPct').textContent = data.results.neutral + '%';
-    document.getElementById('neuBar').style.width = data.results.neutral + '%';
-    document.getElementById('disPct').textContent = data.results.disagree + '%';
-    document.getElementById('disBar').style.width = data.results.disagree + '%';
-  }, 100);
+  setAiTake(voteValue);
+  await recordVote(voteValue);
+
+  document.getElementById('pollVoteSection').style.display = 'none';
+  showResults();
 }
 </script>
 </body>
