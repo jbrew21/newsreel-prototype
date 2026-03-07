@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Where Do You Stand? — Newsreel</title>
+<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --nr-black:#000000; --nr-lead:#1F1F1F; --nr-iron:#2A2A2A;
+  --nr-red:#FF6343; --nr-yellow:#EDBD1F; --nr-green:#1AAD17;
+  --nr-white:#FFFFFF; --nr-smoke:#E0E0E0; --nr-silver:#B0B0B0;
+  --nr-ash:#999999; --nr-steel:#808080;
+  --font-headline:'Bree Serif',Georgia,serif;
+  --font-body:'DM Sans',Helvetica,sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:var(--nr-black); color:var(--nr-white);
+  font-family:var(--font-body); min-height:100vh;
+  display:flex; flex-direction:column; align-items:center;
+}
+
+/* Container */
+.poll-container {
+  width:100%; max-width:420px; padding:0 20px;
+  display:flex; flex-direction:column; min-height:100vh;
+}
+
+/* Header */
+.poll-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 0 24px;
+}
+.poll-logo {
+  font-family:var(--font-headline); font-size:22px; color:var(--nr-white);
+}
+.poll-date {
+  font-family:var(--font-mono); font-size:10px; color:var(--nr-steel);
+  text-transform:uppercase; letter-spacing:1px;
+}
+
+/* Story context */
+.poll-story {
+  background:var(--nr-lead); border-radius:12px; padding:16px;
+  margin-bottom:24px;
+}
+.poll-story-tag {
+  font-family:var(--font-mono); font-size:9px; color:var(--nr-red);
+  text-transform:uppercase; letter-spacing:1.2px; font-weight:600;
+  margin-bottom:8px;
+}
+.poll-story-headline {
+  font-family:var(--font-headline); font-size:18px; color:var(--nr-white);
+  line-height:1.25; margin-bottom:8px;
+}
+.poll-story-summary {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-ash);
+  line-height:1.45;
+}
+
+/* Poll question */
+.poll-question-wrap {
+  text-align:center; padding:8px 0 32px;
+}
+.poll-question-label {
+  font-family:var(--font-headline); font-size:28px; color:var(--nr-white);
+  margin-bottom:12px;
+}
+.poll-question-text {
+  font-family:var(--font-body); font-size:16px; color:var(--nr-silver);
+  line-height:1.4; max-width:340px; margin:0 auto;
+}
+
+/* Slider */
+.poll-slider-wrap {
+  background:var(--nr-lead); border-radius:12px; padding:24px 20px 20px;
+  margin-bottom:24px;
+}
+.poll-track {
+  position:relative; height:48px; margin-bottom:16px;
+}
+.poll-track-line {
+  position:absolute; top:50%; left:12px; right:12px;
+  height:2px; background:var(--nr-yellow); transform:translateY(-50%);
+}
+.poll-track-ticks {
+  position:absolute; top:50%; left:12px; right:12px;
+  display:flex; justify-content:space-between; transform:translateY(-50%);
+}
+.poll-tick {
+  width:2px; height:16px; background:var(--nr-steel); border-radius:1px;
+}
+.poll-thumb {
+  position:absolute; top:50%; left:50%;
+  width:18px; height:32px; background:var(--nr-yellow);
+  border-radius:4px; transform:translate(-50%,-50%);
+  cursor:grab; touch-action:none; z-index:2;
+  transition:left 0.15s ease;
+}
+.poll-thumb:active { cursor:grabbing; }
+.poll-labels {
+  display:flex; justify-content:space-between;
+}
+.poll-label {
+  font-family:var(--font-mono); font-size:10px; color:var(--nr-steel);
+  text-transform:uppercase; letter-spacing:0.3px;
+  cursor:pointer; padding:4px 2px; text-align:center;
+  transition:color 0.15s;
+}
+.poll-label.active { color:var(--nr-yellow); font-weight:600; }
+.poll-submit {
+  display:block; width:100%; padding:14px;
+  background:var(--nr-red); color:var(--nr-black);
+  font-family:var(--font-mono); font-size:13px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.5px;
+  border:none; border-radius:8px; cursor:pointer;
+  transition:transform 0.1s, opacity 0.15s;
+}
+.poll-submit:active { transform:scale(0.97); }
+.poll-submit:disabled { opacity:0.4; cursor:default; }
+
+/* Results (hidden initially) */
+.poll-results { display:none; }
+.poll-results.visible { display:block; }
+.poll-results-bar-wrap {
+  margin-bottom:20px;
+}
+.poll-results-label-row {
+  display:flex; justify-content:space-between; margin-bottom:6px;
+}
+.poll-results-label {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-smoke);
+  font-weight:500;
+}
+.poll-results-pct {
+  font-family:var(--font-mono); font-size:13px; color:var(--nr-white);
+  font-weight:600;
+}
+.poll-results-track {
+  height:8px; background:var(--nr-iron); border-radius:4px; overflow:hidden;
+}
+.poll-results-fill {
+  height:100%; border-radius:4px;
+  transition:width 1s cubic-bezier(0.4,0,0.2,1);
+}
+.poll-results-fill.agree { background:var(--nr-green); }
+.poll-results-fill.disagree { background:var(--nr-red); }
+.poll-results-fill.neutral { background:var(--nr-yellow); }
+
+/* AI Take */
+.poll-ai-take {
+  background:var(--nr-lead); border-radius:12px; padding:16px;
+  margin:24px 0; border-left:3px solid var(--nr-yellow);
+}
+.poll-ai-take-label {
+  font-family:var(--font-mono); font-size:9px; color:var(--nr-yellow);
+  text-transform:uppercase; letter-spacing:1.2px; font-weight:600;
+  margin-bottom:8px;
+}
+.poll-ai-take-text {
+  font-family:var(--font-body); font-size:14px; color:var(--nr-silver);
+  line-height:1.5;
+}
+
+/* Voter count */
+.poll-voter-count {
+  font-family:var(--font-mono); font-size:11px; color:var(--nr-steel);
+  text-align:center; margin-bottom:24px;
+}
+
+/* CTA */
+.poll-cta {
+  background:linear-gradient(135deg, rgba(255,99,67,0.1), rgba(237,189,31,0.08));
+  border:1px solid rgba(255,99,67,0.2);
+  border-radius:12px; padding:20px; text-align:center;
+  margin-bottom:32px;
+}
+.poll-cta-headline {
+  font-family:var(--font-headline); font-size:18px; color:var(--nr-white);
+  margin-bottom:6px;
+}
+.poll-cta-sub {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-ash);
+  line-height:1.4; margin-bottom:14px;
+}
+.poll-cta-btn {
+  display:inline-block; padding:12px 28px;
+  background:var(--nr-white); color:var(--nr-black);
+  font-family:var(--font-mono); font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.5px;
+  border:none; border-radius:8px; cursor:pointer;
+  text-decoration:none;
+}
+
+/* Footer */
+.poll-footer {
+  margin-top:auto; padding:20px 0;
+  text-align:center;
+}
+.poll-footer-logo {
+  font-family:var(--font-headline); font-size:16px; color:var(--nr-steel);
+  margin-bottom:4px;
+}
+.poll-footer-sub {
+  font-family:var(--font-mono); font-size:9px; color:#555;
+  text-transform:uppercase; letter-spacing:1px;
+}
+</style>
+</head>
+<body>
+
+<div class="poll-container">
+  <!-- Header -->
+  <div class="poll-header">
+    <div class="poll-logo">newsreel</div>
+    <div class="poll-date" id="pollDate">MAR 7, 2026</div>
+  </div>
+
+  <!-- Story Context Card -->
+  <div class="poll-story" id="storyCard">
+    <div class="poll-story-tag" id="storyTag">TODAY'S BRIEFING</div>
+    <div class="poll-story-headline" id="storyHeadline">Trump Threatens to Block New Bridge to Canada Unless U.S. Gets 'Half'</div>
+    <div class="poll-story-summary" id="storySummary">President Trump threatened to block the opening of the Gordie Howe International Bridge unless the U.S. receives half ownership of the $5.7 billion crossing.</div>
+  </div>
+
+  <!-- Poll Question -->
+  <div class="poll-question-wrap">
+    <div class="poll-question-label">Where do you stand?</div>
+    <div class="poll-question-text" id="pollQuestion">"The U.S. should receive partial ownership of the Gordie Howe Bridge."</div>
+  </div>
+
+  <!-- Slider (pre-vote) -->
+  <div id="pollVoteSection">
+    <div class="poll-slider-wrap">
+      <div class="poll-track">
+        <div class="poll-track-line"></div>
+        <div class="poll-track-ticks">
+          <div class="poll-tick"></div>
+          <div class="poll-tick"></div>
+          <div class="poll-tick"></div>
+          <div class="poll-tick"></div>
+          <div class="poll-tick"></div>
+        </div>
+        <div class="poll-thumb" id="pollThumb"></div>
+      </div>
+      <div class="poll-labels" id="pollLabels">
+        <div class="poll-label" data-pos="0" onclick="setLabel(0)">Strongly<br>Agree</div>
+        <div class="poll-label" data-pos="1" onclick="setLabel(1)">Agree</div>
+        <div class="poll-label active" data-pos="2" onclick="setLabel(2)">Neutral</div>
+        <div class="poll-label" data-pos="3" onclick="setLabel(3)">Disagree</div>
+        <div class="poll-label" data-pos="4" onclick="setLabel(4)">Strongly<br>Disagree</div>
+      </div>
+    </div>
+    <button class="poll-submit" id="pollSubmit" onclick="submitVote()">SUBMIT YOUR VOTE</button>
+  </div>
+
+  <!-- Results (shown after vote) -->
+  <div class="poll-results" id="pollResults">
+    <div class="poll-results-bar-wrap">
+      <div class="poll-results-label-row">
+        <span class="poll-results-label">Agree / Strongly Agree</span>
+        <span class="poll-results-pct" id="agPct">0%</span>
+      </div>
+      <div class="poll-results-track">
+        <div class="poll-results-fill agree" id="agBar" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="poll-results-bar-wrap">
+      <div class="poll-results-label-row">
+        <span class="poll-results-label">Neutral</span>
+        <span class="poll-results-pct" id="neuPct">0%</span>
+      </div>
+      <div class="poll-results-track">
+        <div class="poll-results-fill neutral" id="neuBar" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="poll-results-bar-wrap">
+      <div class="poll-results-label-row">
+        <span class="poll-results-label">Disagree / Strongly Disagree</span>
+        <span class="poll-results-pct" id="disPct">0%</span>
+      </div>
+      <div class="poll-results-track">
+        <div class="poll-results-fill disagree" id="disBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="poll-voter-count" id="voterCount">1,247 readers voted</div>
+
+    <!-- AI Take on results -->
+    <div class="poll-ai-take">
+      <div class="poll-ai-take-label">Benny's take on the results</div>
+      <div class="poll-ai-take-text" id="aiTake">
+        Readers are sharply divided — but the disagree side has a slight edge. Younger readers (18-24) overwhelmingly oppose U.S. ownership claims, while 25+ readers are more split. This mirrors broader generational divides on trade policy we've tracked all year.
+      </div>
+    </div>
+
+    <!-- App CTA -->
+    <div class="poll-cta">
+      <div class="poll-cta-headline">See how your friends voted</div>
+      <div class="poll-cta-sub">Download Newsreel to see your circle's stances, take the quiz, and join the discussion.</div>
+      <a href="#" class="poll-cta-btn">GET NEWSREEL →</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="poll-footer">
+    <div class="poll-footer-logo">newsreel</div>
+    <div class="poll-footer-sub">Your daily briefing · Weekdays</div>
+  </div>
+</div>
+
+<script>
+// Story data (would be dynamic in production)
+var POLL_DATA = [
+  {
+    tag: "POLITICS · TRADE",
+    headline: "Trump Threatens to Block New Bridge to Canada Unless U.S. Gets 'Half'",
+    summary: "President Trump threatened to block the opening of the Gordie Howe International Bridge unless the U.S. receives half ownership of the $5.7 billion crossing.",
+    question: '"The U.S. should receive partial ownership of the Gordie Howe Bridge."',
+    results: { agree:28, neutral:10, disagree:62 },
+    voters: 1247,
+    aiTake: "Readers are sharply divided — but the disagree side has a clear edge. Younger readers (18-24) overwhelmingly oppose U.S. ownership claims, while 25+ readers are more split. This mirrors broader generational divides on trade policy we've tracked all year."
+  },
+  {
+    tag: "BREAKING · WORLD",
+    headline: "BREAKING: U.S. And Israel Strike Iran, Trump Alludes to 'War'",
+    summary: "U.S. and Israeli forces launched coordinated strikes against Iranian nuclear facilities in what President Trump called 'a necessary step.'",
+    question: '"Diplomacy between the U.S. and Iran will resume within the next month."',
+    results: { agree:18, neutral:22, disagree:60 },
+    voters: 2134,
+    aiTake: "Only 18% of readers think diplomacy is coming — a strikingly pessimistic outlook. This tracks with our previous polls: when military action starts, readers lose faith in negotiation fast. The 22% neutral bloc suggests many are waiting to see what Iran does next."
+  },
+  {
+    tag: "CLIMATE · SCIENCE",
+    headline: "Climate Report Warns of Accelerating Arctic Ice Loss",
+    summary: "Arctic ice is melting 40% faster than previously projected, threatening significant sea level rise by 2050.",
+    question: '"Climate change is the most urgent issue facing the next generation."',
+    results: { agree:71, neutral:12, disagree:17 },
+    voters: 983,
+    aiTake: "71% agree — the strongest consensus we've seen on any poll this month. Climate consistently polls as the #1 concern for readers under 25. The 17% who disagree tend to cite economic issues as more urgent, not climate skepticism."
+  }
+];
+
+// Get story from URL params
+var params = new URLSearchParams(window.location.search);
+var storyIdx = parseInt(params.get('story')) || 0;
+var data = POLL_DATA[Math.min(storyIdx, POLL_DATA.length - 1)];
+
+// Populate page
+document.getElementById('storyTag').textContent = data.tag;
+document.getElementById('storyHeadline').textContent = data.headline;
+document.getElementById('storySummary').textContent = data.summary;
+document.getElementById('pollQuestion').textContent = data.question;
+document.getElementById('aiTake').textContent = data.aiTake;
+document.getElementById('voterCount').textContent = data.voters.toLocaleString() + ' readers voted';
+
+// Slider logic
+var currentPos = 2; // Neutral
+var positions = [0, 25, 50, 75, 100];
+var thumb = document.getElementById('pollThumb');
+
+function setLabel(idx) {
+  currentPos = idx;
+  thumb.style.left = positions[idx] + '%';
+  document.querySelectorAll('.poll-label').forEach(function(el, i) {
+    el.classList.toggle('active', i === idx);
+  });
+}
+
+// Drag support
+var dragging = false;
+thumb.addEventListener('pointerdown', function(e) {
+  dragging = true;
+  thumb.setPointerCapture(e.pointerId);
+  thumb.style.transition = 'none';
+});
+document.addEventListener('pointermove', function(e) {
+  if (!dragging) return;
+  var track = thumb.parentElement;
+  var rect = track.getBoundingClientRect();
+  var pct = Math.max(0, Math.min(100, ((e.clientX - rect.left - 12) / (rect.width - 24)) * 100));
+  thumb.style.left = pct + '%';
+  // Snap to nearest label
+  var nearest = 0;
+  var minDist = Infinity;
+  positions.forEach(function(p, i) {
+    var d = Math.abs(pct - p);
+    if (d < minDist) { minDist = d; nearest = i; }
+  });
+  document.querySelectorAll('.poll-label').forEach(function(el, i) {
+    el.classList.toggle('active', i === nearest);
+  });
+  currentPos = nearest;
+});
+document.addEventListener('pointerup', function() {
+  if (!dragging) return;
+  dragging = false;
+  thumb.style.transition = 'left 0.15s ease';
+  thumb.style.left = positions[currentPos] + '%';
+});
+
+// Submit vote
+function submitVote() {
+  document.getElementById('pollVoteSection').style.display = 'none';
+  var results = document.getElementById('pollResults');
+  results.classList.add('visible');
+
+  // Animate bars
+  setTimeout(function() {
+    document.getElementById('agPct').textContent = data.results.agree + '%';
+    document.getElementById('agBar').style.width = data.results.agree + '%';
+    document.getElementById('neuPct').textContent = data.results.neutral + '%';
+    document.getElementById('neuBar').style.width = data.results.neutral + '%';
+    document.getElementById('disPct').textContent = data.results.disagree + '%';
+    document.getElementById('disBar').style.width = data.results.disagree + '%';
+  }, 100);
+}
+</script>
+</body>
+</html>
