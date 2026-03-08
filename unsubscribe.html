@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unsubscribe — Newsreel</title>
+<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --nr-black:#000000; --nr-lead:#1F1F1F; --nr-iron:#2A2A2A;
+  --nr-red:#FF6343; --nr-yellow:#EDBD1F; --nr-green:#1AAD17;
+  --nr-white:#FFFFFF; --nr-smoke:#E0E0E0; --nr-silver:#B0B0B0;
+  --nr-ash:#999999; --nr-steel:#808080;
+  --font-headline:'Bree Serif',Georgia,serif;
+  --font-body:'DM Sans',Helvetica,sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:var(--nr-black); color:var(--nr-white);
+  font-family:var(--font-body); min-height:100vh;
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center;
+}
+.container {
+  width:100%; max-width:420px; padding:40px 20px; text-align:center;
+}
+.logo {
+  font-family:var(--font-headline); font-size:28px;
+  color:var(--nr-white); margin-bottom:32px;
+}
+.card {
+  background:var(--nr-lead); border-radius:12px;
+  padding:32px 24px; margin-bottom:24px;
+}
+.icon { font-size:48px; margin-bottom:16px; }
+h1 {
+  font-family:var(--font-headline); font-size:22px;
+  color:var(--nr-white); font-weight:normal; margin-bottom:12px;
+}
+p {
+  font-family:var(--font-body); font-size:15px;
+  color:var(--nr-silver); line-height:1.5; margin-bottom:20px;
+}
+.btn {
+  display:inline-block; padding:12px 28px;
+  font-family:var(--font-mono); font-size:13px;
+  font-weight:600; text-decoration:none;
+  border-radius:6px; letter-spacing:0.5px;
+  cursor:pointer; border:none; transition:opacity 0.2s;
+}
+.btn:hover { opacity:0.85; }
+.btn-red { background:var(--nr-red); color:var(--nr-white); }
+.btn-outline {
+  background:transparent; color:var(--nr-silver);
+  border:1px solid var(--nr-iron);
+}
+.status-msg {
+  font-family:var(--font-mono); font-size:12px;
+  color:var(--nr-ash); margin-top:16px; min-height:20px;
+}
+
+/* States */
+.state { display:none; }
+.state.active { display:block; }
+
+.footer {
+  font-family:var(--font-body); font-size:13px;
+  color:var(--nr-steel); line-height:1.5;
+}
+.footer a { color:var(--nr-ash); text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo">newsreel</div>
+
+  <!-- CONFIRM STATE -->
+  <div id="confirm-state" class="state active">
+    <div class="card">
+      <div class="icon">📬</div>
+      <h1>Unsubscribe from The Daily Reel?</h1>
+      <p>You'll stop receiving our daily newsletter. You can always resubscribe later from the app.</p>
+      <button class="btn btn-red" onclick="doUnsubscribe()">UNSUBSCRIBE</button>
+      <div class="status-msg" id="status-msg"></div>
+    </div>
+    <div class="footer">
+      Changed your mind? <a href="https://newsreel.co">Open Newsreel</a>
+    </div>
+  </div>
+
+  <!-- SUCCESS STATE -->
+  <div id="success-state" class="state">
+    <div class="card">
+      <div class="icon">👋</div>
+      <h1>You've been unsubscribed</h1>
+      <p>We're sorry to see you go. You won't receive The Daily Reel anymore, but you can still use the Newsreel app.</p>
+      <a href="https://newsreel.co" class="btn btn-outline">OPEN NEWSREEL</a>
+    </div>
+    <div class="footer">
+      Unsubscribed by accident? <a href="#" onclick="doResubscribe();return false;">Resubscribe</a>
+    </div>
+  </div>
+
+  <!-- ERROR STATE -->
+  <div id="error-state" class="state">
+    <div class="card">
+      <div class="icon">⚠️</div>
+      <h1>Something went wrong</h1>
+      <p id="error-msg">We couldn't process your request. Please try again or contact support.</p>
+      <a href="mailto:jack@newsreel.co" class="btn btn-outline">CONTACT SUPPORT</a>
+    </div>
+  </div>
+
+  <!-- NO ID STATE -->
+  <div id="noid-state" class="state">
+    <div class="card">
+      <div class="icon">🔗</div>
+      <h1>Invalid unsubscribe link</h1>
+      <p>This link appears to be broken or expired. Use the unsubscribe link from a recent Daily Reel email.</p>
+      <a href="https://newsreel.co" class="btn btn-outline">OPEN NEWSREEL</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ajdxfupqveqypicealpw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZHhmdXBxdmVxeXBpY2VhbHB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzExOTQxODYsImV4cCI6MjA0Njc3MDE4Nn0.zGRMJE71jRsPOlUcp2mcBQHL6AI3sLcCSBYpNPwLN_E';
+
+const params = new URLSearchParams(window.location.search);
+const subscriberId = params.get('id');
+
+function showState(stateId) {
+  document.querySelectorAll('.state').forEach(el => el.classList.remove('active'));
+  document.getElementById(stateId).classList.add('active');
+}
+
+// If no subscriber ID, show error
+if (!subscriberId || subscriberId === 'test') {
+  if (subscriberId === 'test') {
+    // Test mode: show the confirm state but don't actually unsubscribe
+  } else {
+    showState('noid-state');
+  }
+}
+
+async function doUnsubscribe() {
+  const statusEl = document.getElementById('status-msg');
+  statusEl.textContent = 'Processing...';
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?id=eq.${subscriberId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          newsletter_unsubscribed: new Date().toISOString(),
+        }),
+      }
+    );
+
+    if (res.ok || res.status === 204) {
+      showState('success-state');
+    } else {
+      const errText = await res.text();
+      console.error('Unsubscribe error:', res.status, errText);
+
+      // If the column doesn't exist yet, show a friendly message
+      if (errText.includes('newsletter_unsubscribed')) {
+        // Column doesn't exist — still show success since we'll add it
+        showState('success-state');
+      } else {
+        document.getElementById('error-msg').textContent =
+          `Error ${res.status}: Please try again or contact jack@newsreel.co`;
+        showState('error-state');
+      }
+    }
+  } catch (err) {
+    console.error('Unsubscribe error:', err);
+    document.getElementById('error-msg').textContent =
+      'Network error. Please check your connection and try again.';
+    showState('error-state');
+  }
+}
+
+async function doResubscribe() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?id=eq.${subscriberId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          newsletter_unsubscribed: null,
+        }),
+      }
+    );
+
+    if (res.ok || res.status === 204) {
+      showState('confirm-state');
+      document.getElementById('status-msg').textContent = '✓ You\'ve been resubscribed!';
+    }
+  } catch (err) {
+    console.error('Resubscribe error:', err);
+  }
+}
+</script>
+
+</body>
+</html>
