@@ -781,21 +781,18 @@ async function submitVote() {
     var storageKey = 'nr_poll_' + dateParam + '_' + storyIdx;
     var previousVote = localStorage.getItem(storageKey);
     if (previousVote) {
+      // Already voted — show results directly
       document.getElementById('pollVoteSection').style.display = 'none';
       setAiTake(previousVote);
       showShareButton(previousVote);
       showResults();
     } else {
-      document.getElementById('pollVoteSection').style.display = 'none';
-      var voteLabel = autoVote.replace(/_/g, ' ');
-      voteLabel = voteLabel.charAt(0).toUpperCase() + voteLabel.slice(1);
-      document.getElementById('yourVoteText').textContent = 'You voted: ' + voteLabel;
-      document.getElementById('yourVote').classList.add('visible');
-      setAiTake(autoVote);
-      showShareButton(autoVote);
-      recordVote(autoVote).then(function() {
-        showResults();
-      });
+      // Pre-select the slider to match their email click, but let them confirm
+      var preSelectIdx = VOTE_MAP.indexOf(autoVote);
+      if (preSelectIdx >= 0) {
+        setLabel(preSelectIdx);
+      }
+      // Show the vote section so they can adjust + submit
     }
   }
 })();
