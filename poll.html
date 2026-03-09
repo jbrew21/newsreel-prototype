@@ -225,6 +225,38 @@ body {
   text-decoration:none;
 }
 
+/* Quiz result */
+.quiz-result {
+  text-align:center; padding:20px 0;
+}
+.quiz-result-icon {
+  font-size:48px; margin-bottom:12px;
+}
+.quiz-result-text {
+  font-family:var(--font-headline); font-size:22px; color:var(--nr-white);
+  margin-bottom:8px;
+}
+.quiz-result-detail {
+  font-family:var(--font-body); font-size:14px; color:var(--nr-silver);
+  line-height:1.5; margin-bottom:24px;
+}
+.quiz-answer-card {
+  background:var(--nr-lead); border-radius:12px; padding:16px;
+  margin-bottom:16px; text-align:left;
+}
+.quiz-answer-card.correct {
+  border:1px solid var(--nr-green);
+}
+.quiz-answer-card.wrong {
+  border:1px solid var(--nr-red);
+}
+.quiz-answer-letter {
+  font-family:var(--font-mono); font-size:12px; font-weight:700;
+  margin-bottom:4px;
+}
+.quiz-answer-letter.correct { color:var(--nr-green); }
+.quiz-answer-letter.wrong { color:var(--nr-red); }
+
 /* Footer */
 .poll-footer {
   margin-top:auto; padding:20px 0;
@@ -261,111 +293,138 @@ body {
   <!-- Header -->
   <div class="poll-header">
     <div class="poll-logo">newsreel</div>
-    <div class="poll-date" id="pollDate">MAR 7, 2026</div>
+    <div class="poll-date" id="pollDate"></div>
   </div>
 
   <!-- Story Context Card -->
   <div class="poll-story" id="storyCard">
-    <div class="poll-story-tag" id="storyTag">TODAY'S BRIEFING</div>
-    <div class="poll-story-headline" id="storyHeadline">Trump Threatens to Block New Bridge to Canada Unless U.S. Gets 'Half'</div>
-    <div class="poll-story-summary" id="storySummary">President Trump threatened to block the opening of the Gordie Howe International Bridge unless the U.S. receives half ownership of the $5.7 billion crossing.</div>
+    <div class="poll-story-tag" id="storyTag"></div>
+    <div class="poll-story-headline" id="storyHeadline"></div>
+    <div class="poll-story-summary" id="storySummary"></div>
   </div>
 
-  <!-- Poll Question -->
-  <div class="poll-question-wrap">
-    <div class="poll-question-label">Where do you stand?</div>
-    <div class="poll-question-text" id="pollQuestion">"The U.S. should receive partial ownership of the Gordie Howe Bridge."</div>
-  </div>
+  <!-- POLL VIEW (default) -->
+  <div id="pollView">
+    <!-- Poll Question -->
+    <div class="poll-question-wrap">
+      <div class="poll-question-label">Where do you stand?</div>
+      <div class="poll-question-text" id="pollQuestion"></div>
+    </div>
 
-  <!-- Your Vote Confirmation (shown on auto-vote from newsletter) -->
-  <div class="poll-your-vote" id="yourVote">
-    <div class="poll-your-vote-check">✓</div>
-    <div class="poll-your-vote-text" id="yourVoteText">You voted: Agree</div>
-  </div>
+    <!-- Your Vote Confirmation (shown on auto-vote from newsletter) -->
+    <div class="poll-your-vote" id="yourVote">
+      <div class="poll-your-vote-check">&#10003;</div>
+      <div class="poll-your-vote-text" id="yourVoteText">You voted: Agree</div>
+    </div>
 
-  <!-- Slider (pre-vote) -->
-  <div id="pollVoteSection">
-    <div class="poll-slider-wrap">
-      <div class="poll-track">
-        <div class="poll-track-line"></div>
-        <div class="poll-track-ticks">
-          <div class="poll-tick"></div>
-          <div class="poll-tick"></div>
-          <div class="poll-tick"></div>
-          <div class="poll-tick"></div>
-          <div class="poll-tick"></div>
+    <!-- Slider (pre-vote) -->
+    <div id="pollVoteSection">
+      <div class="poll-slider-wrap">
+        <div class="poll-track">
+          <div class="poll-track-line"></div>
+          <div class="poll-track-ticks">
+            <div class="poll-tick"></div>
+            <div class="poll-tick"></div>
+            <div class="poll-tick"></div>
+            <div class="poll-tick"></div>
+            <div class="poll-tick"></div>
+          </div>
+          <div class="poll-thumb" id="pollThumb"></div>
         </div>
-        <div class="poll-thumb" id="pollThumb"></div>
+        <div class="poll-labels" id="pollLabels">
+          <div class="poll-label" data-pos="0" onclick="setLabel(0)">Strongly<br>Agree</div>
+          <div class="poll-label" data-pos="1" onclick="setLabel(1)">Agree</div>
+          <div class="poll-label active" data-pos="2" onclick="setLabel(2)">Neutral</div>
+          <div class="poll-label" data-pos="3" onclick="setLabel(3)">Disagree</div>
+          <div class="poll-label" data-pos="4" onclick="setLabel(4)">Strongly<br>Disagree</div>
+        </div>
       </div>
-      <div class="poll-labels" id="pollLabels">
-        <div class="poll-label" data-pos="0" onclick="setLabel(0)">Strongly<br>Agree</div>
-        <div class="poll-label" data-pos="1" onclick="setLabel(1)">Agree</div>
-        <div class="poll-label active" data-pos="2" onclick="setLabel(2)">Neutral</div>
-        <div class="poll-label" data-pos="3" onclick="setLabel(3)">Disagree</div>
-        <div class="poll-label" data-pos="4" onclick="setLabel(4)">Strongly<br>Disagree</div>
+      <button class="poll-submit" id="pollSubmit" onclick="submitVote()">SUBMIT YOUR VOTE</button>
+    </div>
+
+    <!-- Results (shown after vote) -->
+    <div class="poll-results" id="pollResults">
+      <div class="poll-live-badge">
+        <span class="poll-live-dot"></span>
+        LIVE RESULTS
+      </div>
+
+      <div class="poll-results-bar-wrap">
+        <div class="poll-results-label-row">
+          <span class="poll-results-label">Agree / Strongly Agree</span>
+          <span class="poll-results-pct" id="agPct">0%</span>
+        </div>
+        <div class="poll-results-track">
+          <div class="poll-results-fill agree" id="agBar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="poll-results-bar-wrap">
+        <div class="poll-results-label-row">
+          <span class="poll-results-label">Neutral</span>
+          <span class="poll-results-pct" id="neuPct">0%</span>
+        </div>
+        <div class="poll-results-track">
+          <div class="poll-results-fill neutral" id="neuBar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="poll-results-bar-wrap">
+        <div class="poll-results-label-row">
+          <span class="poll-results-label">Disagree / Strongly Disagree</span>
+          <span class="poll-results-pct" id="disPct">0%</span>
+        </div>
+        <div class="poll-results-track">
+          <div class="poll-results-fill disagree" id="disBar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="poll-voter-count" id="voterCount">0 readers voted</div>
+
+      <!-- Challenge a Friend (Nikita Bier style share) -->
+      <div id="shareChallenge" style="display:none; text-align:center; margin-bottom:24px;">
+        <button id="shareBtn" onclick="challengeFriend()" style="
+          display:inline-flex; align-items:center; gap:8px;
+          width:100%; padding:14px 20px; justify-content:center;
+          background:transparent; color:var(--nr-white);
+          font-family:var(--font-mono); font-size:13px; font-weight:700;
+          text-transform:uppercase; letter-spacing:0.5px;
+          border:2px solid var(--nr-yellow); border-radius:8px; cursor:pointer;
+          transition:all 0.15s;
+        ">
+          <span style="font-size:16px;">&#9889;</span>
+          <span id="shareBtnText">CHALLENGE A FRIEND</span>
+        </button>
+        <div style="font-family:var(--font-mono); font-size:9px; color:var(--nr-steel); margin-top:6px;">
+          <span id="shareCount">0</span> people sent this to a friend
+        </div>
+      </div>
+
+      <!-- AI Take on results -->
+      <div class="poll-ai-take">
+        <div class="poll-ai-take-label">What your vote means</div>
+        <div class="poll-ai-take-text" id="aiTake"></div>
+        <div style="font-family:var(--font-mono); font-size:8px; color:var(--nr-steel); margin-top:10px; line-height:1.4;">
+          This analysis is AI-generated and was not reviewed by an editor. It may contain errors or oversimplifications. Always check the sources above.
+        </div>
       </div>
     </div>
-    <button class="poll-submit" id="pollSubmit" onclick="submitVote()">SUBMIT YOUR VOTE</button>
   </div>
 
-  <!-- Results (shown after vote) -->
-  <div class="poll-results" id="pollResults">
-    <div class="poll-live-badge">
-      <span class="poll-live-dot"></span>
-      LIVE RESULTS
-    </div>
+  <!-- QUIZ VIEW (shown when quiz param present) -->
+  <div id="quizView" style="display:none;">
+    <div class="quiz-result" id="quizResult"></div>
+  </div>
 
-    <div class="poll-results-bar-wrap">
-      <div class="poll-results-label-row">
-        <span class="poll-results-label">Agree / Strongly Agree</span>
-        <span class="poll-results-pct" id="agPct">0%</span>
-      </div>
-      <div class="poll-results-track">
-        <div class="poll-results-fill agree" id="agBar" style="width:0%"></div>
-      </div>
-    </div>
-    <div class="poll-results-bar-wrap">
-      <div class="poll-results-label-row">
-        <span class="poll-results-label">Neutral</span>
-        <span class="poll-results-pct" id="neuPct">0%</span>
-      </div>
-      <div class="poll-results-track">
-        <div class="poll-results-fill neutral" id="neuBar" style="width:0%"></div>
-      </div>
-    </div>
-    <div class="poll-results-bar-wrap">
-      <div class="poll-results-label-row">
-        <span class="poll-results-label">Disagree / Strongly Disagree</span>
-        <span class="poll-results-pct" id="disPct">0%</span>
-      </div>
-      <div class="poll-results-track">
-        <div class="poll-results-fill disagree" id="disBar" style="width:0%"></div>
-      </div>
-    </div>
-
-    <div class="poll-voter-count" id="voterCount">0 readers voted</div>
-
-    <!-- AI Take on results -->
-    <div class="poll-ai-take">
-      <div class="poll-ai-take-label">What your vote means</div>
-      <div class="poll-ai-take-text" id="aiTake"></div>
-      <div style="font-family:var(--font-mono); font-size:8px; color:var(--nr-steel); margin-top:10px; line-height:1.4;">
-        This analysis is AI-generated and was not reviewed by an editor. It may contain errors or oversimplifications. Always check the sources above.
-      </div>
-    </div>
-
-    <!-- App CTA -->
-    <div class="poll-cta">
-      <div class="poll-cta-headline">See how your friends voted</div>
-      <div class="poll-cta-sub">Download Newsreel to see your circle's stances, take the quiz, and join the discussion.</div>
-      <a href="#" class="poll-cta-btn">GET NEWSREEL →</a>
-    </div>
+  <!-- App CTA (always shown at bottom) -->
+  <div class="poll-cta">
+    <div class="poll-cta-headline">Get the full story</div>
+    <div class="poll-cta-sub">Download Newsreel for deeper context, daily quizzes, and to see how your friends voted.</div>
+    <a href="https://newsreel.co/download" class="poll-cta-btn">GET NEWSREEL &#8594;</a>
   </div>
 
   <!-- Footer -->
   <div class="poll-footer">
     <div class="poll-footer-logo">newsreel</div>
-    <div class="poll-footer-sub">Your daily briefing · Weekdays</div>
+    <div class="poll-footer-sub">Your daily briefing &middot; Weekdays</div>
   </div>
 </div>
 
@@ -374,84 +433,162 @@ body {
 
 <script>
 // ═══════════════════════════════════════════════════
-// SUPABASE CONFIG — Replace these with your project's values
-// Go to: supabase.com → Your Project → Settings → API
+// SUPABASE CONFIG
 // ═══════════════════════════════════════════════════
 var SUPABASE_URL = 'https://ajdxfupqveqypicealpw.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZHhmdXBxdmVxeXBpY2VhbHB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzExOTQxODYsImV4cCI6MjA0Njc3MDE4Nn0.hFnZFxmD548EPGzoy5E8_WZUp9xSOca7HYLnWFPuMj0';
 
-// Set to false to use hardcoded fallback data (for demo/prototype mode)
-var USE_SUPABASE = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
-
-// Init Supabase client
-var sb = null;
-if (USE_SUPABASE) {
-  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-}
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ═══════════════════════════════════════════════════
-// STORY DATA (metadata only — results come from Supabase)
-// ═══════════════════════════════════════════════════
-var POLL_DATA = [
-  {
-    tag: "POLITICS · TRADE",
-    headline: "Trump Threatens to Block New Bridge to Canada Unless U.S. Gets 'Half'",
-    summary: "President Trump threatened to block the opening of the Gordie Howe International Bridge unless the U.S. receives half ownership of the $5.7 billion crossing.",
-    question: '"The U.S. should receive partial ownership of the Gordie Howe Bridge."',
-    fallbackResults: { agree:28, neutral:10, disagree:62, total:1247 },
-    aiTakes: {
-      agree: "You're in the minority on this one. Only 28% of readers think the U.S. deserves partial ownership. Those who agree with you tend to argue that the bridge benefits both countries equally, so shared ownership makes sense. But the 62% who disagree point out that Canada paid the full $5.7 billion. Their argument: you don't get to claim half of something you didn't pay for. That's a pretty hard case to argue against.",
-      neutral: "You're sitting this one out, and honestly, only 10% of readers are with you. Most people have strong feelings here. The 28% who agree with U.S. ownership say both countries benefit equally, so shared ownership is fair. The 62% who disagree say it's simple: Canada paid $5.7 billion, so it's Canada's bridge. Both sides have a point. The real question is whether trade leverage should work this way between allies.",
-      disagree: "You're with the majority. 62% of readers agree with you that the U.S. has no claim to a bridge Canada paid $5.7 billion to build. The 28% who disagree argue that since both countries benefit from the crossing, shared ownership is reasonable. But here's what's interesting: even among readers who support Trump's broader trade agenda, a significant chunk think the bridge claim goes too far. There's a difference between tough negotiation and claiming assets you didn't fund."
-    }
-  },
-  {
-    tag: "BREAKING · WORLD",
-    headline: "BREAKING: U.S. And Israel Strike Iran, Trump Alludes to 'War'",
-    summary: "U.S. and Israeli forces launched coordinated strikes against Iranian nuclear facilities in what President Trump called 'a necessary step.'",
-    question: '"Diplomacy between the U.S. and Iran will resume within the next month."',
-    fallbackResults: { agree:18, neutral:22, disagree:60, total:2134 },
-    aiTakes: {
-      agree: "You're an optimist, and only 18% of readers are with you. Those who agree tend to point to historical precedent: even after military strikes, back-channel diplomacy usually starts fast. But the 60% who disagree say this is different. When a president uses the word 'war' publicly, it closes diplomatic doors. The 22% in the middle are watching Iran's response before making a call. History says you might be right eventually, but the timeline matters.",
-      neutral: "You're in a wait-and-see camp with 22% of readers. Makes sense, because the next 48 hours will tell us a lot. The 18% who think diplomacy is coming point to back-channel precedent. But the 60% who disagree say the 'war' language makes it nearly impossible. Here's what both sides are missing: it depends almost entirely on what Iran does next. If they escalate, the disagree camp is right. If they open a back channel, the agree camp wins.",
-      disagree: "You're with 60% of readers who don't see diplomacy happening anytime soon. The argument is straightforward: you don't strike a country's nuclear facilities and then sit down for peace talks the next week. The 18% who disagree with you point out that back-channel diplomacy has resumed after strikes before. They're not wrong historically, but the public 'war' framing makes this different. When a president says 'war' out loud, it changes the political calculus for everyone."
-    }
-  },
-  {
-    tag: "CLIMATE · SCIENCE",
-    headline: "Climate Report Warns of Accelerating Arctic Ice Loss",
-    summary: "Arctic ice is melting 40% faster than previously projected, threatening significant sea level rise by 2050.",
-    question: '"Climate change is the most urgent issue facing the next generation."',
-    fallbackResults: { agree:71, neutral:12, disagree:17, total:983 },
-    aiTakes: {
-      agree: "You're with 71% of readers, the strongest consensus we've seen on any poll this month. Climate consistently ranks as the #1 concern for readers under 25. But the 17% who disagree aren't denying climate change. Most of them argue that economic instability, AI disruption, or political polarization are more immediate threats. Their point: climate is slow-moving, but a recession hits your paycheck next month. It's a question of urgency, not denial.",
-      neutral: "Only 12% of readers are on the fence with you. The 71% who agree say the data is unambiguous and the timeline is shrinking. The 17% who disagree aren't climate deniers. They argue that economic instability and political breakdown are more immediate dangers. You're probably weighing both of those arguments. Here's what might help: the new data shows ice melting 40% faster than models predicted. When the models are that far off, the urgency argument gets harder to dismiss.",
-      disagree: "You're in the minority at 17%, but you're not alone, and this is worth understanding. The 71% who agree with urgency point to the 40% acceleration in ice loss as proof that the timeline is shorter than anyone thought. But readers who think like you tend to argue that economic instability, AI, and political polarization are more immediate threats to your generation. That's a fair argument about prioritization. The question is whether the 2050 projections just moved up to 2040."
-    }
-  }
-];
-
-// ═══════════════════════════════════════════════════
-// GET PARAMS & INIT
+// GET URL PARAMS
 // ═══════════════════════════════════════════════════
 var params = new URLSearchParams(window.location.search);
 var storyIdx = parseInt(params.get('story')) || 0;
-var autoVote = params.get('v'); // 'agree', 'neutral', 'disagree' from newsletter
-var data = POLL_DATA[Math.min(storyIdx, POLL_DATA.length - 1)];
+var dateParam = params.get('date') || '';
+var autoVote = params.get('v');
+var quizPick = params.get('quiz');
+var quizAnswer = params.get('ans');
+var isQuizMode = quizPick !== null;
 
-// Populate story card
-document.getElementById('storyTag').textContent = data.tag;
-document.getElementById('storyHeadline').textContent = data.headline;
-document.getElementById('storySummary').textContent = data.summary;
-document.getElementById('pollQuestion').textContent = data.question;
+// Format date for display
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  var d = new Date(dateStr + 'T12:00:00');
+  var months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+}
+document.getElementById('pollDate').textContent = formatDate(dateParam) || 'TODAY';
 
-// AI take gets set dynamically after vote — see setAiTake()
+// ═══════════════════════════════════════════════════
+// LOAD POLL DATA FROM SUPABASE
+// ═══════════════════════════════════════════════════
+var pollData = null;
+
+async function loadPollData() {
+  if (!dateParam) {
+    showError('No date specified');
+    return false;
+  }
+
+  try {
+    var resp = await sb
+      .from('daily_polls')
+      .select('*')
+      .eq('date', dateParam)
+      .eq('story_idx', storyIdx)
+      .single();
+
+    if (resp.error || !resp.data) {
+      showError('Poll not found for this date');
+      return false;
+    }
+
+    pollData = resp.data;
+
+    // Populate story card
+    document.getElementById('storyTag').textContent = pollData.tag || 'NEWS';
+    document.getElementById('storyHeadline').textContent = pollData.headline || '';
+    document.getElementById('storySummary').textContent = pollData.summary || '';
+    document.getElementById('pollQuestion').textContent = '"' + (pollData.question || '') + '"';
+
+    return true;
+  } catch (err) {
+    console.error('Failed to load poll data:', err);
+    showError('Could not load poll data');
+    return false;
+  }
+}
+
+function showError(msg) {
+  document.getElementById('storyTag').textContent = '';
+  document.getElementById('storyHeadline').textContent = msg;
+  document.getElementById('storySummary').textContent = 'Try opening the link from today\'s newsletter.';
+}
+
+// ═══════════════════════════════════════════════════
+// QUIZ MODE
+// ═══════════════════════════════════════════════════
+function showQuiz() {
+  document.getElementById('pollView').style.display = 'none';
+  document.getElementById('quizView').style.display = 'block';
+
+  var picked = parseInt(quizPick);
+  var correct = parseInt(quizAnswer);
+  var isCorrect = picked === correct;
+  var letters = ['A', 'B', 'C', 'D'];
+
+  var html = '<div class="quiz-result">';
+  html += '<div class="quiz-result-icon">' + (isCorrect ? '&#127881;' : '&#129300;') + '</div>';
+  html += '<div class="quiz-result-text">' + (isCorrect ? 'Nailed it!' : 'Not quite!') + '</div>';
+  html += '<div class="quiz-result-detail">';
+
+  if (isCorrect) {
+    html += 'You picked ' + letters[picked] + ' — that\'s correct!';
+  } else {
+    html += 'You picked ' + letters[picked] + ', but the answer is ' + letters[correct] + '.';
+  }
+
+  html += '<br><br>Read the full story on Newsreel for more context.</div>';
+  html += '</div>';
+
+  document.getElementById('quizResult').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// CHALLENGE A FRIEND (viral share mechanic)
+// ═══════════════════════════════════════════════════
+var userVote = null;
+
+function showShareButton(vote) {
+  userVote = vote;
+  var shareEl = document.getElementById('shareChallenge');
+  shareEl.style.display = 'block';
+
+  // Personalize button text based on vote
+  var stance = '';
+  if (vote === 'strongly_agree' || vote === 'agree') stance = 'agreed';
+  else if (vote === 'neutral') stance = 'went neutral';
+  else stance = 'disagreed';
+
+  document.getElementById('shareBtnText').textContent = 'I ' + stance.toUpperCase() + ' — DO YOU?';
+}
+
+function challengeFriend() {
+  var headline = pollData ? pollData.headline : '';
+  var pollUrl = window.location.origin + window.location.pathname + '?date=' + dateParam + '&story=' + storyIdx;
+  var shareText = '"' + (pollData ? pollData.question : '') + '"\n\nI voted on this — where do you stand?\n' + pollUrl;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'Where do you stand? — ' + headline,
+      text: shareText,
+    }).catch(function() {});
+  } else {
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(shareText).then(function() {
+      var btn = document.getElementById('shareBtnText');
+      btn.textContent = 'COPIED! SEND IT';
+      setTimeout(function() {
+        btn.textContent = 'CHALLENGE A FRIEND';
+      }, 2000);
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// AI TAKE
+// ═══════════════════════════════════════════════════
 function setAiTake(vote) {
+  if (!pollData) return;
   var stance;
   if (vote === 'strongly_agree' || vote === 'agree') stance = 'agree';
   else if (vote === 'neutral') stance = 'neutral';
   else stance = 'disagree';
-  document.getElementById('aiTake').textContent = data.aiTakes[stance];
+
+  var takeKey = 'ai_take_' + stance;
+  var take = pollData[takeKey] || 'Thanks for voting! Check back to see how your stance compares to other readers.';
+  document.getElementById('aiTake').textContent = take;
 }
 
 // Map slider positions to vote values
@@ -459,44 +596,25 @@ var VOTE_MAP = ['strongly_agree', 'agree', 'neutral', 'disagree', 'strongly_disa
 var currentPos = 2; // Neutral
 
 // ═══════════════════════════════════════════════════
-// AUTO-VOTE FROM NEWSLETTER
-// ═══════════════════════════════════════════════════
-if (autoVote) {
-  // Check if already voted
-  var storageKey = 'nr_poll_' + storyIdx;
-  var previousVote = localStorage.getItem(storageKey);
-  if (previousVote) {
-    // Already voted — show results with their original stance
-    document.getElementById('pollVoteSection').style.display = 'none';
-    setAiTake(previousVote);
-    showResults();
-  } else {
-    // Record vote and show results
-    document.getElementById('pollVoteSection').style.display = 'none';
-    var voteLabel = autoVote.charAt(0).toUpperCase() + autoVote.slice(1);
-    document.getElementById('yourVoteText').textContent = 'You voted: ' + voteLabel;
-    document.getElementById('yourVote').classList.add('visible');
-    setAiTake(autoVote);
-    recordVote(autoVote).then(function() {
-      showResults();
-    });
-  }
-}
-
-// ═══════════════════════════════════════════════════
 // SUPABASE: RECORD VOTE
 // ═══════════════════════════════════════════════════
+// Encode date+index into a unique integer story_id: YYYYMMDD * 10 + storyIdx
+// e.g. 2026-03-08, story 2 → 20260308 * 10 + 2 = 202603082
+function getStoryId() {
+  if (!dateParam) return storyIdx;
+  var parts = dateParam.split('-');
+  return parseInt(parts.join('')) * 10 + storyIdx;
+}
+var uniqueStoryId = getStoryId();
+
 async function recordVote(vote) {
-  var storageKey = 'nr_poll_' + storyIdx;
-  // Prevent double voting
+  var storageKey = 'nr_poll_' + dateParam + '_' + storyIdx;
   if (localStorage.getItem(storageKey)) return;
   localStorage.setItem(storageKey, vote);
 
-  if (!USE_SUPABASE) return;
-
   try {
     await sb.from('poll_votes').insert({
-      story_id: storyIdx,
+      story_id: uniqueStoryId,
       vote: vote
     });
   } catch (err) {
@@ -508,16 +626,11 @@ async function recordVote(vote) {
 // SUPABASE: FETCH LIVE RESULTS
 // ═══════════════════════════════════════════════════
 async function fetchLiveResults() {
-  if (!USE_SUPABASE) {
-    return data.fallbackResults;
-  }
-
   try {
     var resp = await sb
       .from('poll_votes')
       .select('vote')
-      .eq('story_id', storyIdx);
-
+      .eq('story_id', uniqueStoryId);
     if (resp.error) throw resp.error;
 
     var votes = resp.data;
@@ -540,8 +653,7 @@ async function fetchLiveResults() {
     };
   } catch (err) {
     console.error('Fetch results error:', err);
-    // Fall back to hardcoded
-    return data.fallbackResults;
+    return { agree: 0, neutral: 0, disagree: 0, total: 0 };
   }
 }
 
@@ -554,11 +666,9 @@ async function showResults() {
 
   var liveData = await fetchLiveResults();
 
-  // Update voter count
   document.getElementById('voterCount').textContent =
     liveData.total.toLocaleString() + ' readers voted';
 
-  // Animate bars after short delay
   setTimeout(function() {
     document.getElementById('agPct').textContent = liveData.agree + '%';
     document.getElementById('agBar').style.width = liveData.agree + '%';
@@ -568,23 +678,17 @@ async function showResults() {
     document.getElementById('disBar').style.width = liveData.disagree + '%';
   }, 100);
 
-  // If Supabase is connected, subscribe to real-time updates
-  if (USE_SUPABASE) {
-    subscribeToUpdates();
-  }
+  subscribeToUpdates();
 }
 
 // ═══════════════════════════════════════════════════
 // REAL-TIME: Live vote updates via Supabase Realtime
 // ═══════════════════════════════════════════════════
 function subscribeToUpdates() {
-  if (!sb) return;
-
   sb.channel('poll_votes_realtime')
     .on('postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'poll_votes', filter: 'story_id=eq.' + storyIdx },
+      { event: 'INSERT', schema: 'public', table: 'poll_votes', filter: 'story_id=eq.' + uniqueStoryId },
       function() {
-        // Someone just voted! Refresh results
         fetchLiveResults().then(function(liveData) {
           document.getElementById('voterCount').textContent =
             liveData.total.toLocaleString() + ' readers voted';
@@ -601,7 +705,7 @@ function subscribeToUpdates() {
 }
 
 // ═══════════════════════════════════════════════════
-// SLIDER LOGIC (for direct visitors, not from newsletter)
+// SLIDER LOGIC
 // ═══════════════════════════════════════════════════
 var positions = [0, 25, 50, 75, 100];
 var thumb = document.getElementById('pollThumb');
@@ -656,8 +760,45 @@ async function submitVote() {
   await recordVote(voteValue);
 
   document.getElementById('pollVoteSection').style.display = 'none';
+  showShareButton(voteValue);
   showResults();
 }
+
+// ═══════════════════════════════════════════════════
+// INIT: Load data then handle mode
+// ═══════════════════════════════════════════════════
+(async function init() {
+  var loaded = await loadPollData();
+  if (!loaded) return;
+
+  if (isQuizMode) {
+    showQuiz();
+    return;
+  }
+
+  // Poll mode
+  if (autoVote) {
+    var storageKey = 'nr_poll_' + dateParam + '_' + storyIdx;
+    var previousVote = localStorage.getItem(storageKey);
+    if (previousVote) {
+      document.getElementById('pollVoteSection').style.display = 'none';
+      setAiTake(previousVote);
+      showShareButton(previousVote);
+      showResults();
+    } else {
+      document.getElementById('pollVoteSection').style.display = 'none';
+      var voteLabel = autoVote.replace(/_/g, ' ');
+      voteLabel = voteLabel.charAt(0).toUpperCase() + voteLabel.slice(1);
+      document.getElementById('yourVoteText').textContent = 'You voted: ' + voteLabel;
+      document.getElementById('yourVote').classList.add('visible');
+      setAiTake(autoVote);
+      showShareButton(autoVote);
+      recordVote(autoVote).then(function() {
+        showResults();
+      });
+    }
+  }
+})();
 </script>
 </body>
 </html>
