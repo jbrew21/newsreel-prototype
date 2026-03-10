@@ -112,61 +112,55 @@ body {
 .today-date {
   font-family:var(--font-mono); font-size:11px; font-weight:500;
   color:var(--nr-smoke); text-transform:uppercase; letter-spacing:1px;
-  display:none; /* hidden — now inside briefing pill */
 }
 
-/* ── Briefing Pill ── */
-.briefing-pill-btn {
-  display:flex; align-items:center; gap:6px;
-  background:rgba(255,255,255,0.06); border:1px solid var(--nr-iron);
-  border-radius:20px; padding:4px 10px 4px 4px;
-  cursor:pointer; -webkit-tap-highlight-color:transparent;
-  transition:all 0.25s ease;
-  animation:pillFadeIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.4s both;
+/* ── Stack Icon (mini progress lines) ── */
+/* ── Stack Ring ── */
+.stack-ring {
+  width:42px; height:42px; position:relative; cursor:pointer;
+  background:none; border:none; padding:0;
+  -webkit-tap-highlight-color:transparent;
+  animation:ringFadeIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275) 0.6s both;
 }
-@keyframes pillFadeIn {
-  0%   { transform:scale(0.85); opacity:0; }
-  60%  { transform:scale(1.05); }
+/* Soft radial glow behind the ring — Open-inspired */
+.stack-ring::before {
+  content:''; position:absolute; inset:-8px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,99,67,0.25) 0%, rgba(255,99,67,0) 70%);
+  animation:glowBreathe 4s ease-in-out 1.5s infinite;
+  pointer-events:none;
+}
+@keyframes ringFadeIn {
+  0%   { transform:scale(0.7); opacity:0; }
+  60%  { transform:scale(1.1); }
   100% { transform:scale(1); opacity:1; }
 }
-.briefing-pill-btn:active { transform:scale(0.95); background:rgba(255,255,255,0.04); }
-
-.briefing-pill-ring {
-  width:26px; height:26px; position:relative; flex-shrink:0;
+@keyframes glowBreathe {
+  0%, 100% { transform:scale(0.8); opacity:0; }
+  50% { transform:scale(1.5); opacity:1; }
 }
-.briefing-pill-ring svg { width:100%; height:100%; }
-.briefing-pill-ring svg circle:last-child {
+.stack-ring:active { transform:scale(0.9) !important; }
+.stack-ring:active::before { animation:none; opacity:0; }
+.stack-ring svg { width:100%; height:100%; position:relative; z-index:1; }
+.stack-ring svg circle:last-child {
   transition:stroke-dasharray 0.8s cubic-bezier(0.4,0,0.2,1);
 }
-.briefing-pill-ring-count {
+.stack-ring-count {
   position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  font-family:var(--font-mono); font-size:7px; font-weight:700;
-  color:var(--nr-smoke); letter-spacing:-0.2px; pointer-events:none;
+  font-family:var(--font-mono); font-size:10px; font-weight:700;
+  color:var(--nr-white); letter-spacing:-0.3px; pointer-events:none; z-index:2;
 }
-
-.briefing-pill-text {
-  display:flex; align-items:center; gap:0; line-height:1;
+/* In progress — glow settles to a steady warm ambient */
+.stack-ring.has-progress::before {
+  background:radial-gradient(circle, rgba(255,99,67,0.2) 0%, rgba(255,99,67,0) 70%);
+  animation:glowBreathe 5s ease-in-out infinite;
 }
-.briefing-pill-date { display:none; }
-.briefing-pill-label {
-  font-family:var(--font-mono); font-size:10px; font-weight:500;
-  color:var(--nr-smoke); letter-spacing:0.3px; text-transform:uppercase; white-space:nowrap;
+/* All done — green glow, then fades to rest */
+.stack-ring.all-done::before {
+  background:radial-gradient(circle, rgba(26,173,23,0.2) 0%, rgba(26,173,23,0) 70%);
+  animation:glowBreathe 5s ease-in-out 0s 2;
 }
-
-/* Progress states */
-@keyframes pillPulse {
-  0%, 100% { box-shadow:0 0 0px rgba(255,99,67,0); }
-  50% { box-shadow:0 0 10px rgba(255,99,67,0.2); }
-}
-.briefing-pill-btn.has-progress { border-color:rgba(255,99,67,0.35); }
-.briefing-pill-btn.has-progress .briefing-pill-label { color:var(--nr-red); }
-.briefing-pill-btn.has-progress .briefing-pill-ring-count { color:var(--nr-white); }
-.briefing-pill-btn.has-progress { animation:pillFadeIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.4s both, pillPulse 2s ease-in-out 1.5s 3; }
-
-.briefing-pill-btn.all-done { border-color:rgba(26,173,23,0.4); }
-.briefing-pill-btn.all-done .briefing-pill-ring svg circle:last-child { stroke:var(--nr-green) !important; }
-.briefing-pill-btn.all-done .briefing-pill-ring-count { color:var(--nr-green); }
-.briefing-pill-btn.all-done .briefing-pill-label { color:var(--nr-green); }
+.stack-ring.all-done svg circle:last-child { stroke:var(--nr-green) !important; }
+.stack-ring.all-done .stack-ring-count { color:var(--nr-green); }
 
 /* Legacy — keep for any external refs */
 .today-progress { display:none; }
@@ -1899,17 +1893,13 @@ body {
         <button class="today-filter-btn" id="topicFilterBtn" onclick="openTopics()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
         </button>
-        <span class="today-date" id="todayDate">MAR 3</span>
-        <!-- Briefing Pill Button -->
-        <button class="briefing-pill-btn" id="briefingPillBtn" onclick="openBriefing()">
-          <div class="briefing-pill-ring">
-            <svg viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="17" fill="none" stroke="var(--nr-iron)" stroke-width="3"/>
-              <circle id="progressRing" cx="20" cy="20" r="17" fill="none" stroke="var(--nr-red)" stroke-width="3" stroke-dasharray="0 106.81" stroke-linecap="round" transform="rotate(-90 20 20)"/>
-            </svg>
-            <span class="briefing-pill-ring-count" id="progressCount"></span>
-          </div>
-          <span class="briefing-pill-label" id="pillLabel">Stack · 0/3</span>
+        <span class="today-date" id="todayDate">MAR 9</span>
+        <button class="stack-ring" id="stackRing" onclick="openBriefing()" aria-label="Today's Stack">
+          <svg viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="17" fill="none" stroke="var(--nr-iron)" stroke-width="2.5"/>
+            <circle id="progressRing" cx="20" cy="20" r="17" fill="none" stroke="var(--nr-red)" stroke-width="2.5" stroke-dasharray="0 106.81" stroke-linecap="round" transform="rotate(-90 20 20)"/>
+          </svg>
+          <span class="stack-ring-count" id="stackRingCount">0/3</span>
         </button>
       </div>
     </div>
@@ -4229,13 +4219,8 @@ function showCompletionRing() {
       labelEl.classList.remove('dock');
       updateBriefingCard();
 
-      // Pulse the briefing pill to show it "landed"
-      var pillBtn = document.getElementById('briefingPillBtn');
-      if (pillBtn) {
-        pillBtn.style.animation = 'none';
-        pillBtn.offsetHeight;
-        pillBtn.style.animation = 'pillPulse 0.6s ease 2';
-      }
+      // Update stack lines after story completion
+      updateBriefingCard();
     }, 700);
   }, 1400);
 }
@@ -4471,7 +4456,7 @@ function openBriefing() {
     document.getElementById('briefingProg').textContent = `${briefingRead.size}/${count} read · ${classStory.classroom.due}`;
     el.classList.add('classroom-mode');
   } else {
-    document.querySelector('.briefing-h').textContent = "Today's Briefing";
+    document.querySelector('.briefing-h').textContent = "Today's Stack";
     document.querySelector('.briefing-date').textContent = 'March 3, 2026';
     document.getElementById('briefingProg').textContent = `${briefingRead.size}/${count} completed`;
     el.classList.remove('classroom-mode');
@@ -4512,12 +4497,9 @@ function updateBriefingCard() {
   const count = Math.min(STORIES.length, 4);
   const done = briefingRead.size;
   const circ = 106.81; // 2π×17
-  // Update pill label
-  const pillLabel = document.getElementById('pillLabel');
-  if (pillLabel) {
-    if (done >= count) pillLabel.textContent = 'Stack ✓';
-    else pillLabel.textContent = `Stack · ${done}/${count}`;
-  }
+  // Update ring count
+  const ringCount = document.getElementById('stackRingCount');
+  if (ringCount) ringCount.textContent = done >= count ? '✓' : `${done}/${count}`;
   // Fill ring proportionally
   const ring = document.getElementById('progressRing');
   if (ring) {
@@ -4525,17 +4507,11 @@ function updateBriefingCard() {
     ring.style.strokeDasharray = `${fill} ${circ - fill}`;
     ring.style.stroke = done >= count ? 'var(--nr-green)' : 'var(--nr-red)';
   }
-  // Update pill button classes
-  const pill = document.getElementById('briefingPillBtn');
-  if (pill) {
-    pill.classList.toggle('has-progress', done > 0 && done < count);
-    pill.classList.toggle('all-done', done >= count);
-  }
-  // Legacy fallback
-  const prog = document.getElementById('todayProgress');
-  if (prog) {
-    prog.classList.toggle('has-progress', done > 0 && done < count);
-    prog.classList.toggle('all-done', done >= count);
+  // Update ring classes
+  const stackRing = document.getElementById('stackRing');
+  if (stackRing) {
+    stackRing.classList.toggle('has-progress', done > 0 && done < count);
+    stackRing.classList.toggle('all-done', done >= count);
   }
   // Show/hide the caught-up card
   const caughtUpCard = document.getElementById('caughtUpCard');
