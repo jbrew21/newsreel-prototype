@@ -100,18 +100,29 @@ body {
 }
 .today-top-row {
   display:flex; align-items:center; justify-content:space-between;
-  height:40px;
+  height:48px;
 }
+.today-logo-btn {
+  display:flex; align-items:center; gap:4px;
+  background:none; border:none; padding:8px 4px 8px 0;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+  min-height:44px;
+}
+.today-logo-btn:active { opacity:0.7; }
 .today-logo {
-  font-family:var(--font-headline); font-size:22px; color:var(--nr-white);
-  letter-spacing:-0.3px;
+  font-family:var(--font-headline); font-size:26px; color:var(--nr-white);
+  letter-spacing:-0.3px; line-height:1;
+}
+.today-logo-caret {
+  width:14px; height:14px; color:var(--nr-smoke);
+  margin-top:3px;
 }
 .today-right {
-  display:flex; align-items:center; gap:10px;
+  display:flex; align-items:center; gap:12px;
 }
 .today-date {
-  font-family:var(--font-mono); font-size:11px; font-weight:500;
-  color:var(--nr-smoke); text-transform:uppercase; letter-spacing:1px;
+  font-family:var(--font-mono); font-size:12px; font-weight:500;
+  color:var(--nr-smoke); text-transform:uppercase; letter-spacing:1.2px;
 }
 
 /* ── Stack Icon (mini progress lines) ── */
@@ -162,20 +173,102 @@ body {
 .stack-ring.all-done svg circle:last-child { stroke:var(--nr-green) !important; }
 .stack-ring.all-done .stack-ring-count { color:var(--nr-green); }
 
-/* ── Persistent briefing strip — sits below the top row of the Today header.
-   Unmissable, always-visible entry point to the briefing. Replaces the old
-   corner ring as the primary affordance. ── */
-/* Minimal briefing link — just text, no chrome */
-.briefing-link {
-  display:inline-block; width:auto; align-self:flex-start;
-  margin-top:10px; padding:0; background:none; border:none;
-  font-family:var(--font-mono); font-size:11px;
-  letter-spacing:1.2px; text-transform:uppercase;
-  color:var(--nr-red); cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
+/* ══════════════════════════════════════════════
+   BRIEFING ROW — Instagram Stories pattern for the daily briefing.
+   5 circles below the logo row. Each = one briefing story.
+   Ring state shows read/unread. Tap opens that story directly.
+   First circle is a "today's" aggregate opener for the briefing overview.
+   ══════════════════════════════════════════════ */
+.briefing-row {
+  display:flex; align-items:flex-start; gap:14px;
+  margin-top:6px; padding:8px 0 10px;
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
-.briefing-link:active { opacity:0.6; }
-.briefing-link.done { color:var(--nr-green); }
+.briefing-row::-webkit-scrollbar { display:none; }
+
+.bstory {
+  display:flex; flex-direction:column; align-items:center;
+  gap:6px; flex-shrink:0;
+  background:none; border:none; padding:0; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  min-width:60px;
+}
+.bstory:active { transform:scale(0.94); transition:transform 0.12s; }
+
+/* The ring — 60px outer, 56px inner thumbnail, 2px gap, gradient border */
+.bstory-ring {
+  width:60px; height:60px; border-radius:50%;
+  padding:2.5px;
+  background:conic-gradient(from 210deg,
+    var(--nr-red) 0%,
+    var(--nr-yellow) 35%,
+    var(--nr-pink) 70%,
+    var(--nr-red) 100%);
+  position:relative;
+}
+.bstory.read .bstory-ring {
+  background:var(--nr-iron);
+}
+.bstory-ring-inner {
+  width:100%; height:100%; border-radius:50%;
+  background:var(--nr-black);
+  padding:2px;
+  overflow:hidden;
+}
+.bstory-thumb {
+  width:100%; height:100%; border-radius:50%;
+  overflow:hidden; background:var(--nr-lead);
+  display:flex; align-items:center; justify-content:center;
+}
+.bstory-thumb img {
+  width:100%; height:100%; object-fit:cover;
+}
+
+/* Read state: small check over the thumb */
+.bstory.read .bstory-thumb::after {
+  content:''; position:absolute; inset:0;
+  background:rgba(0,0,0,0.55); border-radius:50%;
+}
+.bstory.read .bstory-thumb::before {
+  content:'✓';
+  position:absolute; inset:0; z-index:2;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:20px; font-weight:700;
+  color:var(--nr-white);
+}
+.bstory-thumb { position:relative; }
+
+/* First circle — the "Today" aggregate. Red solid ring with logo n */
+.bstory-first .bstory-ring {
+  background:var(--nr-red);
+}
+.bstory-first .bstory-ring-inner {
+  background:var(--nr-red);
+}
+.bstory-first .bstory-thumb {
+  background:var(--nr-red);
+  font-family:var(--font-headline); font-size:22px; font-weight:600;
+  color:var(--nr-white);
+}
+.bstory-first.done .bstory-ring {
+  background:var(--nr-green);
+}
+.bstory-first.done .bstory-ring-inner,
+.bstory-first.done .bstory-thumb {
+  background:var(--nr-green);
+}
+
+/* Label under each circle */
+.bstory-label {
+  font-family:var(--font-body); font-size:10px;
+  color:var(--nr-smoke); max-width:64px;
+  text-align:center; line-height:1.2;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.bstory.read .bstory-label { color:var(--nr-steel); }
+.bstory-first .bstory-label { color:var(--nr-red); font-weight:600; letter-spacing:0.2px; }
+.bstory-first.done .bstory-label { color:var(--nr-green); }
 
 /* Legacy — keep for any external refs */
 .today-progress { display:none; }
@@ -200,7 +293,7 @@ body {
 /* Vertical snap container */
 .feed-snap {
   position:absolute;
-  top: calc(var(--safe-top) + 96px);
+  top: calc(var(--safe-top) + 158px);
   bottom: var(--nav-h);
   left:0; right:0;
   overflow-y: scroll;
@@ -2252,14 +2345,15 @@ body {
      ═══════════════════════════════════════════ -->
 <div class="screen on" id="s-today">
   <div class="today-header">
+    <!-- Top row: matches real app — logo + dropdown caret left, date + ring right -->
     <div class="today-top-row">
-      <span class="today-logo">newsreel</span>
+      <button class="today-logo-btn" onclick="openTopics()" aria-label="Switch feed">
+        <span class="today-logo">newsreel</span>
+        <svg class="today-logo-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
       <div class="today-right">
-        <button class="today-filter-btn" id="topicFilterBtn" onclick="openTopics()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
-        </button>
-        <span class="today-date" id="todayDate">MAR 9</span>
-        <button class="stack-ring" id="stackRing" onclick="openBriefing()" aria-label="Today's Stack" style="display:none">
+        <span class="today-date" id="todayDate">APR 11</span>
+        <button class="stack-ring" id="stackRing" onclick="openBriefing()" aria-label="Today's Briefing">
           <svg viewBox="0 0 40 40">
             <circle cx="20" cy="20" r="17" fill="none" stroke="var(--nr-iron)" stroke-width="2.5"/>
             <circle id="progressRing" cx="20" cy="20" r="17" fill="none" stroke="var(--nr-red)" stroke-width="2.5" stroke-dasharray="0 106.81" stroke-linecap="round" transform="rotate(-90 20 20)"/>
@@ -2269,11 +2363,10 @@ body {
       </div>
     </div>
 
-    <!-- Minimal briefing link — one line, text only. The briefing is the landing
-         state; this is the way back to it from the feed. -->
-    <button class="briefing-link" id="briefingStrip" onclick="openBriefing()">
-      TODAY'S BRIEFING &middot; <span id="stripNum">0/5</span>&nbsp;&rarr;
-    </button>
+    <!-- Instagram-style stories row — the primary briefing affordance.
+         Each circle = one story in today's briefing. Ring state = read/unread.
+         Rendered dynamically from STORIES array by renderBriefingRow(). -->
+    <div class="briefing-row" id="briefingRow"></div>
   </div>
 
   <!-- TikTok-style vertical snap feed -->
@@ -5080,6 +5173,47 @@ function openFromBriefing(idx) {
   renderFeed();
 }
 
+// Render the Instagram-style briefing row at the top of Today.
+// First circle = the "today" opener (opens full briefing overlay).
+// Next 5 = direct taps into each story. Read state = check + dimmed ring.
+function renderBriefingRow() {
+  const row = document.getElementById('briefingRow');
+  if (!row) return;
+  const count = Math.min(STORIES.length, 5);
+  const done = briefingRead.size;
+  const allDone = done >= count;
+
+  const firstLabel = allDone ? 'Caught up' : (done > 0 ? `${done}/${count}` : "Today's");
+  let html = `
+    <button class="bstory bstory-first ${allDone ? 'done' : ''}" onclick="openBriefing()">
+      <div class="bstory-ring">
+        <div class="bstory-ring-inner">
+          <div class="bstory-thumb">n</div>
+        </div>
+      </div>
+      <div class="bstory-label">${firstLabel}</div>
+    </button>
+  `;
+
+  for (let i = 0; i < count; i++) {
+    const s = STORIES[i];
+    const read = briefingRead.has(i);
+    // Short author first name for the label
+    const first = (s.author && s.author.name) ? s.author.name.split(' ')[0] : `Story ${i+1}`;
+    html += `
+      <button class="bstory ${read ? 'read' : ''}" onclick="openFromBriefing(${i})">
+        <div class="bstory-ring">
+          <div class="bstory-ring-inner">
+            <div class="bstory-thumb"><img src="${s.image}" alt=""></div>
+          </div>
+        </div>
+        <div class="bstory-label">${first}</div>
+      </button>
+    `;
+  }
+  row.innerHTML = html;
+}
+
 function updateBriefingCard() {
   const count = Math.min(STORIES.length, 5);
   const done = briefingRead.size;
@@ -5101,13 +5235,8 @@ function updateBriefingCard() {
     stackRing.classList.toggle('all-done', done >= count);
   }
 
-  // Update the minimal briefing link
-  const strip = document.getElementById('briefingStrip');
-  if (strip) {
-    strip.classList.toggle('done', done >= count);
-    const stripNum = document.getElementById('stripNum');
-    if (stripNum) stripNum.textContent = done >= count ? 'DONE' : `${done}/${count}`;
-  }
+  // Re-render the Instagram-style briefing row so ring states update
+  renderBriefingRow();
   // Show/hide the caught-up card
   const caughtUpCard = document.getElementById('caughtUpCard');
   if (caughtUpCard) {
@@ -5163,6 +5292,16 @@ updateActivityDot();
 renderWire();
 renderExplore();
 renderProfile();
+renderBriefingRow();
+
+// Set the header date dynamically (MMM D format, e.g. "APR 11")
+(function setHeaderDate() {
+  const el = document.getElementById('todayDate');
+  if (!el) return;
+  const d = new Date();
+  const mon = d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+  el.textContent = `${mon} ${d.getDate()}`;
+})();
 
 // Auto-open topic selection on first visit
 setTimeout(() => {
