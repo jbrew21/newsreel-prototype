@@ -232,6 +232,19 @@ body {
 .brl-count { color:var(--nr-red); font-weight:500; }
 .briefing-row-label.done .brl-count { color:var(--nr-green); }
 
+/* YOUR FEED section header — same mono eyebrow as TODAY'S STACK, with caret */
+.feed-section-label {
+  display:flex; align-items:center; gap:6px;
+  margin-top:10px; margin-bottom:2px; padding:2px 0;
+  background:none; border:none; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  font-family:var(--font-mono); font-size:10px;
+  letter-spacing:1.6px; text-transform:uppercase;
+}
+.feed-section-label:active { opacity:0.6; }
+.feed-section-label .brl-title { color:var(--nr-smoke); }
+.fsl-caret { width:12px; height:12px; color:var(--nr-smoke); }
+
 
 .briefing-row {
   display:flex; align-items:stretch; gap:10px;
@@ -331,7 +344,7 @@ body {
 /* Vertical snap container */
 .feed-snap {
   position:absolute;
-  top: calc(var(--safe-top) + 136px);
+  top: calc(var(--safe-top) + 160px);
   bottom: var(--nav-h);
   left:0; right:0;
   overflow-y: scroll;
@@ -461,7 +474,7 @@ body {
   font-family:var(--font-body); font-size:14px; font-weight:400;
   line-height:1.4; color:var(--nr-silver); padding:0 16px 12px;
   flex:1 1 0; min-height:0; overflow:hidden;
-  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
 }
 
 /* Social proof — friend face photos + reaction on story images */
@@ -2386,12 +2399,9 @@ body {
      ═══════════════════════════════════════════ -->
 <div class="screen on" id="s-today">
   <div class="today-header">
-    <!-- Top row: logo + dropdown caret left (Instagram pattern), date right -->
+    <!-- Top row: plain logo left, date right. Filter lives below on YOUR FEED. -->
     <div class="today-top-row">
-      <button class="today-logo-btn" onclick="toggleFeedMenu(event)" aria-label="Switch feed">
-        <span class="today-logo">newsreel</span>
-        <svg class="today-logo-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
+      <span class="today-logo">newsreel</span>
       <div class="today-right">
         <span class="today-date" id="todayDate">APR 11</span>
       </div>
@@ -2436,6 +2446,13 @@ body {
       <span class="brl-count" id="briefingRowCount">0/5</span>
     </div>
     <div class="briefing-row" id="briefingRow"></div>
+
+    <!-- YOUR FEED section header — filter arrow, matches TODAY'S STACK style.
+         This is now the ONLY filter affordance (the newsreel logo has no caret). -->
+    <button class="feed-section-label" id="feedSectionLabel" onclick="toggleFeedMenu(event)">
+      <span class="brl-title" id="feedSectionTitle">YOUR FEED</span>
+      <svg class="fsl-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
 
     <!-- Hidden legacy elements kept so other code doesn't crash -->
     <button class="stack-ring" id="stackRing" onclick="openBriefing()" style="display:none">
@@ -2813,7 +2830,7 @@ const STORIES = [
     pct: "33%",
     tag: "brief",
     headline: "Trump Threatens to Block New Bridge to Canada Unless U.S. Gets 'Half'",
-    subtitle: "President Trump demanded the U.S. receive half ownership of the Gordie Howe International Bridge…",
+    subtitle: "Canada funded the $5.7B bridge. Trump wants the U.S. to own half anyway.",
     dots: 5,
     slides: [
       { img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&h=600&fit=crop", credit: "WIKIMEDIA COMMONS", text: "President Trump threatened to block the opening of the Gordie Howe International Bridge unless the U.S. receives half ownership of the $5.7 billion crossing." },
@@ -2849,7 +2866,7 @@ const STORIES = [
     readTime: "5 min read",
     pct: "67%",
     headline: "BREAKING: U.S. And Israel Strike Iran, Trump Alludes to 'War'",
-    subtitle: "On Saturday morning, President Trump said the U.S.…",
+    subtitle: "Trump says U.S. forces joined Israel's strike on Iran's nuclear sites. Tehran threatens retaliation.",
     dots: 7,
     slides: [
       { img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&h=600&fit=crop", credit: "REUTERS", text: "U.S. and Israeli forces launched coordinated strikes against Iranian nuclear facilities in what President Trump called 'a necessary step.'" },
@@ -2875,7 +2892,7 @@ const STORIES = [
     readTime: "4 min read",
     pct: "82%",
     headline: "Climate Report Warns of Accelerating Arctic Ice Loss",
-    subtitle: "A new UN-backed study found that Arctic ice is…",
+    subtitle: "A UN-backed study finds Arctic ice melting 40% faster than projected. Sea-level risk by 2050.",
     dots: 5,
     slides: [
       { img: "https://images.unsplash.com/photo-1504711434969-e33886168d6c?w=800&h=600&fit=crop", credit: "AP PHOTO", text: "Arctic ice is melting 40% faster than previously projected, threatening significant sea level rise by 2050." },
@@ -2896,7 +2913,7 @@ const STORIES = [
     readTime: "5 min read",
     pct: "71%",
     headline: "Anthropic Launches Claude Code on the Web as Coding Race Heats Up",
-    subtitle: "The new remote environment lets developers run Claude Code sessions in the cloud…",
+    subtitle: "Anthropic ships cloud-hosted coding sessions, going head-to-head with OpenAI's Codex.",
     dots: 4,
     slides: [
       { img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop", credit: "REUTERS", text: "Anthropic shipped cloud-hosted Claude Code sessions, putting it in direct competition with OpenAI's Codex and Cursor." },
@@ -2916,7 +2933,7 @@ const STORIES = [
     readTime: "6 min read",
     pct: "68%",
     headline: "Newsletter Economy Hits $1B as Creators Leave Platforms",
-    subtitle: "Writers are walking away from X and TikTok to own their distribution…",
+    subtitle: "Independent newsletters topped $1B in 2025 as top creators quit social platforms.",
     dots: 4,
     slides: [
       { img: "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800&h=600&fit=crop", credit: "AP PHOTO", text: "Independent newsletters generated over $1 billion in revenue in 2025, up 40% year over year." },
@@ -3083,7 +3100,7 @@ function renderFeed() {
         ${s.tag ? `<div class="card-pill">${s.tag}</div>` : ''}
       </div>
       <div class="card-headline">${s.headline}</div>
-      <div class="card-sub">${s.slides[1] ? s.slides[1].text : s.slides[0].text}${s.slides[2] ? ' ' + s.slides[2].text : ''}</div>
+      <div class="card-sub">${s.subtitle || s.slides[0].text}</div>
     </div>
   `}).join('');
 
@@ -5336,7 +5353,11 @@ function pickFeed(feed) {
   const show = feed === 'today';
   if (label) label.style.display = show ? '' : 'none';
   if (row) row.style.display = show ? '' : 'none';
-  // (YOUR FEED section label was removed — guard against null if anything references it)
+  // Update YOUR FEED section label to reflect current filter
+  const feedTitle = document.getElementById('feedSectionTitle');
+  if (feedTitle) {
+    feedTitle.textContent = feed === 'today' ? 'YOUR FEED' : feed.toUpperCase();
+  }
   // Adjust the feed top offset since the stack row disappears
   const feedSnap = document.getElementById('feedSnap');
   if (feedSnap) {
