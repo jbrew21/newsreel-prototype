@@ -162,6 +162,21 @@ body {
 .stack-ring.all-done svg circle:last-child { stroke:var(--nr-green) !important; }
 .stack-ring.all-done .stack-ring-count { color:var(--nr-green); }
 
+/* ── Persistent briefing strip — sits below the top row of the Today header.
+   Unmissable, always-visible entry point to the briefing. Replaces the old
+   corner ring as the primary affordance. ── */
+/* Minimal briefing link — just text, no chrome */
+.briefing-link {
+  display:inline-block; width:auto; align-self:flex-start;
+  margin-top:10px; padding:0; background:none; border:none;
+  font-family:var(--font-mono); font-size:11px;
+  letter-spacing:1.2px; text-transform:uppercase;
+  color:var(--nr-red); cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.briefing-link:active { opacity:0.6; }
+.briefing-link.done { color:var(--nr-green); }
+
 /* Legacy — keep for any external refs */
 .today-progress { display:none; }
 .today-progress-count { display:none; }
@@ -185,7 +200,7 @@ body {
 /* Vertical snap container */
 .feed-snap {
   position:absolute;
-  top: calc(var(--safe-top) + 78px);
+  top: calc(var(--safe-top) + 96px);
   bottom: var(--nav-h);
   left:0; right:0;
   overflow-y: scroll;
@@ -1237,11 +1252,29 @@ body {
   padding:60px 20px 20px; flex-shrink:0;
 }
 .briefing-back {
-  display:flex; align-items:center; gap:4px; background:none; border:none;
-  color:var(--nr-red); font-family:var(--font-body); font-size:15px;
-  font-weight:500; cursor:pointer; margin-bottom:20px; padding:0;
+  background:none; border:none; cursor:pointer;
+  margin-bottom:20px; padding:4px 0;
+  font-family:var(--font-mono); font-size:11px;
+  letter-spacing:1.2px; text-transform:uppercase;
+  color:var(--nr-ash);
 }
-.briefing-back svg { width:20px; height:20px; color:var(--nr-red); }
+.briefing-back:active { color:var(--nr-white); }
+.briefing-eyebrow {
+  font-family:var(--font-mono); font-size:10px;
+  letter-spacing:1.6px; text-transform:uppercase;
+  color:var(--nr-ash); margin-bottom:10px;
+}
+.briefing-intro {
+  font-family:var(--font-body); font-size:13px;
+  color:var(--nr-smoke); line-height:1.45;
+  margin-top:8px; margin-bottom:4px;
+  max-width:90%;
+}
+.briefing-streakline {
+  font-family:var(--font-mono); font-size:10px;
+  letter-spacing:1.4px; text-transform:uppercase;
+  color:var(--nr-red); margin-bottom:6px;
+}
 .briefing-h {
   font-family:var(--font-headline); font-size:28px; color:var(--nr-white);
   margin-bottom:4px;
@@ -1306,6 +1339,338 @@ body {
 }
 .briefing-imeta {
   font-family:var(--font-body); font-size:12px; color:var(--nr-ash);
+}
+
+/* BRIEFING — editor byline, footer, scorecard, guess-me */
+
+.briefing-byline {
+  display:flex; align-items:center; gap:10px;
+  margin-top:12px; padding:10px 12px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:var(--radius-lg);
+}
+.briefing-byline-av {
+  width:32px; height:32px; border-radius:50%;
+  background:linear-gradient(135deg,var(--nr-red),var(--nr-yellow));
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:11px; font-weight:600;
+  color:var(--nr-black); flex-shrink:0;
+}
+.briefing-byline-txt { min-width:0; }
+.briefing-byline-name {
+  font-family:var(--font-body); font-size:13px; font-weight:500;
+  color:var(--nr-white); margin-bottom:2px;
+}
+.briefing-byline-role {
+  font-family:var(--font-body); font-size:11px; color:var(--nr-ash);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+.briefing-footer {
+  padding:16px 20px 40px; flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,0.04);
+}
+.briefing-howwepick {
+  font-family:var(--font-mono); font-size:11px;
+  letter-spacing:1.2px; text-transform:uppercase;
+  color:var(--nr-yellow); text-decoration:none;
+}
+.briefing-howwepick:active { opacity:0.6; }
+
+/* Scorecard — replaces briefing-list when all 5 read */
+.briefing-scorecard {
+  display:none;
+  flex:1; overflow-y:auto; padding:8px 20px 40px;
+  -webkit-overflow-scrolling:touch;
+}
+.briefing-overlay.complete .briefing-list { display:none; }
+.briefing-overlay.complete .briefing-scorecard { display:flex; flex-direction:column; }
+.briefing-overlay.complete .briefing-footer { display:none; }
+.briefing-overlay.complete .briefing-prog { display:none; }
+
+.sc-eyebrow {
+  font-family:var(--font-mono); font-size:10px;
+  letter-spacing:1.6px; text-transform:uppercase;
+  color:var(--nr-ash); text-align:center; margin-bottom:14px;
+}
+.sc-h {
+  font-family:var(--font-headline); font-size:36px;
+  color:var(--nr-white); text-align:center; margin-bottom:8px;
+  line-height:1.1;
+}
+.sc-sub {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-smoke);
+  text-align:center; margin-bottom:24px; max-width:280px;
+  margin-left:auto; margin-right:auto; line-height:1.45;
+}
+
+/* Locked state — forced send gate */
+.sc-lock {
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:var(--radius-lg); padding:24px 20px;
+  background:linear-gradient(180deg, rgba(255,99,67,0.06), rgba(255,99,67,0.02));
+  text-align:center;
+}
+.briefing-overlay.streak-unlocked .sc-lock { display:none; }
+.briefing-overlay:not(.streak-unlocked) .sc-unlocked { display:none; }
+.sc-lock-icon {
+  width:44px; height:44px; margin:0 auto 14px;
+  border-radius:50%; background:rgba(255,99,67,0.14);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--nr-red);
+}
+.sc-lock-icon svg { width:20px; height:20px; }
+.sc-lock-h {
+  font-family:var(--font-headline); font-size:20px;
+  color:var(--nr-white); line-height:1.25; margin-bottom:8px;
+}
+.sc-lock-sub {
+  font-family:var(--font-body); font-size:13px;
+  color:var(--nr-ash); line-height:1.5; margin-bottom:20px;
+}
+.sc-lock-btn {
+  width:100%; padding:14px; background:var(--nr-red);
+  border:none; border-radius:var(--radius-lg);
+  font-family:var(--font-mono); font-size:13px; font-weight:500;
+  color:var(--nr-white); text-transform:uppercase;
+  letter-spacing:0.8px; cursor:pointer; margin-bottom:14px;
+}
+.sc-lock-btn:active { opacity:0.8; }
+.sc-lock-foot {
+  font-family:var(--font-body); font-size:11px;
+  color:var(--nr-steel);
+}
+.sc-lock-foot a { color:var(--nr-ash); text-decoration:underline; }
+
+/* Unlocked state — shown after send */
+.sc-unlocked { display:flex; flex-direction:column; }
+.sc-streak-big {
+  text-align:center; margin-bottom:14px;
+}
+.sc-streak-num {
+  font-family:var(--font-headline); font-size:64px;
+  color:var(--nr-red); line-height:1; margin-bottom:4px;
+}
+.sc-streak-label {
+  font-family:var(--font-mono); font-size:11px;
+  letter-spacing:1.6px; color:var(--nr-red);
+}
+.sc-countdown {
+  font-family:var(--font-mono); font-size:11px;
+  letter-spacing:0.8px; text-transform:uppercase;
+  color:var(--nr-yellow); text-align:center;
+  padding:6px 12px; border:1px solid rgba(237,189,31,0.25);
+  border-radius:var(--radius-md);
+  margin:0 auto 22px;
+  width:fit-content;
+}
+.sc-sent {
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding-top:14px; margin-top:8px; text-align:center;
+}
+.sc-sent-eyebrow {
+  font-family:var(--font-mono); font-size:10px;
+  letter-spacing:1.4px; color:var(--nr-ash);
+  text-transform:uppercase; margin-bottom:4px;
+}
+.sc-sent-eyebrow span { color:var(--nr-white); }
+.sc-sent-note {
+  font-family:var(--font-body); font-size:12px;
+  color:var(--nr-steel);
+}
+.sc-rows {
+  display:flex; flex-direction:column; gap:8px;
+  margin-bottom:24px;
+}
+.sc-row {
+  display:flex; align-items:center; gap:12px;
+  padding:10px 12px; background:rgba(255,255,255,0.03);
+  border-radius:var(--radius-lg);
+}
+.sc-row-num {
+  width:24px; height:24px; border-radius:50%;
+  background:var(--nr-green); color:var(--nr-white);
+  font-family:var(--font-mono); font-size:11px; font-weight:600;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.sc-row-title {
+  flex:1; min-width:0;
+  font-family:var(--font-body); font-size:13px;
+  color:var(--nr-white); line-height:1.3;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.sc-row-take {
+  font-family:var(--font-mono); font-size:10px;
+  letter-spacing:0.6px; text-transform:uppercase;
+  padding:3px 8px; border-radius:var(--radius-md);
+  background:rgba(255,99,67,0.14); color:var(--nr-red);
+  flex-shrink:0;
+}
+.sc-row-take.agree { background:rgba(26,173,23,0.14); color:var(--nr-green); }
+.sc-row-take.neutral { background:rgba(255,255,255,0.08); color:var(--nr-smoke); }
+
+.sc-secondary {
+  display:flex; gap:16px; justify-content:center;
+  padding:4px 0 8px;
+}
+.sc-secondary a {
+  font-family:var(--font-mono); font-size:11px;
+  letter-spacing:0.8px; text-transform:uppercase;
+  color:var(--nr-ash); text-decoration:none;
+}
+
+/* ─── How we pick overlay ─── */
+.howwepick-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.7);
+  z-index:3000; display:none; align-items:flex-end; justify-content:center;
+}
+.howwepick-overlay.on { display:flex; }
+.hwp-inner {
+  width:393px; max-height:80vh; overflow-y:auto;
+  background:var(--nr-charcoal);
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  padding:28px 24px 40px; position:relative;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+.hwp-close {
+  position:absolute; top:12px; right:16px; background:none; border:none;
+  color:var(--nr-ash); font-size:24px; cursor:pointer; line-height:1;
+}
+.hwp-h {
+  font-family:var(--font-headline); font-size:28px;
+  color:var(--nr-white); margin-bottom:16px;
+}
+.hwp-inner p {
+  font-family:var(--font-body); font-size:14px;
+  color:var(--nr-smoke); line-height:1.6; margin:0 0 12px;
+}
+.hwp-inner p strong { color:var(--nr-white); font-weight:500; }
+.hwp-sig {
+  font-family:var(--font-body); font-size:13px; font-style:italic;
+  color:var(--nr-ash); margin:16px 0;
+}
+.hwp-meta {
+  border-top:1px solid rgba(255,255,255,0.08); padding-top:14px; margin-top:14px;
+  display:flex; flex-direction:column; gap:6px;
+  font-family:var(--font-body); font-size:12px; color:var(--nr-ash);
+}
+.hwp-meta strong { color:var(--nr-white); font-weight:500; }
+.hwp-meta a { color:var(--nr-yellow); text-decoration:none; }
+
+/* ─── Compare / send-to-friend overlay ─── */
+.compare-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.75);
+  z-index:3100; display:none; align-items:flex-end; justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.compare-overlay.on { display:flex; }
+.cmp-inner {
+  width:393px; max-height:90vh; overflow-y:auto;
+  background:var(--nr-charcoal);
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  padding:28px 24px 32px; position:relative;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+.cmp-close {
+  position:absolute; top:12px; right:16px; background:none; border:none;
+  color:var(--nr-ash); font-size:24px; cursor:pointer; line-height:1;
+}
+.cmp-eyebrow {
+  font-family:var(--font-mono); font-size:10px;
+  letter-spacing:1.4px; color:var(--nr-ash);
+  text-transform:uppercase; margin-bottom:10px;
+}
+.cmp-h {
+  font-family:var(--font-headline); font-size:28px;
+  color:var(--nr-white); line-height:1.15; margin-bottom:6px;
+}
+.cmp-sub {
+  font-family:var(--font-body); font-size:13px; color:var(--nr-smoke);
+  margin-bottom:20px;
+}
+.cmp-card {
+  background:var(--nr-lead);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:var(--radius-lg); padding:16px;
+  margin-bottom:20px;
+}
+.cmp-card-top {
+  display:flex; align-items:center; gap:10px; margin-bottom:12px;
+}
+.cmp-card-av {
+  width:32px; height:32px; border-radius:50%;
+  background:linear-gradient(135deg,var(--nr-red),var(--nr-yellow));
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:11px; font-weight:600;
+  color:var(--nr-black);
+}
+.cmp-card-txt { min-width:0; }
+.cmp-card-name {
+  font-family:var(--font-body); font-size:13px;
+  color:var(--nr-white); font-weight:500; margin-bottom:2px;
+}
+.cmp-card-meta {
+  font-family:var(--font-mono); font-size:10px;
+  letter-spacing:0.8px; color:var(--nr-ash); text-transform:uppercase;
+}
+.cmp-grid {
+  display:grid; grid-template-columns:repeat(5,1fr); gap:6px;
+  margin-bottom:12px;
+}
+.cmp-tile {
+  aspect-ratio:1; border-radius:var(--radius-md);
+  background:var(--nr-iron); display:flex;
+  align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:14px; font-weight:600;
+  color:var(--nr-white);
+}
+.cmp-tile.agree { background:var(--nr-green); }
+.cmp-tile.disagree { background:var(--nr-red); }
+.cmp-tile.neutral { background:var(--nr-steel); color:var(--nr-black); }
+.cmp-tile.hidden {
+  background:var(--nr-iron); color:var(--nr-steel);
+  border:1px dashed rgba(255,255,255,0.15);
+}
+.cmp-tile.locked {
+  background:var(--nr-iron); color:var(--nr-white);
+  border:1px solid rgba(255,99,67,0.3);
+  font-size:16px;
+}
+.cmp-card-footer {
+  font-family:var(--font-mono); font-size:10px;
+  letter-spacing:0.8px; text-transform:uppercase;
+  color:var(--nr-ash); text-align:center;
+}
+.cmp-recipients { margin-bottom:16px; }
+.cmp-recip-label {
+  font-family:var(--font-mono); font-size:11px;
+  letter-spacing:1.2px; color:var(--nr-ash);
+  text-transform:uppercase; margin-bottom:10px;
+}
+.cmp-recip-chips {
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+.cmp-chip {
+  padding:8px 14px; background:var(--nr-lead);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px; font-family:var(--font-body);
+  font-size:13px; color:var(--nr-white); cursor:pointer;
+}
+.cmp-chip.on { background:var(--nr-red); border-color:var(--nr-red); }
+.cmp-chip-more { color:var(--nr-ash); }
+.cmp-send-btn {
+  width:100%; padding:14px; background:var(--nr-red);
+  border:none; border-radius:var(--radius-lg);
+  font-family:var(--font-mono); font-size:13px; font-weight:500;
+  color:var(--nr-white); text-transform:uppercase;
+  letter-spacing:0.8px; cursor:pointer; margin-bottom:10px;
+}
+.cmp-send-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.cmp-foot {
+  font-family:var(--font-body); font-size:11px;
+  color:var(--nr-ash); text-align:center;
 }
 
 /* Briefing pill — small, right-aligned in tabs row */
@@ -1894,15 +2259,21 @@ body {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
         </button>
         <span class="today-date" id="todayDate">MAR 9</span>
-        <button class="stack-ring" id="stackRing" onclick="openBriefing()" aria-label="Today's Stack">
+        <button class="stack-ring" id="stackRing" onclick="openBriefing()" aria-label="Today's Stack" style="display:none">
           <svg viewBox="0 0 40 40">
             <circle cx="20" cy="20" r="17" fill="none" stroke="var(--nr-iron)" stroke-width="2.5"/>
             <circle id="progressRing" cx="20" cy="20" r="17" fill="none" stroke="var(--nr-red)" stroke-width="2.5" stroke-dasharray="0 106.81" stroke-linecap="round" transform="rotate(-90 20 20)"/>
           </svg>
-          <span class="stack-ring-count" id="stackRingCount">0/3</span>
+          <span class="stack-ring-count" id="stackRingCount">0/5</span>
         </button>
       </div>
     </div>
+
+    <!-- Minimal briefing link — one line, text only. The briefing is the landing
+         state; this is the way back to it from the feed. -->
+    <button class="briefing-link" id="briefingStrip" onclick="openBriefing()">
+      TODAY'S BRIEFING &middot; <span id="stripNum">0/5</span>&nbsp;&rarr;
+    </button>
   </div>
 
   <!-- TikTok-style vertical snap feed -->
@@ -2072,12 +2443,112 @@ body {
 <!-- BRIEFING OVERLAY -->
 <div class="briefing-overlay" id="briefingOverlay">
   <div class="briefing-top">
-    <button class="briefing-back" onclick="closeBriefing()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+    <button class="briefing-back" onclick="closeBriefing()">Browse feed →</button>
+    <div class="briefing-streakline">DAY 12</div>
     <div class="briefing-h">Today's Briefing</div>
-    <div class="briefing-date">March 3, 2026</div>
-    <div class="briefing-prog" id="briefingProg">0/4 completed</div>
+    <div class="briefing-date" id="briefingDate">APRIL 11, 2026</div>
+    <div class="briefing-prog" id="briefingProg">0/5 completed</div>
+    <div class="briefing-byline" id="briefingByline">
+      <div class="briefing-byline-av">JB</div>
+      <div class="briefing-byline-txt">
+        <div class="briefing-byline-name">Edited by Jack Brewster</div>
+        <div class="briefing-byline-role">Journalist. Founder of Newsreel.</div>
+      </div>
+    </div>
   </div>
   <div class="briefing-list" id="briefingList"></div>
+  <div class="briefing-footer" id="briefingFooter">
+    <a class="briefing-howwepick" href="#" onclick="event.preventDefault();openHowWePick()">How we pick &rarr;</a>
+  </div>
+
+  <!-- Scorecard completion state (shown when all 5 read) — locked behind a send -->
+  <div class="briefing-scorecard" id="briefingScorecard">
+    <div class="sc-eyebrow">BRIEFING #412 &middot; APRIL 11</div>
+    <div class="sc-h">That's today.</div>
+    <div class="sc-sub">5 stories. 6 minutes. You picked a side on every one.</div>
+
+    <!-- LOCKED state: streak + feed are hidden until user sends a Guess Me card -->
+    <div class="sc-lock" id="scLock">
+      <div class="sc-lock-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+      </div>
+      <div class="sc-lock-h">One friend stands between you and your streak.</div>
+      <div class="sc-lock-sub">Pick someone who thinks they know you. They guess your 5. You see your streak.</div>
+      <button class="sc-lock-btn" onclick="openGuessMe()">Pick a friend &rarr;</button>
+      <div class="sc-lock-foot">Can't send right now? <a href="#" onclick="event.preventDefault();skipGuessMe()">Break streak</a></div>
+    </div>
+
+    <!-- UNLOCKED state: shown after a Guess Me card is sent -->
+    <div class="sc-unlocked" id="scUnlocked">
+      <div class="sc-streak-big">
+        <div class="sc-streak-num">12</div>
+        <div class="sc-streak-label">DAY STREAK</div>
+      </div>
+      <div class="sc-countdown" id="scCountdown">Tomorrow's briefing in 14:22:09</div>
+      <div class="sc-rows" id="scRows"></div>
+      <div class="sc-sent">
+        <div class="sc-sent-eyebrow">SENT TO <span id="scSentName">Maya</span></div>
+        <div class="sc-sent-note">We'll let you know when she guesses.</div>
+      </div>
+      <div class="sc-secondary">
+        <a href="#" onclick="event.preventDefault();openPerspectiveToday()">Today's Perspective &rarr;</a>
+        <a href="#" onclick="event.preventDefault();closeBriefing()">Browse feed &rarr;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW WE PICK OVERLAY -->
+<div class="howwepick-overlay" id="howWePickOverlay" onclick="if(event.target===this)closeHowWePick()">
+  <div class="hwp-inner">
+    <button class="hwp-close" onclick="closeHowWePick()">&times;</button>
+    <div class="hwp-h">How we pick</div>
+    <p>Every morning, a Newsreel editor reviews roughly 200 stories from vetted sources and picks five you should not miss.</p>
+    <p>We index for <strong>significance</strong> (does this matter?), <strong>underreported</strong> (is anyone else covering it?), and <strong>readability</strong> (can you finish it in five minutes?).</p>
+    <p>Same five stories for every reader. That's the point. The conversation only works if we're reading the same thing.</p>
+    <div class="hwp-sig">Jack Brewster, Founder of Newsreel. Journalist. Forbes 30 Under 30.</div>
+    <div class="hwp-meta">
+      <div><strong>Editor on duty:</strong> Jack Brewster</div>
+      <div><strong>Last updated:</strong> <span id="hwpUpdated">6:42am ET</span></div>
+      <!-- Corrections line only surfaces when there are actual corrections. Absence is the trust signal. -->
+    </div>
+  </div>
+</div>
+
+<!-- GUESS ME OVERLAY — the forced-send gate before the streak unlocks -->
+<div class="compare-overlay" id="compareOverlay" onclick="if(event.target===this)closeCompareCard()">
+  <div class="cmp-inner">
+    <button class="cmp-close" onclick="closeCompareCard()">&times;</button>
+    <div class="cmp-eyebrow">GUESS ME &middot; BRIEFING #412</div>
+    <div class="cmp-h">Can your friends<br>guess how you voted?</div>
+    <div class="cmp-sub">5 stories. 5 guesses. If they know you, they'll get 4/5.</div>
+
+    <div class="cmp-card">
+      <div class="cmp-card-top">
+        <div class="cmp-card-av">JB</div>
+        <div class="cmp-card-txt">
+          <div class="cmp-card-name">Jack &middot; APRIL 11</div>
+          <div class="cmp-card-meta">5 stories &middot; waiting on a guesser</div>
+        </div>
+      </div>
+      <div class="cmp-grid" id="cmpGrid"></div>
+      <div class="cmp-card-footer">Your friend guesses blind. You see their score.</div>
+    </div>
+
+    <div class="cmp-recipients">
+      <div class="cmp-recip-label">Pick one friend</div>
+      <div class="cmp-recip-chips">
+        <button class="cmp-chip" onclick="pickRecipient(this,'Maya')">Maya</button>
+        <button class="cmp-chip" onclick="pickRecipient(this,'Dave')">Dave</button>
+        <button class="cmp-chip" onclick="pickRecipient(this,'Nadya')">Nadya</button>
+        <button class="cmp-chip" onclick="pickRecipient(this,'Eliza')">Eliza</button>
+        <button class="cmp-chip cmp-chip-more" onclick="alert('Contact picker — v2.')">+ more</button>
+      </div>
+    </div>
+
+    <button class="cmp-send-btn" id="cmpSendBtn" onclick="sendCompare()" disabled>Pick a friend</button>
+    <div class="cmp-foot">If they don't have Newsreel, they'll be asked to install to guess.</div>
+  </div>
 </div>
 
 <!-- TOPICS OVERLAY -->
@@ -2402,7 +2873,7 @@ function renderFeed() {
   `}).join('');
 
   // Append "You're Caught Up" card at end of feed
-  const caughtUpCount = Math.min(STORIES.length, 4);
+  const caughtUpCount = Math.min(STORIES.length, 5);
   el.innerHTML += `
   <div class="feed-page caughtup-page${briefingRead.size >= caughtUpCount ? '' : ' caughtup-hidden'}" id="caughtUpCard">
     <div class="caughtup-orb caughtup-orb-1"></div>
@@ -3693,8 +4164,10 @@ function closeCarousel() {
 /* ═══════════════════════════════════════════════
    POLL
    ═══════════════════════════════════════════════ */
+let currentPollStoryIdx = null;
 function openPoll(idx) {
   const s = STORIES[idx];
+  currentPollStoryIdx = idx;
   document.getElementById('pollQ').textContent = s.poll;
   const labels = ['Strongly Agree','Agree','Neutral','Disagree','Strongly Disagree'];
   document.getElementById('pollLabels').innerHTML = labels.map((l,i)=>`<div class="poll-lbl${i===2?' sel':''}" onclick="setPoll(${i})">${l}</div>`).join('');
@@ -3735,6 +4208,12 @@ function closePoll() {
 function setPoll(i) {
   document.getElementById('pollThumb').style.left = [0,25,50,75,100][i]+'%';
   document.querySelectorAll('.poll-lbl').forEach((l,j) => l.classList.toggle('sel', j===i));
+  // Capture the user's take on this story. i=0,1 = agree; 2 = skip/neutral; 3,4 = disagree.
+  // Scorecard rows read from userTakes, so this feeds the Guess Me primitive.
+  if (currentPollStoryIdx !== null) {
+    const take = (i <= 1) ? 'agree' : (i >= 3) ? 'disagree' : 'skip';
+    setTake(currentPollStoryIdx, take);
+  }
   // Confirm sharing to circle
   var note = document.querySelector('.poll-note');
   if (note && !note.classList.contains('confirmed')) {
@@ -4168,7 +4647,7 @@ function registerStoryComplete() {
 
 /* ─── showCompletionRing: the visual ring pop → fill → dock animation ─── */
 function showCompletionRing() {
-  const count = Math.min(STORIES.length, 4);
+  const count = Math.min(STORIES.length, 5);
   const done = briefingRead.size;
 
   // Setup the floating ring
@@ -4221,6 +4700,16 @@ function showCompletionRing() {
 
       // Update stack lines after story completion
       updateBriefingCard();
+
+      // If this was the 5th story, force the user into the briefing
+      // scorecard. This is the Guess Me gate — they cannot see their
+      // streak until they send a card to one friend.
+      if (briefingRead.size >= count) {
+        // Close the carousel first if it's open, then pop the scorecard.
+        const carEl = document.getElementById('carousel');
+        if (carEl && carEl.classList.contains('on')) carEl.classList.remove('on');
+        setTimeout(openBriefing, 350);
+      }
     }, 700);
   }, 1400);
 }
@@ -4443,11 +4932,18 @@ let contributorStoriesSeen = {};  // track which contributor stories have been v
 function openBriefing() {
   const el = document.getElementById('briefingOverlay');
   const list = document.getElementById('briefingList');
-  const count = Math.min(STORIES.length, 4);
+  const count = Math.min(STORIES.length, 5);
 
-  // Check if this is a classroom briefing (any story has classroom)
+  // Classroom mode is an explicit user-type flag, not auto-detected.
+  // Consumer view is the default. Flip IS_CLASSROOM_USER to true to preview classroom-mode.
+  const IS_CLASSROOM_USER = false;
   const classStory = STORIES.slice(0, count).find(s => s.classroom);
-  const isClassroom = !!classStory;
+  const isClassroom = IS_CLASSROOM_USER && !!classStory;
+
+  // Dynamic today's date, uppercase, e.g. "APRIL 11, 2026"
+  const todayStr = new Date().toLocaleDateString('en-US', {
+    month: 'long', day: 'numeric', year: 'numeric'
+  }).toUpperCase();
 
   // Update header based on classroom vs regular
   if (isClassroom) {
@@ -4456,8 +4952,8 @@ function openBriefing() {
     document.getElementById('briefingProg').textContent = `${briefingRead.size}/${count} read · ${classStory.classroom.due}`;
     el.classList.add('classroom-mode');
   } else {
-    document.querySelector('.briefing-h').textContent = "Today's Stack";
-    document.querySelector('.briefing-date').textContent = 'March 3, 2026';
+    document.querySelector('.briefing-h').textContent = "Today's Briefing";
+    document.querySelector('.briefing-date').textContent = todayStr;
     document.getElementById('briefingProg').textContent = `${briefingRead.size}/${count} completed`;
     el.classList.remove('classroom-mode');
   }
@@ -4468,17 +4964,108 @@ function openBriefing() {
       <div class="briefing-thumb"><img src="${s.image}" alt=""></div>
       <div class="briefing-iinfo">
         <div class="briefing-ititle">${s.headline}</div>
-        <div class="briefing-imeta">${s.author.name} · ${s.slides.length} slides</div>
+        <div class="briefing-imeta">${s.author.name} &middot; ${s.slides.length} slides</div>
       </div>
-      ${s.classroom && s.classroom.responses ? `
-        <button class="briefing-discuss-btn" onclick="event.stopPropagation();openFeedDiscussion(${i})" title="Discussion forum">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--nr-teal)" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>
-        </button>
-      ` : ''}
     </div>
   `).join('');
 
+  // Complete state: scorecard replaces the list when all 5 are read
+  if (briefingRead.size >= count) {
+    el.classList.add('complete');
+    renderScorecard(count);
+  } else {
+    el.classList.remove('complete');
+  }
+
   el.classList.add('on');
+}
+
+// Per-story takes captured inside the carousel. Keyed by story index.
+// Values: 'agree' | 'disagree' | 'skip'. Persists for the session only in v1.
+let userTakes = {};
+function setTake(idx, take) {
+  userTakes[idx] = take;
+  // Update the scorecard rows if they're visible
+  const count = Math.min(STORIES.length, 5);
+  if (document.getElementById('scRows')) renderScorecard(count);
+}
+function takeLabel(take) {
+  if (take === 'agree') return { label:'AGREE', cls:'agree' };
+  if (take === 'disagree') return { label:'DISAGREE', cls:'' };
+  if (take === 'skip') return { label:'SKIPPED', cls:'neutral' };
+  return { label:'—', cls:'neutral' };
+}
+function renderScorecard(count) {
+  const rows = document.getElementById('scRows');
+  if (!rows) return;
+  rows.innerHTML = STORIES.slice(0, count).map((s, i) => {
+    const take = takeLabel(userTakes[i]);
+    return `
+      <div class="sc-row">
+        <div class="sc-row-num">${i + 1}</div>
+        <div class="sc-row-title">${s.headline}</div>
+        <div class="sc-row-take ${take.cls}">${take.label}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// How we pick
+function openHowWePick() {
+  document.getElementById('howWePickOverlay').classList.add('on');
+}
+function closeHowWePick() {
+  document.getElementById('howWePickOverlay').classList.remove('on');
+}
+function openPerspectiveToday() {
+  // Stub — in production routes to today's argument cluster
+  alert("Today's Perspective — argument clustering across 257 journalists. Coming v2.");
+}
+
+// Guess Me — the forced-send gate. Until a send happens, the streak is locked.
+let cmpRecipient = null;
+function openGuessMe() { openCompareCard(); }
+function openCompareCard() {
+  const overlay = document.getElementById('compareOverlay');
+  const grid = document.getElementById('cmpGrid');
+  // All 5 tiles are hidden from the sender's POV — the friend is the one who guesses.
+  // The numbered tiles are a teaser: "5 stories, your takes locked inside."
+  grid.innerHTML = [1,2,3,4,5].map(n => `<div class="cmp-tile locked">${n}</div>`).join('');
+  overlay.classList.add('on');
+}
+function closeCompareCard() {
+  document.getElementById('compareOverlay').classList.remove('on');
+  cmpRecipient = null;
+  document.querySelectorAll('.cmp-chip.on').forEach(c => c.classList.remove('on'));
+  const btn = document.getElementById('cmpSendBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Pick a friend';
+  }
+}
+function pickRecipient(btn, name) {
+  document.querySelectorAll('.cmp-chip.on').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  cmpRecipient = name;
+  document.getElementById('cmpSendBtn').disabled = false;
+  document.getElementById('cmpSendBtn').textContent = `Challenge ${name}`;
+}
+function sendCompare() {
+  if (!cmpRecipient) return;
+  const btn = document.getElementById('cmpSendBtn');
+  btn.textContent = `Sent to ${cmpRecipient}`;
+  btn.disabled = true;
+  // Unlock the streak on the briefing scorecard
+  const brief = document.getElementById('briefingOverlay');
+  if (brief) brief.classList.add('streak-unlocked');
+  const sentName = document.getElementById('scSentName');
+  if (sentName) sentName.textContent = cmpRecipient;
+  setTimeout(closeCompareCard, 900);
+}
+// Break-streak escape hatch — real product should persist this choice.
+function skipGuessMe() {
+  if (!confirm("Break your streak and browse the feed? You can still send tomorrow.")) return;
+  closeBriefing();
 }
 
 function closeBriefing() {
@@ -4494,10 +5081,10 @@ function openFromBriefing(idx) {
 }
 
 function updateBriefingCard() {
-  const count = Math.min(STORIES.length, 4);
+  const count = Math.min(STORIES.length, 5);
   const done = briefingRead.size;
   const circ = 106.81; // 2π×17
-  // Update ring count
+  // Update ring count (hidden but kept in sync for legacy paths)
   const ringCount = document.getElementById('stackRingCount');
   if (ringCount) ringCount.textContent = done >= count ? '✓' : `${done}/${count}`;
   // Fill ring proportionally
@@ -4513,6 +5100,14 @@ function updateBriefingCard() {
     stackRing.classList.toggle('has-progress', done > 0 && done < count);
     stackRing.classList.toggle('all-done', done >= count);
   }
+
+  // Update the minimal briefing link
+  const strip = document.getElementById('briefingStrip');
+  if (strip) {
+    strip.classList.toggle('done', done >= count);
+    const stripNum = document.getElementById('stripNum');
+    if (stripNum) stripNum.textContent = done >= count ? 'DONE' : `${done}/${count}`;
+  }
   // Show/hide the caught-up card
   const caughtUpCard = document.getElementById('caughtUpCard');
   if (caughtUpCard) {
@@ -4524,6 +5119,18 @@ function updateBriefingCard() {
       initCaughtUpAnimations();
     } else {
       caughtUpCard.classList.add('caughtup-hidden');
+    }
+  }
+  // Keep the briefing scorecard state in sync regardless of how the user finishes.
+  // This fires on every story completion, so the scorecard is ready the next time
+  // the briefing is opened (including mid-flow).
+  const brief = document.getElementById('briefingOverlay');
+  if (brief) {
+    if (done >= count) {
+      brief.classList.add('complete');
+      renderScorecard(count);
+    } else {
+      brief.classList.remove('complete');
     }
   }
 }
@@ -4561,6 +5168,21 @@ renderProfile();
 setTimeout(() => {
   if (!topicsChosen) openTopics();
 }, 800);
+
+// Land on the briefing every time the user is on Today with work left.
+// No sessionStorage gate — the briefing is the home surface, full stop.
+// If the user dismisses it, they get the feed with the persistent strip
+// at the top. If they're done, the strip shows the "caught up" state.
+function maybeLandOnBriefing() {
+  // Don't interrupt other flows
+  if (document.getElementById('topicsOverlay').classList.contains('on')) return;
+  if (document.getElementById('briefingOverlay').classList.contains('on')) return;
+  const count = Math.min(STORIES.length, 5);
+  // Only auto-open if there's work left. Done = stay in feed.
+  if (briefingRead.size >= count) return;
+  openBriefing();
+}
+setTimeout(maybeLandOnBriefing, topicsChosen ? 300 : 2200);
 
 /* ═══════════════════════════════════════════════
    VIEWPORT SCALE — Shrinks the phone frame to fit
