@@ -125,6 +125,49 @@ body {
   color:var(--nr-smoke); text-transform:uppercase; letter-spacing:1.2px;
 }
 
+/* Feed dropdown menu — attached to the newsreel ∨ caret, Instagram pattern.
+   Not a modal. Positioned absolutely below the caret inside the header. */
+.feed-menu {
+  display:none;
+  position:absolute;
+  top:52px; left:16px; z-index:30;
+  min-width:200px;
+  background:var(--nr-charcoal);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:var(--radius-lg);
+  padding:6px 0;
+  box-shadow:0 12px 32px rgba(0,0,0,0.5);
+  animation:feedMenuDrop 0.18s cubic-bezier(0.2,0,0.2,1);
+}
+.feed-menu.on { display:block; }
+@keyframes feedMenuDrop {
+  0%   { transform:translateY(-8px); opacity:0; }
+  100% { transform:translateY(0); opacity:1; }
+}
+.feed-menu-item {
+  display:flex; align-items:center; gap:10px;
+  width:100%; padding:12px 16px;
+  background:none; border:none; cursor:pointer;
+  font-family:var(--font-body); font-size:14px;
+  color:var(--nr-white); text-align:left;
+  -webkit-tap-highlight-color:transparent;
+}
+.feed-menu-item:active { background:rgba(255,255,255,0.06); }
+.fm-check {
+  width:14px; font-family:var(--font-mono); font-size:12px;
+  color:var(--nr-red); visibility:hidden;
+}
+.feed-menu-item.active .fm-check { visibility:visible; }
+.feed-menu-item.active .fm-label { font-weight:600; }
+.fm-label { flex:1; }
+
+/* Scrim behind dropdown to capture tap-outside */
+.feed-menu-scrim {
+  display:none; position:fixed; inset:0; z-index:29;
+  background:transparent;
+}
+.feed-menu-scrim.on { display:block; }
+
 /* ── Stack Icon (mini progress lines) ── */
 /* ── Stack Ring ── */
 .stack-ring {
@@ -2329,14 +2372,47 @@ body {
      ═══════════════════════════════════════════ -->
 <div class="screen on" id="s-today">
   <div class="today-header">
-    <!-- Top row: logo + dropdown caret left, date right -->
+    <!-- Top row: logo + dropdown caret left (Instagram pattern), date right -->
     <div class="today-top-row">
-      <button class="today-logo-btn" onclick="openTopics()" aria-label="Switch feed">
+      <button class="today-logo-btn" onclick="toggleFeedMenu(event)" aria-label="Switch feed">
         <span class="today-logo">newsreel</span>
         <svg class="today-logo-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div class="today-right">
         <span class="today-date" id="todayDate">APR 11</span>
+      </div>
+
+      <!-- Inline feed dropdown menu — Instagram-style, attached to caret.
+           Not a modal. Tap outside to dismiss. -->
+      <div class="feed-menu" id="feedMenu">
+        <button class="feed-menu-item active" data-feed="today" onclick="pickFeed('today')">
+          <span class="fm-check">✓</span>
+          <span class="fm-label">Today's Briefing</span>
+        </button>
+        <button class="feed-menu-item" data-feed="Politics" onclick="pickFeed('Politics')">
+          <span class="fm-check">✓</span>
+          <span class="fm-label">Politics</span>
+        </button>
+        <button class="feed-menu-item" data-feed="World" onclick="pickFeed('World')">
+          <span class="fm-check">✓</span>
+          <span class="fm-label">World</span>
+        </button>
+        <button class="feed-menu-item" data-feed="Tech" onclick="pickFeed('Tech')">
+          <span class="fm-check">✓</span>
+          <span class="fm-label">Tech</span>
+        </button>
+        <button class="feed-menu-item" data-feed="Business" onclick="pickFeed('Business')">
+          <span class="fm-check">✓</span>
+          <span class="fm-label">Business</span>
+        </button>
+        <button class="feed-menu-item" data-feed="Climate" onclick="pickFeed('Climate')">
+          <span class="fm-check">✓</span>
+          <span class="fm-label">Climate</span>
+        </button>
+        <button class="feed-menu-item" data-feed="Media" onclick="pickFeed('Media')">
+          <span class="fm-check">✓</span>
+          <span class="fm-label">Media</span>
+        </button>
       </div>
     </div>
 
@@ -2353,6 +2429,9 @@ body {
       <span class="stack-ring-count" id="stackRingCount">0/5</span>
     </button>
   </div>
+
+  <!-- Scrim for feed menu tap-outside dismiss -->
+  <div class="feed-menu-scrim" id="feedMenuScrim" onclick="closeFeedMenu()"></div>
 
   <!-- TikTok-style vertical snap feed -->
   <div class="feed-snap" id="feedSnap"></div>
@@ -2907,8 +2986,13 @@ const TOPICS = [
 ];
 
 let selectedTopics = new Set();
-let topicsChosen = false;
+// Default topicsChosen to TRUE so the Benny auto-open gate never fires.
+// The feed is open by default — no forced personalization.
+let topicsChosen = true;
 let activeFilter = 'all';
+// currentFeed = which feed mode is active in the top dropdown.
+// 'today' = curated briefing + feed (default). Any other value = topic filter.
+let currentFeed = 'today';
 
 /* ═══════════════════════════════════════════════
    RENDER — Build all screens from data
@@ -2925,13 +3009,12 @@ function getStoryReaders(storyIdx) {
 function renderFeed() {
   const el = document.getElementById('feedSnap');
 
-  // Filter stories by selected topics
+  // Filter stories based on the active feed picked in the top dropdown.
+  // 'today' = show everything. Otherwise = show only stories tagged with that topic.
   const storyItems = STORIES.map((s, i) => ({ s, i }));
-  const filtered = !topicsChosen || selectedTopics.size === 0
+  const filtered = currentFeed === 'today'
     ? storyItems
-    : activeFilter !== 'all'
-      ? storyItems.filter(({ s }) => s.tags.includes(activeFilter))
-      : storyItems.filter(({ s }) => s.tags.some(t => selectedTopics.has(t)));
+    : storyItems.filter(({ s }) => s.tags && s.tags.includes(currentFeed));
 
   el.innerHTML = filtered.map(({ s, i }, filteredIdx) => {
     // Social proof: friend face photos + activity badge ON the image
@@ -5198,6 +5281,43 @@ function openFromBriefing(idx) {
   renderFeed();
 }
 
+// Feed menu (top dropdown) — Instagram-pattern caret dropdown.
+function toggleFeedMenu(ev) {
+  if (ev) ev.stopPropagation();
+  const menu = document.getElementById('feedMenu');
+  const scrim = document.getElementById('feedMenuScrim');
+  if (!menu || !scrim) return;
+  const on = menu.classList.toggle('on');
+  scrim.classList.toggle('on', on);
+}
+function closeFeedMenu() {
+  const menu = document.getElementById('feedMenu');
+  const scrim = document.getElementById('feedMenuScrim');
+  if (menu) menu.classList.remove('on');
+  if (scrim) scrim.classList.remove('on');
+}
+function pickFeed(feed) {
+  currentFeed = feed;
+  // Update active state in the menu
+  document.querySelectorAll('.feed-menu-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.feed === feed);
+  });
+  // Hide the briefing row when on a topic feed — briefing only shows on Today's Stack
+  const label = document.getElementById('briefingRowLabel');
+  const row = document.getElementById('briefingRow');
+  const show = feed === 'today';
+  if (label) label.style.display = show ? '' : 'none';
+  if (row) row.style.display = show ? '' : 'none';
+  // Adjust the feed top offset since the briefing row disappears
+  const feedSnap = document.getElementById('feedSnap');
+  if (feedSnap) {
+    feedSnap.style.top = show ? '' : 'calc(var(--safe-top) + 56px)';
+  }
+  // Re-render feed with the new filter
+  renderFeed();
+  closeFeedMenu();
+}
+
 // Render the film-strip briefing row at the top of Today.
 // 5 square photo tiles. Each tile = one story. Tap opens that story directly.
 // Read state dims the tile and overlays a check. Section label above shows N/5.
@@ -5318,10 +5438,9 @@ renderBriefingRow();
   el.textContent = `${mon} ${d.getDate()}`;
 })();
 
-// Auto-open topic selection on first visit
-setTimeout(() => {
-  if (!topicsChosen) openTopics();
-}, 800);
+// Benny personalization wizard auto-open: KILLED.
+// Jack: the briefing is the landing product, not a personalization flow.
+// Users who want to customize tap the newsreel ∨ caret top-left for the feed menu.
 
 // Land on the briefing every time the user is on Today with work left.
 // No sessionStorage gate — the briefing is the home surface, full stop.
