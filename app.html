@@ -2387,7 +2387,7 @@ body {
       <div class="feed-menu" id="feedMenu">
         <button class="feed-menu-item active" data-feed="today" onclick="pickFeed('today')">
           <span class="fm-check">✓</span>
-          <span class="fm-label">Today's Briefing</span>
+          <span class="fm-label">Today's Stack</span>
         </button>
         <button class="feed-menu-item" data-feed="Politics" onclick="pickFeed('Politics')">
           <span class="fm-check">✓</span>
@@ -2418,7 +2418,7 @@ body {
 
     <!-- Section label + film-strip briefing row -->
     <div class="briefing-row-label" id="briefingRowLabel">
-      <span class="brl-title">TODAY'S BRIEFING</span>
+      <span class="brl-title">TODAY'S STACK</span>
       <span class="brl-count" id="briefingRowCount">0/5</span>
     </div>
     <div class="briefing-row" id="briefingRow"></div>
@@ -2602,7 +2602,7 @@ body {
   <div class="briefing-top">
     <button class="briefing-back" onclick="closeBriefing()">Browse feed →</button>
     <div class="briefing-streakline">DAY 12</div>
-    <div class="briefing-h">Today's Briefing</div>
+    <div class="briefing-h">Today's Stack</div>
     <div class="briefing-date" id="briefingDate">APRIL 11, 2026</div>
     <div class="briefing-prog" id="briefingProg">0/5 completed</div>
     <div class="briefing-byline" id="briefingByline">
@@ -5153,7 +5153,7 @@ function openBriefing() {
     document.getElementById('briefingProg').textContent = `${briefingRead.size}/${count} read · ${classStory.classroom.due}`;
     el.classList.add('classroom-mode');
   } else {
-    document.querySelector('.briefing-h').textContent = "Today's Briefing";
+    document.querySelector('.briefing-h').textContent = "Today's Stack";
     document.querySelector('.briefing-date').textContent = todayStr;
     document.getElementById('briefingProg').textContent = `${briefingRead.size}/${count} completed`;
     el.classList.remove('classroom-mode');
