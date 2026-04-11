@@ -232,6 +232,19 @@ body {
 .brl-count { color:var(--nr-red); font-weight:500; }
 .briefing-row-label.done .brl-count { color:var(--nr-green); }
 
+/* YOUR FEED section header — same mono eyebrow as TODAY'S STACK, with caret */
+.feed-section-label {
+  display:flex; align-items:center; gap:6px;
+  margin-top:14px; margin-bottom:6px; padding:4px 0;
+  background:none; border:none; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  font-family:var(--font-mono); font-size:10px;
+  letter-spacing:1.6px; text-transform:uppercase;
+}
+.feed-section-label:active { opacity:0.6; }
+.feed-section-label .brl-title { color:var(--nr-smoke); }
+.fsl-caret { width:12px; height:12px; color:var(--nr-smoke); }
+
 .briefing-row {
   display:flex; align-items:stretch; gap:10px;
   padding:0 0 6px;
@@ -330,7 +343,7 @@ body {
 /* Vertical snap container */
 .feed-snap {
   position:absolute;
-  top: calc(var(--safe-top) + 200px);
+  top: calc(var(--safe-top) + 234px);
   bottom: var(--nav-h);
   left:0; right:0;
   overflow-y: scroll;
@@ -2432,6 +2445,12 @@ body {
       <span class="brl-count" id="briefingRowCount">0/5</span>
     </div>
     <div class="briefing-row" id="briefingRow"></div>
+
+    <!-- Feed section header — section label + filter arrow. Matches TODAY'S STACK style. -->
+    <button class="feed-section-label" id="feedSectionLabel" onclick="toggleFeedMenu(event)">
+      <span class="brl-title" id="feedSectionTitle">YOUR FEED</span>
+      <svg class="fsl-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
 
     <!-- Hidden legacy elements kept so other code doesn't crash -->
     <button class="stack-ring" id="stackRing" onclick="openBriefing()" style="display:none">
@@ -5291,12 +5310,26 @@ function openFromBriefing(idx) {
   renderFeed();
 }
 
-// Feed menu (top dropdown) — Instagram-pattern caret dropdown.
+// Feed menu — Instagram-pattern caret dropdown. Dynamically positions
+// below whichever button triggered it (top-left newsreel ∨ or YOUR FEED ∨).
 function toggleFeedMenu(ev) {
   if (ev) ev.stopPropagation();
   const menu = document.getElementById('feedMenu');
   const scrim = document.getElementById('feedMenuScrim');
   if (!menu || !scrim) return;
+
+  // Position the menu below the triggering button (within the today-header).
+  if (ev && ev.currentTarget) {
+    const btn = ev.currentTarget;
+    const header = btn.closest('.today-header');
+    if (header) {
+      const btnRect = btn.getBoundingClientRect();
+      const headerRect = header.getBoundingClientRect();
+      menu.style.top = (btnRect.bottom - headerRect.top + 6) + 'px';
+      menu.style.left = Math.max(0, btnRect.left - headerRect.left) + 'px';
+    }
+  }
+
   const on = menu.classList.toggle('on');
   scrim.classList.toggle('on', on);
 }
@@ -5312,16 +5345,21 @@ function pickFeed(feed) {
   document.querySelectorAll('.feed-menu-item').forEach(item => {
     item.classList.toggle('active', item.dataset.feed === feed);
   });
-  // Hide the briefing row when on a topic feed — briefing only shows on Today's Stack
+  // Hide the stack row when on a topic feed — stack only shows on Today's Stack
   const label = document.getElementById('briefingRowLabel');
   const row = document.getElementById('briefingRow');
   const show = feed === 'today';
   if (label) label.style.display = show ? '' : 'none';
   if (row) row.style.display = show ? '' : 'none';
-  // Adjust the feed top offset since the briefing row disappears
+  // Update the YOUR FEED section label to reflect the current filter
+  const feedTitle = document.getElementById('feedSectionTitle');
+  if (feedTitle) {
+    feedTitle.textContent = feed === 'today' ? 'YOUR FEED' : feed.toUpperCase();
+  }
+  // Adjust the feed top offset since the stack row disappears
   const feedSnap = document.getElementById('feedSnap');
   if (feedSnap) {
-    feedSnap.style.top = show ? '' : 'calc(var(--safe-top) + 56px)';
+    feedSnap.style.top = show ? '' : 'calc(var(--safe-top) + 96px)';
   }
   // Re-render feed with the new filter
   renderFeed();
