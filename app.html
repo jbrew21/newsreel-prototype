@@ -232,18 +232,6 @@ body {
 .brl-count { color:var(--nr-red); font-weight:500; }
 .briefing-row-label.done .brl-count { color:var(--nr-green); }
 
-/* YOUR FEED section header — same mono eyebrow as TODAY'S STACK, with caret */
-.feed-section-label {
-  display:flex; align-items:center; gap:6px;
-  margin-top:8px; margin-bottom:2px; padding:2px 0;
-  background:none; border:none; cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  font-family:var(--font-mono); font-size:10px;
-  letter-spacing:1.6px; text-transform:uppercase;
-}
-.feed-section-label:active { opacity:0.6; }
-.feed-section-label .brl-title { color:var(--nr-smoke); }
-.fsl-caret { width:12px; height:12px; color:var(--nr-smoke); }
 
 .briefing-row {
   display:flex; align-items:stretch; gap:10px;
@@ -343,7 +331,7 @@ body {
 /* Vertical snap container */
 .feed-snap {
   position:absolute;
-  top: calc(var(--safe-top) + 176px);
+  top: calc(var(--safe-top) + 152px);
   bottom: var(--nav-h);
   left:0; right:0;
   overflow-y: scroll;
@@ -2445,12 +2433,6 @@ body {
       <span class="brl-count" id="briefingRowCount">0/5</span>
     </div>
     <div class="briefing-row" id="briefingRow"></div>
-
-    <!-- Feed section header — section label + filter arrow. Matches TODAY'S STACK style. -->
-    <button class="feed-section-label" id="feedSectionLabel" onclick="toggleFeedMenu(event)">
-      <span class="brl-title" id="feedSectionTitle">YOUR FEED</span>
-      <svg class="fsl-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-    </button>
 
     <!-- Hidden legacy elements kept so other code doesn't crash -->
     <button class="stack-ring" id="stackRing" onclick="openBriefing()" style="display:none">
@@ -5351,11 +5333,7 @@ function pickFeed(feed) {
   const show = feed === 'today';
   if (label) label.style.display = show ? '' : 'none';
   if (row) row.style.display = show ? '' : 'none';
-  // Update the YOUR FEED section label to reflect the current filter
-  const feedTitle = document.getElementById('feedSectionTitle');
-  if (feedTitle) {
-    feedTitle.textContent = feed === 'today' ? 'YOUR FEED' : feed.toUpperCase();
-  }
+  // (YOUR FEED section label was removed — guard against null if anything references it)
   // Adjust the feed top offset since the stack row disappears
   const feedSnap = document.getElementById('feedSnap');
   if (feedSnap) {
