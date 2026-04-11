@@ -5493,20 +5493,10 @@ renderBriefingRow();
 // Jack: the briefing is the landing product, not a personalization flow.
 // Users who want to customize tap the newsreel ∨ caret top-left for the feed menu.
 
-// Land on the briefing every time the user is on Today with work left.
-// No sessionStorage gate — the briefing is the home surface, full stop.
-// If the user dismisses it, they get the feed with the persistent strip
-// at the top. If they're done, the strip shows the "caught up" state.
-function maybeLandOnBriefing() {
-  // Don't interrupt other flows
-  if (document.getElementById('topicsOverlay').classList.contains('on')) return;
-  if (document.getElementById('briefingOverlay').classList.contains('on')) return;
-  const count = Math.min(STORIES.length, 5);
-  // Only auto-open if there's work left. Done = stay in feed.
-  if (briefingRead.size >= count) return;
-  openBriefing();
-}
-setTimeout(maybeLandOnBriefing, topicsChosen ? 300 : 2200);
+// Auto-open of briefing on app open: KILLED.
+// Jack: the homepage is the homepage. Users land on the feed with
+// the TODAY'S STACK row at the top. They open the stack list overlay
+// only if they explicitly tap into it from a stack card.
 
 /* ═══════════════════════════════════════════════
    VIEWPORT SCALE — Shrinks the phone frame to fit
