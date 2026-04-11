@@ -174,101 +174,85 @@ body {
 .stack-ring.all-done .stack-ring-count { color:var(--nr-green); }
 
 /* ══════════════════════════════════════════════
-   BRIEFING ROW — Instagram Stories pattern for the daily briefing.
-   5 circles below the logo row. Each = one briefing story.
-   Ring state shows read/unread. Tap opens that story directly.
-   First circle is a "today's" aggregate opener for the briefing overview.
+   BRIEFING ROW — Film strip pattern for the daily briefing.
+   Section label + 5 square photo tiles. Tap opens that story.
+   Numbered mono overlay reinforces the "5 stories" contract.
+   Tactile Digital: analog film-strip vibe, on-brand.
    ══════════════════════════════════════════════ */
+.briefing-row-label {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-top:12px; margin-bottom:8px;
+  font-family:var(--font-mono); font-size:10px;
+  letter-spacing:1.6px; text-transform:uppercase;
+}
+.brl-title { color:var(--nr-smoke); }
+.brl-count { color:var(--nr-red); font-weight:500; }
+.briefing-row-label.done .brl-count { color:var(--nr-green); }
+
 .briefing-row {
-  display:flex; align-items:flex-start; gap:14px;
-  margin-top:6px; padding:8px 0 10px;
-  overflow-x:auto; -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
+  display:flex; align-items:center; gap:8px;
+  padding-bottom:4px;
 }
-.briefing-row::-webkit-scrollbar { display:none; }
 
-.bstory {
-  display:flex; flex-direction:column; align-items:center;
-  gap:6px; flex-shrink:0;
-  background:none; border:none; padding:0; cursor:pointer;
+.bstrip-tile {
+  position:relative; flex:1;
+  aspect-ratio:1 / 1;
+  max-width:68px;
+  border:none; padding:0; background:var(--nr-lead);
+  border-radius:6px; overflow:hidden; cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  min-width:60px;
+  transition:transform 0.12s ease;
 }
-.bstory:active { transform:scale(0.94); transition:transform 0.12s; }
+.bstrip-tile:active { transform:scale(0.94); }
 
-/* The ring — 60px outer, 56px inner thumbnail, 2px gap, gradient border */
-.bstory-ring {
-  width:60px; height:60px; border-radius:50%;
-  padding:2.5px;
-  background:conic-gradient(from 210deg,
-    var(--nr-red) 0%,
-    var(--nr-yellow) 35%,
-    var(--nr-pink) 70%,
-    var(--nr-red) 100%);
-  position:relative;
-}
-.bstory.read .bstory-ring {
-  background:var(--nr-iron);
-}
-.bstory-ring-inner {
-  width:100%; height:100%; border-radius:50%;
-  background:var(--nr-black);
-  padding:2px;
-  overflow:hidden;
-}
-.bstory-thumb {
-  width:100%; height:100%; border-radius:50%;
-  overflow:hidden; background:var(--nr-lead);
-  display:flex; align-items:center; justify-content:center;
-}
-.bstory-thumb img {
+.bstrip-photo {
+  position:absolute; inset:0;
   width:100%; height:100%; object-fit:cover;
+  transition:opacity 0.25s ease, filter 0.25s ease;
 }
 
-/* Read state: small check over the thumb */
-.bstory.read .bstory-thumb::after {
+.bstrip-num {
+  position:absolute; top:4px; left:5px;
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  color:var(--nr-white); letter-spacing:-0.2px;
+  text-shadow:0 1px 4px rgba(0,0,0,0.85);
+  z-index:2;
+}
+
+/* Thin red accent border — the "film frame" edge, matches briefing label */
+.bstrip-tile::after {
   content:''; position:absolute; inset:0;
-  background:rgba(0,0,0,0.55); border-radius:50%;
+  border-radius:6px; pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(255,99,67,0.25);
 }
-.bstory.read .bstory-thumb::before {
-  content:'✓';
-  position:absolute; inset:0; z-index:2;
+.bstrip-tile:not(.read):nth-of-type(1)::after,
+.bstrip-tile:not(.read)::after {
+  box-shadow:inset 0 0 0 1px rgba(255,99,67,0.35);
+}
+
+/* Read state: dim the photo and overlay a small check in the corner */
+.bstrip-tile.read .bstrip-photo { opacity:0.35; filter:saturate(0.3); }
+.bstrip-tile.read::after { box-shadow:inset 0 0 0 1px rgba(26,173,23,0.45); }
+.bstrip-tile.read .bstrip-num { color:var(--nr-steel); text-shadow:none; }
+.bstrip-check { display:none; }
+.bstrip-tile.read .bstrip-check {
+  display:flex; position:absolute; inset:0; z-index:2;
+  align-items:center; justify-content:center;
+}
+.bstrip-tile.read .bstrip-check::before {
+  content:''; width:20px; height:20px; border-radius:50%;
+  background:var(--nr-green);
+  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/14px no-repeat;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/14px no-repeat;
+}
+/* Simpler — just draw a filled green circle with a white check */
+.bstrip-tile.read .bstrip-check::before {
+  content:'✓'; background:var(--nr-green);
+  color:var(--nr-white); font-family:var(--font-mono);
+  font-size:12px; font-weight:700;
   display:flex; align-items:center; justify-content:center;
-  font-family:var(--font-mono); font-size:20px; font-weight:700;
-  color:var(--nr-white);
+  mask:none; -webkit-mask:none;
 }
-.bstory-thumb { position:relative; }
-
-/* First circle — the "Today" aggregate. Red solid ring with logo n */
-.bstory-first .bstory-ring {
-  background:var(--nr-red);
-}
-.bstory-first .bstory-ring-inner {
-  background:var(--nr-red);
-}
-.bstory-first .bstory-thumb {
-  background:var(--nr-red);
-  font-family:var(--font-headline); font-size:22px; font-weight:600;
-  color:var(--nr-white);
-}
-.bstory-first.done .bstory-ring {
-  background:var(--nr-green);
-}
-.bstory-first.done .bstory-ring-inner,
-.bstory-first.done .bstory-thumb {
-  background:var(--nr-green);
-}
-
-/* Label under each circle */
-.bstory-label {
-  font-family:var(--font-body); font-size:10px;
-  color:var(--nr-smoke); max-width:64px;
-  text-align:center; line-height:1.2;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.bstory.read .bstory-label { color:var(--nr-steel); }
-.bstory-first .bstory-label { color:var(--nr-red); font-weight:600; letter-spacing:0.2px; }
-.bstory-first.done .bstory-label { color:var(--nr-green); }
 
 /* Legacy — keep for any external refs */
 .today-progress { display:none; }
@@ -293,7 +277,7 @@ body {
 /* Vertical snap container */
 .feed-snap {
   position:absolute;
-  top: calc(var(--safe-top) + 158px);
+  top: calc(var(--safe-top) + 170px);
   bottom: var(--nav-h);
   left:0; right:0;
   overflow-y: scroll;
@@ -2345,7 +2329,7 @@ body {
      ═══════════════════════════════════════════ -->
 <div class="screen on" id="s-today">
   <div class="today-header">
-    <!-- Top row: matches real app — logo + dropdown caret left, date + ring right -->
+    <!-- Top row: logo + dropdown caret left, date right -->
     <div class="today-top-row">
       <button class="today-logo-btn" onclick="openTopics()" aria-label="Switch feed">
         <span class="today-logo">newsreel</span>
@@ -2353,20 +2337,21 @@ body {
       </button>
       <div class="today-right">
         <span class="today-date" id="todayDate">APR 11</span>
-        <button class="stack-ring" id="stackRing" onclick="openBriefing()" aria-label="Today's Briefing">
-          <svg viewBox="0 0 40 40">
-            <circle cx="20" cy="20" r="17" fill="none" stroke="var(--nr-iron)" stroke-width="2.5"/>
-            <circle id="progressRing" cx="20" cy="20" r="17" fill="none" stroke="var(--nr-red)" stroke-width="2.5" stroke-dasharray="0 106.81" stroke-linecap="round" transform="rotate(-90 20 20)"/>
-          </svg>
-          <span class="stack-ring-count" id="stackRingCount">0/5</span>
-        </button>
       </div>
     </div>
 
-    <!-- Instagram-style stories row — the primary briefing affordance.
-         Each circle = one story in today's briefing. Ring state = read/unread.
-         Rendered dynamically from STORIES array by renderBriefingRow(). -->
+    <!-- Section label + film-strip briefing row -->
+    <div class="briefing-row-label" id="briefingRowLabel">
+      <span class="brl-title">TODAY'S BRIEFING</span>
+      <span class="brl-count" id="briefingRowCount">0/5</span>
+    </div>
     <div class="briefing-row" id="briefingRow"></div>
+
+    <!-- Hidden legacy elements kept so other code doesn't crash -->
+    <button class="stack-ring" id="stackRing" onclick="openBriefing()" style="display:none">
+      <svg viewBox="0 0 40 40"><circle id="progressRing" cx="20" cy="20" r="17" fill="none" stroke="var(--nr-red)" stroke-width="2.5" stroke-dasharray="0 106.81"/></svg>
+      <span class="stack-ring-count" id="stackRingCount">0/5</span>
+    </button>
   </div>
 
   <!-- TikTok-style vertical snap feed -->
@@ -2808,6 +2793,46 @@ const STORIES = [
     quiz: [
       { q: "How much faster is Arctic ice melting than previously projected?", opts: ["10%", "20%", "40%", "60%"], answer: 2, explain: "Arctic ice is melting 40% faster than previously projected." },
       { q: "What is eroding ice shelves from below?", opts: ["Volcanic activity", "Warming ocean currents", "Underground rivers", "Rising air temperatures"], answer: 1, explain: "Warming ocean currents are eroding ice shelves from below — a process invisible from the surface." },
+    ],
+  },
+  {
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=700&h=900&fit=crop",
+    credit: "REUTERS",
+    author: { name: "Eliza Haverstock", initials: "EH", role: "Editor at Newsreel" },
+    tags: ["Tech","AI"],
+    readTime: "5 min read",
+    pct: "71%",
+    headline: "Anthropic Launches Claude Code on the Web as Coding Race Heats Up",
+    subtitle: "The new remote environment lets developers run Claude Code sessions in the cloud…",
+    dots: 4,
+    slides: [
+      { img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop", credit: "REUTERS", text: "Anthropic shipped cloud-hosted Claude Code sessions, putting it in direct competition with OpenAI's Codex and Cursor." },
+      { img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&h=600&fit=crop", credit: "Anthropic", text: "Developers can now start a task on their phone, hand it off to the cloud, and come back to a finished PR." },
+    ],
+    poll: "AI-written code should be reviewed by a human before merging.",
+    readMore: { title: "Anthropic Unveils Claude Code on the Web", source: "Reuters", icon: "📰", url: "#" },
+    quiz: [
+      { q: "Which company shipped cloud-hosted coding sessions?", opts: ["OpenAI", "Google", "Anthropic", "Meta"], answer: 2, explain: "Anthropic launched Claude Code on the web in 2025." },
+    ],
+  },
+  {
+    image: "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=700&h=900&fit=crop",
+    credit: "AP PHOTO",
+    author: { name: "Katie Toepp", initials: "KT", role: "Reporter at Newsreel" },
+    tags: ["Media","Business"],
+    readTime: "6 min read",
+    pct: "68%",
+    headline: "Newsletter Economy Hits $1B as Creators Leave Platforms",
+    subtitle: "Writers are walking away from X and TikTok to own their distribution…",
+    dots: 4,
+    slides: [
+      { img: "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800&h=600&fit=crop", credit: "AP PHOTO", text: "Independent newsletters generated over $1 billion in revenue in 2025, up 40% year over year." },
+      { img: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=600&fit=crop", credit: "Substack", text: "Top creators are migrating off social platforms to own their audience and avoid algorithmic risk." },
+    ],
+    poll: "Owning your audience matters more than reach.",
+    readMore: { title: "The Newsletter Gold Rush", source: "Associated Press", icon: "📰", url: "#" },
+    quiz: [
+      { q: "How much did the independent newsletter economy grow in 2025?", opts: ["10%", "25%", "40%", "60%"], answer: 2, explain: "Independent newsletters grew 40% year over year to top $1B." },
     ],
   },
 ];
@@ -5173,9 +5198,9 @@ function openFromBriefing(idx) {
   renderFeed();
 }
 
-// Render the Instagram-style briefing row at the top of Today.
-// First circle = the "today" opener (opens full briefing overlay).
-// Next 5 = direct taps into each story. Read state = check + dimmed ring.
+// Render the film-strip briefing row at the top of Today.
+// 5 square photo tiles. Each tile = one story. Tap opens that story directly.
+// Read state dims the tile and overlays a check. Section label above shows N/5.
 function renderBriefingRow() {
   const row = document.getElementById('briefingRow');
   if (!row) return;
@@ -5183,31 +5208,21 @@ function renderBriefingRow() {
   const done = briefingRead.size;
   const allDone = done >= count;
 
-  const firstLabel = allDone ? 'Caught up' : (done > 0 ? `${done}/${count}` : "Today's");
-  let html = `
-    <button class="bstory bstory-first ${allDone ? 'done' : ''}" onclick="openBriefing()">
-      <div class="bstory-ring">
-        <div class="bstory-ring-inner">
-          <div class="bstory-thumb">n</div>
-        </div>
-      </div>
-      <div class="bstory-label">${firstLabel}</div>
-    </button>
-  `;
+  // Update the section label above the row
+  const label = document.getElementById('briefingRowLabel');
+  const countEl = document.getElementById('briefingRowCount');
+  if (label) label.classList.toggle('done', allDone);
+  if (countEl) countEl.textContent = allDone ? 'CAUGHT UP' : `${done}/${count}`;
 
+  let html = '';
   for (let i = 0; i < count; i++) {
     const s = STORIES[i];
     const read = briefingRead.has(i);
-    // Short author first name for the label
-    const first = (s.author && s.author.name) ? s.author.name.split(' ')[0] : `Story ${i+1}`;
     html += `
-      <button class="bstory ${read ? 'read' : ''}" onclick="openFromBriefing(${i})">
-        <div class="bstory-ring">
-          <div class="bstory-ring-inner">
-            <div class="bstory-thumb"><img src="${s.image}" alt=""></div>
-          </div>
-        </div>
-        <div class="bstory-label">${first}</div>
+      <button class="bstrip-tile ${read ? 'read' : ''}" onclick="openFromBriefing(${i})" aria-label="Story ${i+1}: ${s.headline.replace(/"/g, '&quot;')}">
+        <img class="bstrip-photo" src="${s.image}" alt="">
+        <span class="bstrip-num">${i + 1}</span>
+        <span class="bstrip-check"></span>
       </button>
     `;
   }
