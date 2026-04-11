@@ -256,7 +256,7 @@ body {
 
 .bstack-card {
   position:relative; flex:0 0 auto;
-  width:158px; height:104px;
+  width:150px; height:88px;
   border:none; padding:0; background:var(--nr-lead);
   border-radius:8px; overflow:hidden; cursor:pointer;
   -webkit-tap-highlight-color:transparent;
@@ -343,7 +343,7 @@ body {
 /* Vertical snap container */
 .feed-snap {
   position:absolute;
-  top: calc(var(--safe-top) + 192px);
+  top: calc(var(--safe-top) + 176px);
   bottom: var(--nav-h);
   left:0; right:0;
   overflow-y: scroll;
@@ -365,19 +365,15 @@ body {
 
 /* Image + side actions layout */
 .card-content-row {
-  display:flex; gap:0; padding:4px 0 0 16px;
-  flex:1 1 auto; min-height:0;
+  display:flex; gap:0; padding:4px 0 0 16px; flex:0 0 auto; min-height:0;
   overflow:hidden;
 }
 
-/* Main image area — swipeable slide track. Aspect-ratio is the goal,
-   but max-height caps it so the headline + subtitle below always fit. */
+/* Main image area — swipeable slide track, 4:5 like the phone in mini */
 .card-img-wrap {
   position:relative;
   flex:1;
   aspect-ratio: 4 / 5;
-  max-height: 100%;
-  min-height: 0;
   overflow: hidden;
   background: var(--nr-lead);
   border-radius: 12px;
