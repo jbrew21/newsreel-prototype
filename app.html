@@ -232,8 +232,11 @@ body {
 .brl-count { color:var(--nr-red); font-weight:500; }
 .briefing-row-label.done .brl-count { color:var(--nr-green); }
 
-/* YOUR FEED section header — same mono eyebrow as TODAY'S STACK, with caret */
+/* YOUR FEED section header — same mono eyebrow as TODAY'S STACK, with caret.
+   Visual size is compact; real tap area expanded via ::before pseudo-element
+   so the touch target meets 44pt accessibility minimum without pushing layout. */
 .feed-section-label {
+  position:relative;
   display:flex; align-items:center; gap:6px;
   margin-top:10px; margin-bottom:2px; padding:2px 0;
   background:none; border:none; cursor:pointer;
@@ -241,9 +244,16 @@ body {
   font-family:var(--font-mono); font-size:10px;
   letter-spacing:1.6px; text-transform:uppercase;
 }
-.feed-section-label:active { opacity:0.6; }
+/* Invisible expanded hit area — 44pt tall centered on the visible label */
+.feed-section-label::before {
+  content:''; position:absolute; left:-8px; right:-8px;
+  top:50%; transform:translateY(-50%);
+  height:44px;
+}
+.feed-section-label:active { opacity:0.55; }
+.feed-section-label:active .fsl-caret { transform:translateY(1px); }
 .feed-section-label .brl-title { color:var(--nr-smoke); }
-.fsl-caret { width:12px; height:12px; color:var(--nr-smoke); }
+.fsl-caret { width:12px; height:12px; color:var(--nr-smoke); transition:transform 0.15s ease; }
 
 
 .briefing-row {
@@ -2623,7 +2633,7 @@ body {
 <!-- BOTTOM NAV -->
 <nav class="bottomnav">
   <button class="navbtn on" data-tab="today"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span class="lbl">Today</span></button>
-  <button class="navbtn" data-tab="activity" style="position:relative"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/></svg><span class="nav-dot" id="actNavDot"></span><span class="lbl">Wire</span></button>
+  <button class="navbtn" data-tab="activity" style="position:relative"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/></svg><span class="nav-dot" id="actNavDot"></span><span class="lbl">Activity</span></button>
   <button class="navbtn" data-tab="explore"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg><span class="lbl">Explore</span></button>
   <button class="navbtn" data-tab="profile"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0113 0"/></svg><span class="lbl">Profile</span></button>
 </nav>
