@@ -82,8 +82,12 @@ body {
 .navbtn:active { transform:scale(0.9); }
 .navbtn svg { width:24px; height:24px; }
 .navbtn .lbl { font-family:var(--font-body); font-size:10px; font-weight:500; }
-.navbtn .ico, .navbtn .lbl { color:rgba(255,255,255,0.6); }
-.navbtn.on .ico, .navbtn.on .lbl { color:var(--nr-red); }
+/* Inactive: outline icons, muted label. Active: filled icon via SVG fill, bright label.
+   Instagram + X pattern: icon fill state is the indicator, no dots/lines. */
+.navbtn .ico { color:rgba(255,255,255,0.45); }
+.navbtn .lbl { color:rgba(255,255,255,0.45); }
+.navbtn.on .ico { color:var(--nr-white); fill:var(--nr-white); }
+.navbtn.on .lbl { color:var(--nr-white); }
 
 /* ═══════════════════════════════════════════════
    SCREENS
@@ -251,9 +255,10 @@ body {
   height:44px;
 }
 .feed-section-label:active { opacity:0.55; }
-.feed-section-label:active .fsl-caret { transform:translateY(1px); }
+.feed-section-label:active .fsl-caret { transform:rotate(180deg); }
+.feed-section-label.menu-open .fsl-caret { transform:rotate(180deg); }
 .feed-section-label .brl-title { color:var(--nr-smoke); }
-.fsl-caret { width:12px; height:12px; color:var(--nr-smoke); transition:transform 0.15s ease; }
+.fsl-caret { width:12px; height:12px; color:var(--nr-smoke); transition:transform 0.2s ease-out; }
 
 
 .briefing-row {
@@ -372,7 +377,12 @@ body {
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  /* X/Twitter press state: subtle bg flash on tap */
+  transition: background 0.08s ease;
 }
+.feed-page:active { background:rgba(255,255,255,0.03); }
+/* Card separation: 1px divider at ~15% white, X/Twitter pattern */
+.feed-page + .feed-page { border-top:1px solid rgba(255,255,255,0.06); }
 
 /* Image + side actions layout */
 .card-content-row {
@@ -5344,12 +5354,17 @@ function toggleFeedMenu(ev) {
 
   const on = menu.classList.toggle('on');
   scrim.classList.toggle('on', on);
+  // Rotate the caret ∨ → ∧ on open (Instagram pattern)
+  const feedLabel = document.getElementById('feedSectionLabel');
+  if (feedLabel) feedLabel.classList.toggle('menu-open', on);
 }
 function closeFeedMenu() {
   const menu = document.getElementById('feedMenu');
   const scrim = document.getElementById('feedMenuScrim');
   if (menu) menu.classList.remove('on');
   if (scrim) scrim.classList.remove('on');
+  const feedLabel = document.getElementById('feedSectionLabel');
+  if (feedLabel) feedLabel.classList.remove('menu-open');
 }
 function pickFeed(feed) {
   currentFeed = feed;
