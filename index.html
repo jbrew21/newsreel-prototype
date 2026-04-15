@@ -381,16 +381,22 @@ body {
    ═══════════════════════════════════════════════ */
 .car-slide--timeline {
   background:linear-gradient(170deg, var(--nr-black) 0%, var(--nr-charcoal) 60%, var(--nr-lead) 100%);
-  padding:64px 20px 32px; display:flex; flex-direction:column; align-items:stretch; overflow:hidden;
+  padding:52px 20px 28px; display:flex; flex-direction:column; align-items:stretch;
+  overflow-y:auto;
   color:var(--nr-white);
 }
+.tl-header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .tl-label {
   font-family:var(--font-mono); font-size:10px; letter-spacing:0.28em;
-  color:var(--nr-yellow); text-align:center; text-transform:uppercase;
+  color:var(--nr-yellow); text-transform:uppercase;
+}
+.tl-progress {
+  font-family:var(--font-mono); font-size:10px; letter-spacing:0.14em;
+  color:var(--nr-ash); text-transform:uppercase;
 }
 .tl-instruction {
-  font-family:var(--font-headline); font-size:18px; color:var(--nr-white);
-  text-align:center; margin:10px 0 22px; min-height:44px; line-height:1.3;
+  font-family:var(--font-headline); font-size:17px; color:var(--nr-white);
+  text-align:center; margin:8px 0 16px; min-height:28px; line-height:1.3;
   display:flex; align-items:center; justify-content:center; gap:10px;
 }
 .tl-instruction-hand {
@@ -435,31 +441,38 @@ body {
   border:1px solid rgba(237,189,31,0.35);
   padding:3px 8px; border-radius:4px; white-space:nowrap;
 }
-.tl-zone {
-  font-family:var(--font-mono); font-size:11px; letter-spacing:0.28em;
-  color:var(--nr-ash); text-transform:uppercase; text-align:center;
-  padding:16px 0; transition:color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+.tl-clue-holder { margin-bottom:10px; }
+.tl-stack { display:flex; flex-direction:column; gap:0; }
+.tl-gap {
+  min-height:30px; padding:8px 0;
+  font-family:var(--font-mono); font-size:10px; letter-spacing:0.22em;
+  color:rgba(255,255,255,0.3); text-transform:uppercase; text-align:center;
   display:flex; align-items:center; justify-content:center; gap:6px;
-  border:1px solid transparent; border-radius:var(--radius);
+  border:1px dashed rgba(255,255,255,0.14); border-radius:8px;
+  margin:4px 0;
+  transition:color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
-.tl-zone.idle { animation:tlZoneBreathe 2.8s ease-in-out infinite; }
+.tl-gap.idle { animation:tlZoneBreathe 2.8s ease-in-out infinite; }
+.tl-gap.hover {
+  color:var(--nr-white); animation:none;
+  border-color:rgba(237,189,31,0.55); border-style:solid;
+  background:rgba(237,189,31,0.08);
+}
+.tl-gap.correct {
+  color:var(--nr-green); border-color:rgba(26,173,23,0.5); border-style:solid;
+  background:rgba(26,173,23,0.08); animation:none;
+}
+.tl-gap.wrong {
+  color:var(--nr-red); border-color:rgba(255,99,67,0.5); border-style:solid;
+  background:rgba(255,99,67,0.08); animation:tlShake 0.4s ease;
+}
+.tl-gap-label { font-weight:400; }
+.tl-gap-mark { display:inline-flex; width:14px; height:14px; }
+.tl-gap-mark svg { width:100%; height:100%; }
 @keyframes tlZoneBreathe {
   0%, 100% { opacity:0.55; }
   50% { opacity:1; }
 }
-.tl-zone.hover { color:var(--nr-white); opacity:1; animation:none;
-  border-color:rgba(237,189,31,0.5); background:rgba(237,189,31,0.06); }
-.tl-zone.correct { color:var(--nr-green); font-weight:500; opacity:1; animation:none; }
-.tl-zone.wrong   { color:var(--nr-red); font-weight:500; opacity:1; animation:tlShake 0.4s ease; }
-.tl-zone.placed { padding:0; border-color:rgba(255,255,255,0.06);
-  background:transparent; min-height:0; animation:none; }
-.tl-zone.placed.correct { border-color:rgba(26,173,23,0.45); background:rgba(26,173,23,0.06); }
-.tl-zone.placed.wrong   { border-color:rgba(255,99,67,0.45); background:rgba(255,99,67,0.06); }
-.tl-zone.placed .tl-zone-label,
-.tl-zone.placed .tl-zone-mark { display:none !important; }
-.tl-zone-mark { display:none; width:14px; height:14px; flex-shrink:0; }
-.tl-zone.correct .tl-zone-mark:nth-of-type(1) { display:inline-block; }
-.tl-zone.wrong   .tl-zone-mark:nth-of-type(2) { display:inline-block; }
 .tl-clue.landed { animation:tlCardLand 0.38s cubic-bezier(0.34, 1.56, 0.64, 1); }
 @keyframes tlCardLand {
   0%   { transform:scale(0.94); }
@@ -484,52 +497,55 @@ body {
   20%, 60% { transform:translateX(-3px); }
   40%, 80% { transform:translateX(3px); }
 }
-.tl-axis { position:relative; margin:0; }
-.tl-axis-before, .tl-axis-after {
-  position:absolute; left:29px; width:1.5px; background:rgba(255,255,255,0.18);
+.tl-anchor-item {
+  display:flex; align-items:center; gap:12px; padding:3px 0;
 }
-.tl-axis-before { top:-20px; height:20px; }
-.tl-axis-after  { bottom:-20px; height:20px; }
-.tl-anchor { position:relative; display:flex; align-items:center; gap:14px; }
 .tl-anchor-year {
-  width:58px; height:58px; border-radius:50%; flex-shrink:0;
-  background:rgba(255,99,67,0.14); border:1.5px solid var(--nr-red);
-  display:flex; align-items:center; justify-content:center; position:relative; z-index:2;
-  font-family:var(--font-headline); color:var(--nr-red); font-size:14px;
+  width:52px; height:52px; border-radius:50%; flex-shrink:0;
+  background:rgba(255,99,67,0.12); border:1.5px solid rgba(255,99,67,0.8);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-headline); color:var(--nr-red); font-size:13px;
   font-variant-numeric:tabular-nums;
-  box-shadow:0 0 0 4px rgba(255,99,67,0.08);
+}
+.tl-anchor-item--seed .tl-anchor-year {
+  background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.35); color:var(--nr-silver);
+}
+.tl-anchor-item--just-placed { animation:tlItemIn 0.35s ease forwards; }
+@keyframes tlItemIn {
+  0%   { opacity:0; transform:translateY(-6px); }
+  100% { opacity:1; transform:translateY(0); }
 }
 .tl-anchor-card {
   flex:1; background:rgba(31,31,31,0.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
   border:1px solid rgba(255,255,255,0.06);
-  border-radius:var(--radius); padding:12px 14px;
-  font-family:var(--font-body); font-size:13.5px; line-height:1.45;
+  border-radius:var(--radius); padding:10px 12px;
+  font-family:var(--font-body); font-size:12.5px; line-height:1.4;
   color:var(--nr-white);
 }
-.tl-points-badge {
-  display:none; padding:4px 10px; border-radius:999px;
-  background:var(--nr-green); color:var(--nr-white);
+.tl-result {
+  margin-top:14px; min-height:22px;
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px;
+  text-align:center;
+}
+.tl-result-line { font-family:var(--font-headline); font-size:16px; }
+.tl-result-line--ok { color:var(--nr-white); }
+.tl-result-line--miss { color:var(--nr-smoke); }
+.tl-result-hint {
+  width:100%; font-family:var(--font-body); font-size:12.5px;
+  color:var(--nr-ash); line-height:1.4;
+}
+.tl-pts {
   font-family:var(--font-mono); font-size:10px; letter-spacing:0.08em;
-  font-weight:500; white-space:nowrap;
-  box-shadow:0 6px 18px rgba(26,173,23,0.35);
-  transform:scale(0);
-}
-.tl-points-badge.show {
-  display:inline-flex; align-items:center;
-  animation:tlPointsPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-@keyframes tlPointsPop {
-  0%   { transform:scale(0); opacity:0; }
-  55%  { transform:scale(1.2); opacity:1; }
-  100% { transform:scale(1); opacity:1; }
+  color:var(--nr-green); background:rgba(26,173,23,0.1);
+  border:1px solid rgba(26,173,23,0.35);
+  padding:2px 8px; border-radius:4px; white-space:nowrap;
 }
 @media (prefers-reduced-motion: reduce) {
   .tl-instruction-hand { animation:none; }
   .tl-clue { transition:none; }
   .tl-clue.landed { animation:none; }
-  .tl-zone.idle { animation:none; opacity:1; }
-  .tl-points-badge.show { animation:none; transform:translateX(-50%) scale(1); opacity:1; }
-  .tl-zone.wrong { animation:none; }
+  .tl-gap.idle { animation:none; opacity:1; }
+  .tl-gap.wrong { animation:none; }
   .tl-next-btn { transition:none; }
 }
 /* ═══════════════════════════════════════════════
@@ -2324,16 +2340,28 @@ const STORIES = [
     discussion: "Should foreign infrastructure deals include shared ownership?",
     readMore: { title: "Full Story: Trump's Bridge Ultimatum", source: "Newsreel", icon: "📰", url: "#" },
     timeline: {
-      clue: {
-        img: "https://images.unsplash.com/photo-1529260830199-42c24126f198?w=200&h=200&fit=crop",
-        text: "The U.S. and Canada sign NAFTA, creating a continental free trade zone.",
-        points: 2,
-      },
       anchor: {
-        year: "2018",
-        text: "The USMCA replaces NAFTA as the new North American trade agreement.",
+        year: 1994,
+        text: "The U.S., Canada, and Mexico sign NAFTA, creating a continental free trade zone.",
+        img: "https://images.unsplash.com/photo-1529260830199-42c24126f198?w=200&h=200&fit=crop",
       },
-      correct_position: "before",
+      clues: [
+        {
+          year: 1965,
+          text: "The U.S. and Canada sign the Auto Pact, their first major trade deal.",
+          img: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=200&h=200&fit=crop",
+        },
+        {
+          year: 2018,
+          text: "The USMCA replaces NAFTA as the new North American trade agreement.",
+          img: "https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=200&h=200&fit=crop",
+        },
+        {
+          year: 2026,
+          text: "Trump threatens to block the Gordie Howe Bridge unless the U.S. gets half.",
+          img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=200&h=200&fit=crop",
+        },
+      ],
     },
     quiz: [
       { q: "Who funded the construction of the Gordie Howe International Bridge?", opts: ["The U.S.", "Canada", "Both countries equally", "A private company"], answer: 1, explain: "Canada fully funded the $5.7 billion bridge connecting Detroit to Windsor." },
@@ -3650,43 +3678,33 @@ let carContentEnd = 0;     // index of first slide AFTER content (where completi
 let carStoryCompleted = false;  // has this story been registered as complete during this carousel session
 
 /* ═══════════════════════════════════════════════
-   TIMELINE GAME — drag clue BEFORE/AFTER an anchor event
+   TIMELINE GAME — multi-round Wikitrivia-style placement.
    ═══════════════════════════════════════════════ */
+const TL_SVG_HAND = '<svg class="tl-instruction-hand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5a2 2 0 0 1 4 0v6"/><path d="M13 7a2 2 0 0 1 4 0v5"/><path d="M17 9a2 2 0 0 1 4 0v5a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.3l-4-4a2 2 0 0 1 2.8-2.8L7 15V5a2 2 0 0 1 4 0v6"/></svg>';
+const TL_SVG_CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 8.5 6.5 12 13 4.5"/></svg>';
+const TL_SVG_X = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>';
+const TL_CORRECT_COPY = ['Nailed it.', 'Correct.', 'Exactly.', 'You knew that.', 'Locked in.'];
+function tlPickCorrectCopy() { return TL_CORRECT_COPY[Math.floor(Math.random() * TL_CORRECT_COPY.length)]; }
+
 function renderTimelineSlide(idx) {
   const story = STORIES[idx];
   const t = story.timeline;
-  if (!t) return '';
-  const pts = (t.clue && t.clue.points) || 2;
-  const handSvg = '<svg class="tl-instruction-hand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5a2 2 0 0 1 4 0v6"/><path d="M13 7a2 2 0 0 1 4 0v5"/><path d="M17 9a2 2 0 0 1 4 0v5a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.3l-4-4a2 2 0 0 1 2.8-2.8L7 15V5a2 2 0 0 1 4 0v6"/></svg>';
-  const checkSvg = '<svg class="tl-zone-mark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 8.5 6.5 12 13 4.5"/></svg>';
-  const xSvg = '<svg class="tl-zone-mark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>';
+  if (!t || !t.anchor || !Array.isArray(t.clues) || t.clues.length === 0) return '';
   return `
-    <div class="car-slide car-slide--timeline" id="carTimeline-${idx}" data-correct="${t.correct_position}" data-points="${pts}">
-      <div class="tl-label">Timeline</div>
+    <div class="car-slide car-slide--timeline" id="carTimeline-${idx}">
+      <div class="tl-header">
+        <div class="tl-label">Timeline</div>
+        <div class="tl-progress" id="tlProgress-${idx}">Round 1 of ${t.clues.length}</div>
+      </div>
       <div class="tl-instruction" id="tlInstruction-${idx}">
-        ${handSvg}
-        <span id="tlInstructionText-${idx}">Drag the clue onto the timeline</span>
-        <span class="tl-points-badge" id="tlPoints-${idx}">+${pts} Points</span>
+        ${TL_SVG_HAND}
+        <span id="tlInstructionText-${idx}">Drag onto the timeline</span>
       </div>
-      <div class="tl-clue" id="tlClue-${idx}">
-        <img class="tl-clue-img" src="${t.clue.img || story.image}" alt="">
-        <div class="tl-clue-body">
-          <p class="tl-clue-text">${t.clue.text}</p>
-          <span class="tl-clue-pts">${pts} Points</span>
-        </div>
-      </div>
-      <div class="tl-zone idle" id="tlBefore-${idx}"><span class="tl-zone-label">Before</span>${checkSvg}${xSvg}</div>
-      <div class="tl-axis">
-        <div class="tl-axis-before"></div>
-        <div class="tl-anchor">
-          <div class="tl-anchor-year">${t.anchor.year}</div>
-          <div class="tl-anchor-card">${t.anchor.text}</div>
-        </div>
-        <div class="tl-axis-after"></div>
-      </div>
-      <div class="tl-zone idle" id="tlAfter-${idx}"><span class="tl-zone-label">After</span>${checkSvg}${xSvg}</div>
-      <button type="button" class="tl-next-btn" id="tlNext-${idx}" onclick="carGo(1)">
-        Next
+      <div class="tl-clue-holder" id="tlClueHolder-${idx}"></div>
+      <div class="tl-stack" id="tlStack-${idx}"></div>
+      <div class="tl-result" id="tlResult-${idx}"></div>
+      <button type="button" class="tl-next-btn" id="tlNext-${idx}">
+        <span id="tlNextLabel-${idx}">Next round</span>
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>
       </button>
     </div>`;
@@ -3695,111 +3713,209 @@ function renderTimelineSlide(idx) {
 function initTimelineDrag(idx) {
   const slide = document.getElementById('carTimeline-' + idx);
   if (!slide) return;
-  const clue = document.getElementById('tlClue-' + idx);
-  const beforeZone = document.getElementById('tlBefore-' + idx);
-  const afterZone = document.getElementById('tlAfter-' + idx);
-  const pointsBadge = document.getElementById('tlPoints-' + idx);
+  const t = STORIES[idx].timeline;
+  if (!t || !t.anchor || !Array.isArray(t.clues) || t.clues.length === 0) return;
+
+  const stackEl = document.getElementById('tlStack-' + idx);
+  const clueHolder = document.getElementById('tlClueHolder-' + idx);
+  const progressEl = document.getElementById('tlProgress-' + idx);
   const instructionText = document.getElementById('tlInstructionText-' + idx);
   const handEl = slide.querySelector('.tl-instruction-hand');
-  const correct = slide.getAttribute('data-correct');
-  const pts = parseInt(slide.getAttribute('data-points'), 10) || 2;
-  if (!clue || !beforeZone || !afterZone) return;
+  const resultEl = document.getElementById('tlResult-' + idx);
+  const nextBtn = document.getElementById('tlNext-' + idx);
+  const nextLabel = document.getElementById('tlNextLabel-' + idx);
 
-  let startX = 0, startY = 0, dragY = 0, dragging = false, resolved = false;
   const DRAG_THRESHOLD_PX = 30;
+  const TOTAL_ROUNDS = t.clues.length;
+  const PTS_PER_CORRECT = 2;
 
-  function hitZone(y) {
-    const br = beforeZone.getBoundingClientRect();
-    const ar = afterZone.getBoundingClientRect();
-    if (y >= br.top && y <= br.bottom) return 'before';
-    if (y >= ar.top && y <= ar.bottom) return 'after';
-    return null;
-  }
-  function clearHover() {
-    beforeZone.classList.remove('hover');
-    afterZone.classList.remove('hover');
-  }
+  let placed = [Object.assign({}, t.anchor, { _seed: true })];
+  let queue = t.clues.slice();
+  let round = 0;
+  let correctCount = 0;
+  let currentClue = null;
+  let resolved = false;
+
   function vibrate(pattern) {
     try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (_) {}
   }
-
-  function onDown(e) {
-    if (resolved) return;
-    e.stopPropagation();
-    try { clue.setPointerCapture && clue.setPointerCapture(e.pointerId); } catch (_) {}
-    vibrate(15);
-    beforeZone.classList.remove('idle');
-    afterZone.classList.remove('idle');
-    const pt = e.touches ? e.touches[0] : e;
-    startX = pt.clientX;
-    startY = pt.clientY;
-    dragging = true;
-    clue.classList.add('dragging');
+  function sortedPlaced() { return placed.slice().sort(function (a, b) { return a.year - b.year; }); }
+  function correctGapFor(year) {
+    const sorted = sortedPlaced();
+    let i = 0;
+    for (; i < sorted.length; i++) if (year < sorted[i].year) break;
+    return i;
   }
-  function onMove(e) {
-    if (!dragging || resolved) return;
-    e.stopPropagation();
-    const pt = e.touches ? e.touches[0] : e;
-    dragY = pt.clientY - startY;
-    clue.style.transform = 'translateY(' + dragY + 'px)';
-    const zone = hitZone(pt.clientY);
-    clearHover();
-    if (zone === 'before') beforeZone.classList.add('hover');
-    if (zone === 'after') afterZone.classList.add('hover');
+  function renderAnchorHTML(event) {
+    const seedClass = event._seed ? ' tl-anchor-item--seed' : '';
+    return '<div class="tl-anchor-item' + seedClass + '">' +
+      '<div class="tl-anchor-year">' + event.year + '</div>' +
+      '<div class="tl-anchor-card">' + event.text + '</div>' +
+    '</div>';
   }
-  function onUp(e) {
-    if (!dragging || resolved) return;
-    e.stopPropagation();
-    dragging = false;
-    clue.classList.remove('dragging');
-    const pt = e.changedTouches ? e.changedTouches[0] : e;
-    const dx = Math.abs(pt.clientX - startX);
-    const dy = Math.abs(pt.clientY - startY);
-    const zone = hitZone(pt.clientY);
-    clearHover();
-    if (!zone || dy < DRAG_THRESHOLD_PX || dx > dy) {
-      clue.style.transform = 'translateY(0)';
+  function rebuildTimeline() {
+    const sorted = sortedPlaced();
+    let html = '';
+    for (let i = 0; i <= sorted.length; i++) {
+      let label;
+      if (i === 0) label = 'before ' + sorted[0].year;
+      else if (i === sorted.length) label = 'after ' + sorted[sorted.length - 1].year;
+      else label = sorted[i - 1].year + '–' + sorted[i].year;
+      html += '<div class="tl-gap idle" data-gap="' + i + '"><span class="tl-gap-label">' + label + '</span></div>';
+      if (i < sorted.length) html += renderAnchorHTML(sorted[i]);
+    }
+    stackEl.innerHTML = html;
+  }
+  function mountClue(clueData) {
+    clueHolder.innerHTML =
+      '<div class="tl-clue" id="tlClue-' + idx + '">' +
+        '<img class="tl-clue-img" src="' + (clueData.img || STORIES[idx].image) + '" alt="">' +
+        '<div class="tl-clue-body">' +
+          '<p class="tl-clue-text">' + clueData.text + '</p>' +
+        '</div>' +
+      '</div>';
+    currentClue = document.getElementById('tlClue-' + idx);
+    attachDragHandlers(currentClue, clueData);
+  }
+  function getGaps() { return Array.from(stackEl.querySelectorAll('.tl-gap')); }
+  function hitGap(y) {
+    const gaps = getGaps();
+    for (let i = 0; i < gaps.length; i++) {
+      const r = gaps[i].getBoundingClientRect();
+      if (y >= r.top && y <= r.bottom) return { idx: i, el: gaps[i] };
+    }
+    return null;
+  }
+  function clearHover() { getGaps().forEach(function (g) { g.classList.remove('hover'); }); }
+  function setAllGapsIdle(on) {
+    getGaps().forEach(function (g) {
+      if (on) g.classList.add('idle'); else g.classList.remove('idle');
+    });
+  }
+  function attachDragHandlers(clue, clueData) {
+    let startX = 0, startY = 0;
+    let dragging = false;
+    function onDown(e) {
+      if (resolved) return;
+      e.stopPropagation();
+      try { clue.setPointerCapture && clue.setPointerCapture(e.pointerId); } catch (_) {}
+      vibrate(15);
+      setAllGapsIdle(false);
+      const pt = e.touches ? e.touches[0] : e;
+      startX = pt.clientX; startY = pt.clientY;
+      dragging = true;
+      clue.classList.add('dragging');
+    }
+    function onMove(e) {
+      if (!dragging || resolved) return;
+      e.stopPropagation();
+      const pt = e.touches ? e.touches[0] : e;
+      clue.style.transform = 'translateY(' + (pt.clientY - startY) + 'px)';
+      clearHover();
+      const hit = hitGap(pt.clientY);
+      if (hit) hit.el.classList.add('hover');
+    }
+    function onUp(e) {
+      if (!dragging || resolved) return;
+      e.stopPropagation();
+      dragging = false;
       clue.classList.remove('dragging');
-      beforeZone.classList.add('idle');
-      afterZone.classList.add('idle');
-      return;
+      const pt = e.changedTouches ? e.changedTouches[0] : e;
+      const dx = Math.abs(pt.clientX - startX);
+      const dy = Math.abs(pt.clientY - startY);
+      const hit = hitGap(pt.clientY);
+      clearHover();
+      if (!hit || dy < DRAG_THRESHOLD_PX || dx > dy) {
+        clue.style.transform = 'translateY(0)';
+        setAllGapsIdle(true);
+        return;
+      }
+      resolved = true;
+      resolveDrop(clue, clueData, hit);
     }
-    resolved = true;
-    clue.classList.add('locked');
-    clue.style.transform = '';
-    const wasCorrect = zone === correct;
-    const landedZone = zone === 'before' ? beforeZone : afterZone;
-    const correctZone = correct === 'before' ? beforeZone : afterZone;
-    landedZone.classList.add('placed');
-    landedZone.appendChild(clue);
-    clue.classList.add('landed');
-    clue.classList.remove('dragging');
+    clue.addEventListener('pointerdown', onDown);
+    clue.addEventListener('pointermove', onMove);
+    clue.addEventListener('pointerup', onUp);
+    clue.addEventListener('pointercancel', onUp);
+    clue.addEventListener('touchstart', onDown, {passive:false});
+    clue.addEventListener('touchmove', onMove, {passive:false});
+    clue.addEventListener('touchend', onUp);
+  }
+  function resolveDrop(clue, clueData, hit) {
+    const correctGap = correctGapFor(clueData.year);
+    const wasCorrect = hit.idx === correctGap;
     if (handEl) handEl.style.display = 'none';
-    const nextBtn = document.getElementById('tlNext-' + idx);
     if (wasCorrect) {
-      landedZone.classList.add('correct');
-      if (instructionText) instructionText.textContent = 'Nice — that was right.';
-      pointsBadge.classList.add('show');
+      correctCount++;
+      hit.el.classList.add('correct');
+      hit.el.innerHTML = '<span class="tl-gap-mark">' + TL_SVG_CHECK + '</span>';
       vibrate([40, 30, 60]);
+      if (resultEl) {
+        resultEl.innerHTML = '<span class="tl-result-line tl-result-line--ok">' + tlPickCorrectCopy() +
+          '</span><span class="tl-pts">+' + PTS_PER_CORRECT + ' pts</span>';
+      }
     } else {
-      landedZone.classList.add('wrong');
-      correctZone.classList.add('correct');
-      const y = slide.querySelector('.tl-anchor-year');
-      if (instructionText) instructionText.textContent = 'Not quite — it happened ' + correct + ' ' + (y ? y.textContent : '') + '.';
+      hit.el.classList.add('wrong');
+      hit.el.innerHTML = '<span class="tl-gap-mark">' + TL_SVG_X + '</span>';
       vibrate([80, 40, 80]);
+      const gaps = getGaps();
+      if (gaps[correctGap]) {
+        gaps[correctGap].classList.add('correct');
+        gaps[correctGap].innerHTML = '<span class="tl-gap-mark">' + TL_SVG_CHECK + '</span>';
+      }
+      if (resultEl) {
+        const sorted = sortedPlaced();
+        const neighbor = correctGap === 0 ? 'before ' + sorted[0].year :
+                         correctGap === sorted.length ? 'after ' + sorted[sorted.length - 1].year :
+                         'between ' + sorted[correctGap - 1].year + ' and ' + sorted[correctGap].year;
+        resultEl.innerHTML = '<span class="tl-result-line tl-result-line--miss">Not quite.</span>' +
+          '<span class="tl-result-hint">It belongs ' + neighbor + '.</span>';
+      }
     }
+    setTimeout(function () {
+      const gaps = getGaps();
+      const targetGap = gaps[correctGap];
+      if (targetGap) {
+        const newAnchor = document.createElement('div');
+        newAnchor.className = 'tl-anchor-item tl-anchor-item--just-placed';
+        newAnchor.innerHTML =
+          '<div class="tl-anchor-year">' + clueData.year + '</div>' +
+          '<div class="tl-anchor-card">' + clueData.text + '</div>';
+        targetGap.parentNode.replaceChild(newAnchor, targetGap);
+      }
+      if (clueHolder) clueHolder.innerHTML = '';
+      placed.push(clueData);
+      round++;
+      revealNext();
+    }, wasCorrect ? 450 : 900);
+  }
+  function revealNext() {
     if (nextBtn) {
-      setTimeout(function() { nextBtn.classList.add('show'); }, 450);
+      const lastRound = round >= TOTAL_ROUNDS;
+      if (lastRound) {
+        if (nextLabel) nextLabel.textContent = 'Finish';
+        nextBtn.onclick = function () { if (typeof carGo === 'function') carGo(1); };
+      } else {
+        if (nextLabel) nextLabel.textContent = 'Next round';
+        nextBtn.onclick = startNextRound;
+      }
+      setTimeout(function () { nextBtn.classList.add('show'); }, 300);
     }
   }
+  function startNextRound() {
+    if (!nextBtn) return;
+    nextBtn.classList.remove('show');
+    if (resultEl) resultEl.innerHTML = '';
+    resolved = false;
+    rebuildTimeline();
+    if (progressEl) progressEl.textContent = 'Round ' + (round + 1) + ' of ' + TOTAL_ROUNDS;
+    if (instructionText) instructionText.textContent = 'Drag onto the timeline';
+    if (handEl) handEl.style.display = '';
+    mountClue(queue[round]);
+  }
 
-  clue.addEventListener('pointerdown', onDown);
-  clue.addEventListener('pointermove', onMove);
-  clue.addEventListener('pointerup', onUp);
-  clue.addEventListener('pointercancel', onUp);
-  clue.addEventListener('touchstart', onDown, {passive:false});
-  clue.addEventListener('touchmove', onMove, {passive:false});
-  clue.addEventListener('touchend', onUp);
+  rebuildTimeline();
+  mountClue(queue[0]);
 }
 
 function openCarousel(idx, startSlide) {
