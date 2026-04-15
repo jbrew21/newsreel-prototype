@@ -408,6 +408,7 @@ body {
   border:1px solid rgba(255,255,255,0.06);
   border-radius:var(--radius); padding:12px 14px;
   touch-action:none; user-select:none;
+  text-transform:none; text-align:left; letter-spacing:normal;
   box-shadow:0 2px 10px rgba(0,0,0,0.35);
   transition:box-shadow 0.18s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor:grab;
@@ -437,15 +438,47 @@ body {
 .tl-zone {
   font-family:var(--font-mono); font-size:11px; letter-spacing:0.28em;
   color:var(--nr-ash); text-transform:uppercase; text-align:center;
-  padding:16px 0; transition:color 0.18s ease;
+  padding:16px 0; transition:color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
   display:flex; align-items:center; justify-content:center; gap:6px;
+  border:1px solid transparent; border-radius:var(--radius);
 }
-.tl-zone.hover { color:var(--nr-white); }
-.tl-zone.correct { color:var(--nr-green); font-weight:500; }
-.tl-zone.wrong { color:var(--nr-red); font-weight:500; animation:tlShake 0.4s ease; }
+.tl-zone.idle { animation:tlZoneBreathe 2.8s ease-in-out infinite; }
+@keyframes tlZoneBreathe {
+  0%, 100% { opacity:0.55; }
+  50% { opacity:1; }
+}
+.tl-zone.hover { color:var(--nr-white); opacity:1; animation:none;
+  border-color:rgba(237,189,31,0.5); background:rgba(237,189,31,0.06); }
+.tl-zone.correct { color:var(--nr-green); font-weight:500; opacity:1; animation:none; }
+.tl-zone.wrong   { color:var(--nr-red); font-weight:500; opacity:1; animation:tlShake 0.4s ease; }
+.tl-zone.placed { padding:0; border-color:rgba(255,255,255,0.06);
+  background:transparent; min-height:0; animation:none; }
+.tl-zone.placed.correct { border-color:rgba(26,173,23,0.45); background:rgba(26,173,23,0.06); }
+.tl-zone.placed.wrong   { border-color:rgba(255,99,67,0.45); background:rgba(255,99,67,0.06); }
+.tl-zone.placed .tl-zone-label,
+.tl-zone.placed .tl-zone-mark { display:none !important; }
 .tl-zone-mark { display:none; width:14px; height:14px; flex-shrink:0; }
 .tl-zone.correct .tl-zone-mark:nth-of-type(1) { display:inline-block; }
 .tl-zone.wrong   .tl-zone-mark:nth-of-type(2) { display:inline-block; }
+.tl-clue.landed { animation:tlCardLand 0.38s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes tlCardLand {
+  0%   { transform:scale(0.94); }
+  60%  { transform:scale(1.03); }
+  100% { transform:scale(1); }
+}
+.tl-next-btn {
+  margin:18px auto 0; padding:12px 30px;
+  background:var(--nr-red); color:var(--nr-white); border:none;
+  border-radius:999px; cursor:pointer;
+  font-family:var(--font-mono); font-size:11px; letter-spacing:0.16em;
+  text-transform:uppercase;
+  opacity:0; transform:translateY(6px); pointer-events:none;
+  transition:opacity 0.22s ease, transform 0.22s ease, background 0.18s ease;
+  display:inline-flex; align-items:center; gap:6px; align-self:center;
+}
+.tl-next-btn.show { opacity:1; transform:translateY(0); pointer-events:auto; }
+.tl-next-btn:active { background:#E85535; transform:translateY(0) scale(0.97); }
+.tl-next-btn svg { width:12px; height:12px; }
 @keyframes tlShake {
   0%, 100% { transform:translateX(0); }
   20%, 60% { transform:translateX(-3px); }
@@ -474,23 +507,30 @@ body {
   color:var(--nr-white);
 }
 .tl-points-badge {
-  position:absolute; top:92px; left:50%; transform:translateX(-50%) scale(0); opacity:0;
-  z-index:10; padding:8px 16px; border-radius:999px;
+  display:none; padding:4px 10px; border-radius:999px;
   background:var(--nr-green); color:var(--nr-white);
-  font-family:var(--font-headline); font-size:14px; letter-spacing:0.02em;
-  box-shadow:0 10px 30px rgba(26,173,23,0.45);
+  font-family:var(--font-mono); font-size:10px; letter-spacing:0.08em;
+  font-weight:500; white-space:nowrap;
+  box-shadow:0 6px 18px rgba(26,173,23,0.35);
+  transform:scale(0);
 }
-.tl-points-badge.show { animation:tlPointsPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.tl-points-badge.show {
+  display:inline-flex; align-items:center;
+  animation:tlPointsPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
 @keyframes tlPointsPop {
-  0% { transform:translateX(-50%) translateY(6px) scale(0); opacity:0; }
-  55% { transform:translateX(-50%) translateY(0) scale(1.15); opacity:1; }
-  100% { transform:translateX(-50%) translateY(0) scale(1); opacity:1; }
+  0%   { transform:scale(0); opacity:0; }
+  55%  { transform:scale(1.2); opacity:1; }
+  100% { transform:scale(1); opacity:1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .tl-instruction-hand { animation:none; }
   .tl-clue { transition:none; }
+  .tl-clue.landed { animation:none; }
+  .tl-zone.idle { animation:none; opacity:1; }
   .tl-points-badge.show { animation:none; transform:translateX(-50%) scale(1); opacity:1; }
   .tl-zone.wrong { animation:none; }
+  .tl-next-btn { transition:none; }
 }
 /* ═══════════════════════════════════════════════
    QUIZ OVERLAY
@@ -3626,6 +3666,7 @@ function renderTimelineSlide(idx) {
       <div class="tl-instruction" id="tlInstruction-${idx}">
         ${handSvg}
         <span id="tlInstructionText-${idx}">Drag the clue onto the timeline</span>
+        <span class="tl-points-badge" id="tlPoints-${idx}">+${pts} Points</span>
       </div>
       <div class="tl-clue" id="tlClue-${idx}">
         <img class="tl-clue-img" src="${t.clue.img || story.image}" alt="">
@@ -3634,7 +3675,7 @@ function renderTimelineSlide(idx) {
           <span class="tl-clue-pts">${pts} Points</span>
         </div>
       </div>
-      <div class="tl-zone" id="tlBefore-${idx}">Before${checkSvg}${xSvg}</div>
+      <div class="tl-zone idle" id="tlBefore-${idx}"><span class="tl-zone-label">Before</span>${checkSvg}${xSvg}</div>
       <div class="tl-axis">
         <div class="tl-axis-before"></div>
         <div class="tl-anchor">
@@ -3643,8 +3684,11 @@ function renderTimelineSlide(idx) {
         </div>
         <div class="tl-axis-after"></div>
       </div>
-      <div class="tl-zone" id="tlAfter-${idx}">After${checkSvg}${xSvg}</div>
-      <div class="tl-points-badge" id="tlPoints-${idx}">+${pts} Points</div>
+      <div class="tl-zone idle" id="tlAfter-${idx}"><span class="tl-zone-label">After</span>${checkSvg}${xSvg}</div>
+      <button type="button" class="tl-next-btn" id="tlNext-${idx}" onclick="carGo(1)">
+        Next
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>
+      </button>
     </div>`;
 }
 
@@ -3674,10 +3718,17 @@ function initTimelineDrag(idx) {
     beforeZone.classList.remove('hover');
     afterZone.classList.remove('hover');
   }
+  function vibrate(pattern) {
+    try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (_) {}
+  }
+
   function onDown(e) {
     if (resolved) return;
     e.stopPropagation();
     try { clue.setPointerCapture && clue.setPointerCapture(e.pointerId); } catch (_) {}
+    vibrate(15);
+    beforeZone.classList.remove('idle');
+    afterZone.classList.remove('idle');
     const pt = e.touches ? e.touches[0] : e;
     startY = pt.clientY;
     dragging = true;
@@ -3704,26 +3755,37 @@ function initTimelineDrag(idx) {
     clearHover();
     if (!zone) {
       clue.style.transform = 'translateY(0)';
+      clue.classList.remove('dragging');
+      beforeZone.classList.add('idle');
+      afterZone.classList.add('idle');
       return;
     }
     resolved = true;
     clue.classList.add('locked');
-    clue.style.transform = 'translateY(0)';
+    clue.style.transform = '';
     const wasCorrect = zone === correct;
     const landedZone = zone === 'before' ? beforeZone : afterZone;
     const correctZone = correct === 'before' ? beforeZone : afterZone;
+    landedZone.classList.add('placed');
+    landedZone.appendChild(clue);
+    clue.classList.add('landed');
+    clue.classList.remove('dragging');
     if (handEl) handEl.style.display = 'none';
+    const nextBtn = document.getElementById('tlNext-' + idx);
     if (wasCorrect) {
       landedZone.classList.add('correct');
       if (instructionText) instructionText.textContent = 'Nice — that was right.';
       pointsBadge.classList.add('show');
-      setTimeout(function() { if (typeof carGo === 'function') carGo(1); }, 1500);
+      vibrate([40, 30, 60]);
     } else {
       landedZone.classList.add('wrong');
       correctZone.classList.add('correct');
       const y = slide.querySelector('.tl-anchor-year');
       if (instructionText) instructionText.textContent = 'Not quite — it happened ' + correct + ' ' + (y ? y.textContent : '') + '.';
-      setTimeout(function() { if (typeof carGo === 'function') carGo(1); }, 2300);
+      vibrate([80, 40, 80]);
+    }
+    if (nextBtn) {
+      setTimeout(function() { nextBtn.classList.add('show'); }, 450);
     }
   }
 
