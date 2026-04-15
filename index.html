@@ -364,6 +364,116 @@ body {
 }
 .car-abtn { width:40px; height:40px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; }
 .car-abtn svg { width:22px; height:22px; color:var(--nr-white); }
+/* "Read full story" link inside each carousel card — opens the in-app browser. */
+.car-read-more {
+  display:inline-flex; align-items:center; gap:6px; margin-top:10px;
+  background:none; border:none; padding:0; cursor:pointer;
+  font-family:var(--font-mono); font-size:11px; letter-spacing:0.05em;
+  color:rgba(255,255,255,0.62); text-decoration:underline;
+  text-decoration-color:rgba(255,255,255,0.25); text-underline-offset:3px;
+  transition:color 0.18s ease, text-decoration-color 0.18s ease;
+}
+.car-read-more:hover { color:var(--nr-white); text-decoration-color:rgba(255,255,255,0.7); }
+.car-read-more-arrow { display:inline-block; transition:transform 0.18s ease; }
+.car-read-more:hover .car-read-more-arrow { transform:translateX(2px); }
+/* ═══════════════════════════════════════════════
+   TIMELINE GAME SLIDE — editorial paper aesthetic.
+   ═══════════════════════════════════════════════ */
+.car-slide--timeline {
+  background:#F5EFE4;
+  padding:64px 24px 32px; display:flex; flex-direction:column; align-items:stretch; overflow:hidden;
+  color:#2A241C;
+}
+.tl-label {
+  font-family:var(--font-mono); font-size:10px; letter-spacing:0.28em;
+  color:#8C7A5B; text-align:center; text-transform:uppercase;
+}
+.tl-instruction {
+  font-family:var(--font-headline); font-size:16px; color:#2A241C;
+  text-align:center; margin:10px 0 22px; min-height:42px; line-height:1.3;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.tl-instruction-hand {
+  display:inline-block; font-size:18px; animation:tlHandBounce 1.8s ease-in-out infinite;
+}
+@keyframes tlHandBounce {
+  0%, 100% { transform:translateY(0) rotate(-8deg); }
+  50% { transform:translateY(-3px) rotate(4deg); }
+}
+.tl-clue {
+  position:relative; z-index:2; display:flex; gap:12px; align-items:flex-start;
+  background:#FFFFFF; border-radius:12px; padding:12px 14px;
+  touch-action:none; user-select:none;
+  box-shadow:0 1px 0 rgba(0,0,0,0.04), 0 2px 8px rgba(62,46,26,0.10);
+  transition:box-shadow 0.18s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor:grab;
+}
+.tl-clue.dragging { box-shadow:0 14px 28px rgba(62,46,26,0.25); cursor:grabbing; transition:none; }
+.tl-clue.locked { pointer-events:none; }
+.tl-clue-img {
+  width:62px; height:62px; border-radius:6px; object-fit:cover; flex-shrink:0;
+  background:#E8DFD0;
+}
+.tl-clue-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
+.tl-clue-text {
+  font-family:Georgia, "Times New Roman", serif; font-size:13.5px; line-height:1.4;
+  color:#2A241C; margin:0;
+}
+.tl-clue-pts {
+  align-self:flex-start;
+  font-family:var(--font-mono); font-size:10px; letter-spacing:0.06em;
+  color:#7A5A16; background:rgba(237,189,31,0.22);
+  border:1px solid rgba(237,189,31,0.55);
+  padding:3px 8px; border-radius:4px; white-space:nowrap;
+}
+.tl-zone {
+  font-family:var(--font-mono); font-size:11px; letter-spacing:0.28em;
+  color:#8C7A5B; text-transform:uppercase; text-align:center;
+  padding:16px 0; transition:color 0.18s ease;
+}
+.tl-zone.hover { color:#2A241C; font-weight:500; }
+.tl-zone.correct { color:#2F7D32; font-weight:600; }
+.tl-zone.wrong { color:#B3412A; font-weight:600; animation:tlShake 0.4s ease; }
+@keyframes tlShake {
+  0%, 100% { transform:translateX(0); }
+  20%, 60% { transform:translateX(-3px); }
+  40%, 80% { transform:translateX(3px); }
+}
+.tl-axis { position:relative; margin:0; }
+.tl-axis-before, .tl-axis-after {
+  position:absolute; left:30px; width:1.5px; background:#C9B99A;
+}
+.tl-axis-before { top:-32px; height:32px; }
+.tl-axis-after  { bottom:-32px; height:32px; }
+.tl-anchor { position:relative; display:flex; align-items:center; gap:14px; }
+.tl-anchor-year {
+  width:60px; height:60px; border-radius:50%; flex-shrink:0;
+  background:#FFFFFF; border:1.5px solid #C9B99A;
+  display:flex; align-items:center; justify-content:center; position:relative; z-index:2;
+  font-family:Georgia, "Times New Roman", serif; color:#6B5A38;
+  font-size:14px; font-weight:600;
+  box-shadow:0 1px 2px rgba(62,46,26,0.08);
+}
+.tl-anchor-card {
+  flex:1; background:#FFFFFF; border-radius:10px;
+  padding:12px 14px;
+  font-family:Georgia, "Times New Roman", serif; font-size:13.5px; line-height:1.4;
+  color:#2A241C;
+  box-shadow:0 1px 0 rgba(0,0,0,0.04), 0 2px 6px rgba(62,46,26,0.08);
+}
+.tl-points-badge {
+  position:absolute; top:92px; left:50%; transform:translateX(-50%) scale(0); opacity:0;
+  z-index:10; padding:8px 16px; border-radius:999px;
+  background:#2F7D32; color:#FFFFFF;
+  font-family:var(--font-headline); font-size:14px; letter-spacing:0.02em;
+  box-shadow:0 8px 24px rgba(47,125,50,0.35);
+}
+.tl-points-badge.show { animation:tlPointsPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+@keyframes tlPointsPop {
+  0% { transform:translateX(-50%) translateY(6px) scale(0); opacity:0; }
+  55% { transform:translateX(-50%) translateY(0) scale(1.2); opacity:1; }
+  100% { transform:translateX(-50%) translateY(0) scale(1); opacity:1; }
+}
 /* ═══════════════════════════════════════════════
    QUIZ OVERLAY
    ═══════════════════════════════════════════════ */
@@ -2155,6 +2265,18 @@ const STORIES = [
     poll: "The U.S. should receive partial ownership of the Gordie Howe Bridge.",
     discussion: "Should foreign infrastructure deals include shared ownership?",
     readMore: { title: "Full Story: Trump's Bridge Ultimatum", source: "Newsreel", icon: "📰", url: "#" },
+    timeline: {
+      clue: {
+        img: "https://images.unsplash.com/photo-1529260830199-42c24126f198?w=200&h=200&fit=crop",
+        text: "The U.S. and Canada sign NAFTA, creating a continental free trade zone.",
+        points: 2,
+      },
+      anchor: {
+        year: "2018",
+        text: "The USMCA replaces NAFTA as the new North American trade agreement.",
+      },
+      correct_position: "before",
+    },
     quiz: [
       { q: "Who funded the construction of the Gordie Howe International Bridge?", opts: ["The U.S.", "Canada", "Both countries equally", "A private company"], answer: 1, explain: "Canada fully funded the $5.7 billion bridge connecting Detroit to Windsor." },
       { q: "What did President Trump demand regarding the bridge?", opts: ["Shut it down", "Half ownership", "Rename it", "Toll-free access"], answer: 1, explain: "Trump demanded the U.S. receive half ownership of the crossing." },
@@ -3469,15 +3591,140 @@ let carShareSlideIdx = 0;  // which slide is the share card (finale)
 let carContentEnd = 0;     // index of first slide AFTER content (where completion triggers)
 let carStoryCompleted = false;  // has this story been registered as complete during this carousel session
 
+/* ═══════════════════════════════════════════════
+   TIMELINE GAME — drag clue BEFORE/AFTER an anchor event
+   ═══════════════════════════════════════════════ */
+function renderTimelineSlide(idx) {
+  const story = STORIES[idx];
+  const t = story.timeline;
+  if (!t) return '';
+  const pts = (t.clue && t.clue.points) || 2;
+  return `
+    <div class="car-slide car-slide--timeline" id="carTimeline-${idx}" data-correct="${t.correct_position}" data-points="${pts}">
+      <div class="tl-label">Timeline</div>
+      <div class="tl-instruction" id="tlInstruction-${idx}">
+        <span class="tl-instruction-hand" aria-hidden="true">&#x1F449;</span>
+        <span id="tlInstructionText-${idx}">Drag the clue onto the timeline</span>
+      </div>
+      <div class="tl-clue" id="tlClue-${idx}">
+        <img class="tl-clue-img" src="${t.clue.img || story.image}" alt="">
+        <div class="tl-clue-body">
+          <p class="tl-clue-text">${t.clue.text}</p>
+          <span class="tl-clue-pts">${pts} Points</span>
+        </div>
+      </div>
+      <div class="tl-zone" id="tlBefore-${idx}">Before</div>
+      <div class="tl-axis">
+        <div class="tl-axis-before"></div>
+        <div class="tl-anchor">
+          <div class="tl-anchor-year">${t.anchor.year}</div>
+          <div class="tl-anchor-card">${t.anchor.text}</div>
+        </div>
+        <div class="tl-axis-after"></div>
+      </div>
+      <div class="tl-zone" id="tlAfter-${idx}">After</div>
+      <div class="tl-points-badge" id="tlPoints-${idx}">+${pts} Points</div>
+    </div>`;
+}
+
+function initTimelineDrag(idx) {
+  const slide = document.getElementById('carTimeline-' + idx);
+  if (!slide) return;
+  const clue = document.getElementById('tlClue-' + idx);
+  const beforeZone = document.getElementById('tlBefore-' + idx);
+  const afterZone = document.getElementById('tlAfter-' + idx);
+  const pointsBadge = document.getElementById('tlPoints-' + idx);
+  const instructionText = document.getElementById('tlInstructionText-' + idx);
+  const handEl = slide.querySelector('.tl-instruction-hand');
+  const correct = slide.getAttribute('data-correct');
+  const pts = parseInt(slide.getAttribute('data-points'), 10) || 2;
+  if (!clue || !beforeZone || !afterZone) return;
+
+  let startY = 0, dragY = 0, dragging = false, resolved = false;
+
+  function hitZone(y) {
+    const br = beforeZone.getBoundingClientRect();
+    const ar = afterZone.getBoundingClientRect();
+    if (y >= br.top && y <= br.bottom) return 'before';
+    if (y >= ar.top && y <= ar.bottom) return 'after';
+    return null;
+  }
+  function clearHover() {
+    beforeZone.classList.remove('hover');
+    afterZone.classList.remove('hover');
+  }
+  function onDown(e) {
+    if (resolved) return;
+    e.stopPropagation();
+    try { clue.setPointerCapture && clue.setPointerCapture(e.pointerId); } catch (_) {}
+    const pt = e.touches ? e.touches[0] : e;
+    startY = pt.clientY;
+    dragging = true;
+    clue.classList.add('dragging');
+  }
+  function onMove(e) {
+    if (!dragging || resolved) return;
+    e.stopPropagation();
+    const pt = e.touches ? e.touches[0] : e;
+    dragY = pt.clientY - startY;
+    clue.style.transform = 'translateY(' + dragY + 'px)';
+    const zone = hitZone(pt.clientY);
+    clearHover();
+    if (zone === 'before') beforeZone.classList.add('hover');
+    if (zone === 'after') afterZone.classList.add('hover');
+  }
+  function onUp(e) {
+    if (!dragging || resolved) return;
+    e.stopPropagation();
+    dragging = false;
+    clue.classList.remove('dragging');
+    const pt = e.changedTouches ? e.changedTouches[0] : e;
+    const zone = hitZone(pt.clientY);
+    clearHover();
+    if (!zone) {
+      clue.style.transform = 'translateY(0)';
+      return;
+    }
+    resolved = true;
+    clue.classList.add('locked');
+    clue.style.transform = 'translateY(0)';
+    const wasCorrect = zone === correct;
+    const landedZone = zone === 'before' ? beforeZone : afterZone;
+    const correctZone = correct === 'before' ? beforeZone : afterZone;
+    if (handEl) handEl.style.display = 'none';
+    if (wasCorrect) {
+      landedZone.classList.add('correct');
+      if (instructionText) instructionText.textContent = 'Nice — that was right.';
+      pointsBadge.classList.add('show');
+      setTimeout(function() { if (typeof carGo === 'function') carGo(1); }, 1500);
+    } else {
+      landedZone.classList.add('wrong');
+      correctZone.classList.add('correct');
+      const y = slide.querySelector('.tl-anchor-year');
+      if (instructionText) instructionText.textContent = 'Not quite — it happened ' + correct + ' ' + (y ? y.textContent : '') + '.';
+      setTimeout(function() { if (typeof carGo === 'function') carGo(1); }, 2300);
+    }
+  }
+
+  clue.addEventListener('pointerdown', onDown);
+  clue.addEventListener('pointermove', onMove);
+  clue.addEventListener('pointerup', onUp);
+  clue.addEventListener('pointercancel', onUp);
+  clue.addEventListener('touchstart', onDown, {passive:false});
+  clue.addEventListener('touchmove', onMove, {passive:false});
+  clue.addEventListener('touchend', onUp);
+}
+
 function openCarousel(idx, startSlide) {
   const story = STORIES[idx];
   currentStoryIdx = idx;
   carSlide = startSlide || 0;
   const hasDiscuss = !!story.discussion && !story.classroom;
+  const hasTimeline = !!story.timeline;
   carContentEnd = story.slides.length;  // first slide after content = poll (completion triggers here)
-  carShareSlideIdx = story.slides.length + 1 + (hasDiscuss ? 1 : 0);  // share card is the finale
+  carShareSlideIdx = story.slides.length + 1 + (hasTimeline ? 1 : 0) + (hasDiscuss ? 1 : 0);
   carStoryCompleted = false;
-  carTotal = story.slides.length + 1 + (hasDiscuss ? 1 : 0) + 1; // content + poll + discuss? + share
+  carTotal = story.slides.length + 1 + (hasTimeline ? 1 : 0) + (hasDiscuss ? 1 : 0) + 1;
   const el = document.getElementById('carousel');
   el.innerHTML = `
     <div class="car-top">
@@ -3495,6 +3742,7 @@ function openCarousel(idx, startSlide) {
           <div class="car-slide-credit">${s.credit}</div>
           <div class="car-slide-card">${s.label?`<div class="car-slide-label">${s.label}</div>`:''}
             <div class="car-slide-body">${s.text}</div>
+            <button class="car-read-more" onclick="event.stopPropagation();openBrowserFor(${idx})">Read full story <span class="car-read-more-arrow">&rsaquo;</span></button>
           </div>
           <div class="car-slide-actions">
             <button class="car-abtn">${ICONS.audio}</button>
@@ -3506,6 +3754,7 @@ function openCarousel(idx, startSlide) {
         <div class="car-slide" style="align-items:center;justify-content:center;cursor:pointer" onclick="openPoll(${idx})">
           <div style="text-align:center;padding:40px"><div style="font-family:var(--font-headline);font-size:30px;color:var(--nr-white);margin-bottom:10px">Where do you stand?</div><div style="color:var(--nr-ash);font-size:14px">Tap to share your opinion</div></div>
         </div>
+        ${hasTimeline ? renderTimelineSlide(idx) : ''}
         ${hasDiscuss ? `<div class="car-slide" style="align-items:center;justify-content:center;cursor:pointer" onclick="openDiscuss(${idx})">
           <div style="text-align:center;padding:40px">
             ${story.classroom
@@ -3555,6 +3804,7 @@ function openCarousel(idx, startSlide) {
               }).join('')}
             </div>
             <button class="car-share-btn" id="carShareBtn" data-share-stagger="3" onclick="shareFromCarousel()">SHARE TO CIRCLE</button>
+            <button class="car-read-more" style="margin-top:12px;align-self:center" data-share-stagger="3" onclick="openBrowserFor(${idx})">Read full story <span class="car-read-more-arrow">&rsaquo;</span></button>
             <button class="car-share-done" data-share-stagger="3" onclick="closeCarousel()">back to briefing</button>
           </div>
         </div>
@@ -3613,6 +3863,9 @@ function openCarousel(idx, startSlide) {
     else if (e.key === 'Escape') closeCarousel();
   };
   document.addEventListener('keydown', el._keyHandler);
+
+  // Wire up timeline game drag handlers if this story has a timeline.
+  if (hasTimeline) initTimelineDrag(idx);
 
   updateCarNav();
 }
@@ -4307,22 +4560,31 @@ function openBrowserFor(idx) {
 
   document.getElementById('inappBrowser').classList.add('on');
 
-  // Simulate article loading
+  // Simulate article loading, then render a newspaper-style article using all slide text.
   setTimeout(() => {
+    const heroImg = story.slides[0] && story.slides[0].img ? story.slides[0].img : story.image;
+    const paragraphs = story.slides.map(sl => `<p style="margin:0 0 18px 0">${sl.text}</p>`).join('');
     document.getElementById('browserContent').innerHTML = `
-      <div style="width:100%;height:100%;background:var(--nr-white);padding:24px;overflow-y:auto">
-        <div style="font-family:Georgia,serif;color:#111">
-          <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">${rm.source}</div>
-          <div style="font-size:26px;font-weight:700;line-height:1.2;margin-bottom:16px;color:#111">${rm.title}</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #e5e5e5">
-            <div style="width:32px;height:32px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#666">${story.author.initials}</div>
-            <div><div style="font-size:13px;font-weight:600;color:#111">${story.author.name}</div><div style="font-size:12px;color:#888">Published today</div></div>
+      <div style="width:100%;background:var(--nr-white);overflow-y:auto;height:100%">
+        <article style="padding:20px 22px 60px;font-family:Georgia,serif;color:#111">
+          <div style="font-size:11px;color:#c41e3a;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-family:'Helvetica Neue',sans-serif">${rm.source}</div>
+          <h1 style="font-size:26px;font-weight:700;line-height:1.2;margin:0 0 14px 0;color:#111">${rm.title}</h1>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #e5e5e5">
+            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#c41e3a,#e85d75);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;font-family:'Helvetica Neue',sans-serif">${story.author.initials}</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#111;font-family:'Helvetica Neue',sans-serif">${story.author.name}</div>
+              <div style="font-size:12px;color:#888;font-family:'Helvetica Neue',sans-serif">${story.author.role || 'Published today'} · ${story.readTime || ''}</div>
+            </div>
           </div>
-          <div style="font-size:17px;line-height:1.7;color:#333">
-            <p style="margin-bottom:16px">${story.slides[0].text}</p>
-            <p style="margin-bottom:16px;color:#666;font-style:italic">This is a preview of the full article. In the real app, the complete source article would load here from ${rm.source}.</p>
+          <figure style="margin:0 0 20px 0">
+            <img src="${heroImg}" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;display:block">
+            <figcaption style="font-size:11px;color:#888;margin-top:6px;font-style:italic;font-family:'Helvetica Neue',sans-serif">${story.credit || 'Newsreel'}</figcaption>
+          </figure>
+          <div style="font-size:16px;line-height:1.7;color:#333">
+            ${paragraphs}
+            <p style="margin:28px 0 0 0;padding-top:18px;border-top:1px solid #eee;color:#888;font-style:italic;font-size:14px;font-family:'Helvetica Neue',sans-serif">Published by ${rm.source}. You're reading an in-app preview on Newsreel.</p>
           </div>
-        </div>
+        </article>
       </div>`;
   }, 1500);
 }
