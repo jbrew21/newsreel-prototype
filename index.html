@@ -3705,7 +3705,8 @@ function initTimelineDrag(idx) {
   const pts = parseInt(slide.getAttribute('data-points'), 10) || 2;
   if (!clue || !beforeZone || !afterZone) return;
 
-  let startY = 0, dragY = 0, dragging = false, resolved = false;
+  let startX = 0, startY = 0, dragY = 0, dragging = false, resolved = false;
+  const DRAG_THRESHOLD_PX = 30;
 
   function hitZone(y) {
     const br = beforeZone.getBoundingClientRect();
@@ -3730,6 +3731,7 @@ function initTimelineDrag(idx) {
     beforeZone.classList.remove('idle');
     afterZone.classList.remove('idle');
     const pt = e.touches ? e.touches[0] : e;
+    startX = pt.clientX;
     startY = pt.clientY;
     dragging = true;
     clue.classList.add('dragging');
@@ -3751,9 +3753,11 @@ function initTimelineDrag(idx) {
     dragging = false;
     clue.classList.remove('dragging');
     const pt = e.changedTouches ? e.changedTouches[0] : e;
+    const dx = Math.abs(pt.clientX - startX);
+    const dy = Math.abs(pt.clientY - startY);
     const zone = hitZone(pt.clientY);
     clearHover();
-    if (!zone) {
+    if (!zone || dy < DRAG_THRESHOLD_PX || dx > dy) {
       clue.style.transform = 'translateY(0)';
       clue.classList.remove('dragging');
       beforeZone.classList.add('idle');
