@@ -2594,6 +2594,110 @@ body {
 .share-action-btn:active { transform:scale(0.96); }
 .share-action-btn.primary { background:var(--nr-red); border-color:var(--nr-red); }
 
+/* ═══════════════ AUTHOR PROFILE OVERLAY ═══════════════ */
+.author-ov {
+  position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%);
+  background:#000; z-index:4000; display:none; overflow-y:auto;
+  font-family:var(--font-body); color:var(--nr-white);
+}
+.author-ov.show { display:block; }
+.author-ov-back {
+  position:sticky; top:0; z-index:5; padding:14px 16px 8px;
+  background:linear-gradient(180deg,#000 70%,transparent);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.author-ov-back button {
+  background:none; border:0; color:var(--nr-white); font-family:var(--font-body);
+  font-size:15px; font-weight:500; cursor:pointer; padding:0;
+}
+.author-hero {
+  position:relative; height:200px; margin:0 16px; border-radius:8px; overflow:hidden;
+  background:var(--nr-iron);
+}
+.author-hero img.cover { width:100%; height:100%; object-fit:cover; display:block; }
+.author-hero .av {
+  position:absolute; right:16px; bottom:-30px; width:90px; height:90px;
+  border-radius:50%; border:3px solid #000; object-fit:cover; background:var(--nr-iron);
+}
+.author-pad { padding:44px 20px 80px; }
+.author-name-row { display:flex; align-items:center; gap:8px; }
+.author-name-row h1 {
+  font-family:var(--font-headline); font-size:32px; font-weight:400; margin:0;
+  color:var(--nr-white);
+}
+.author-vbadge {
+  width:22px; height:22px; border-radius:50%; background:var(--nr-yellow);
+  display:flex; align-items:center; justify-content:center; color:#000;
+  font-size:13px; font-weight:700;
+}
+.author-class-chip {
+  display:inline-block; margin-top:10px; padding:5px 10px; border-radius:6px;
+  background:rgba(255,99,67,0.15); color:var(--nr-red);
+  font-family:var(--font-mono); font-size:11px; font-weight:600;
+  text-transform:uppercase; letter-spacing:0.5px;
+}
+.author-role { color:var(--nr-ash); font-size:14px; margin-top:8px; }
+.author-section { margin-top:24px; }
+.author-eyebrow {
+  font-family:var(--font-mono); font-size:10px; font-weight:600;
+  letter-spacing:1.5px; text-transform:uppercase; color:var(--nr-ash);
+  margin-bottom:8px;
+}
+.author-byus { font-size:15px; line-height:1.5; color:var(--nr-white); }
+.author-verified-stamp {
+  margin-top:12px; padding:10px 12px; border-radius:6px;
+  background:rgba(237,189,31,0.08); border:1px solid rgba(237,189,31,0.2);
+  font-size:12px; line-height:1.5; color:#C8C8C8;
+  display:flex; gap:8px; align-items:flex-start;
+}
+.author-verified-stamp .check {
+  color:var(--nr-yellow); font-weight:700; flex-shrink:0;
+}
+.author-verified-stamp a { color:var(--nr-yellow); text-decoration:none; font-weight:500; }
+.author-mission {
+  font-size:15px; line-height:1.5; color:var(--nr-white);
+  border-left:2px solid var(--nr-red); padding-left:12px; font-style:italic;
+}
+.author-beats { display:flex; flex-wrap:wrap; gap:6px; }
+.author-beat {
+  padding:5px 10px; border-radius:6px; background:var(--nr-lead);
+  font-size:12px; color:#C8C8C8;
+}
+.author-disc {
+  font-size:14px; line-height:1.5; color:var(--nr-white);
+  padding:12px; background:var(--nr-lead); border-radius:8px;
+}
+.author-disc-tag {
+  display:inline-block; margin-bottom:6px;
+  font-family:var(--font-mono); font-size:10px; font-weight:600;
+  letter-spacing:0.5px; color:var(--nr-yellow); text-transform:uppercase;
+}
+.author-stats {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;
+  margin-top:24px; padding:16px 0; border-top:1px solid var(--nr-iron); border-bottom:1px solid var(--nr-iron);
+}
+.author-stats .s-num {
+  font-family:var(--font-headline); font-size:24px; color:var(--nr-white); font-weight:400;
+}
+.author-stats .s-lbl {
+  font-size:11px; color:var(--nr-ash); margin-top:2px;
+}
+.author-self { font-size:14px; line-height:1.5; color:#C8C8C8; }
+.author-socials { display:flex; flex-wrap:wrap; gap:8px; }
+.author-soc {
+  padding:6px 12px; border-radius:6px; background:var(--nr-lead);
+  font-size:12px; color:var(--nr-white); text-decoration:none;
+  border:1px solid var(--nr-iron);
+}
+.author-grid {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px;
+}
+.author-grid .tile {
+  aspect-ratio:1; background:var(--nr-iron); border-radius:6px; overflow:hidden;
+  cursor:pointer; position:relative;
+}
+.author-grid .tile img { width:100%; height:100%; object-fit:cover; }
+
 </style>
 </head>
 <body>
@@ -2717,6 +2821,71 @@ body {
   <div class="stories-reply">
     <input class="stories-reply-input" id="storiesReplyInput" placeholder="Reply…" readonly>
     <button class="stories-reply-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+  </div>
+</div>
+
+<!-- AUTHOR PROFILE OVERLAY -->
+<div class="author-ov" id="authorOv">
+  <div class="author-ov-back">
+    <button onclick="closeAuthor()">‹ Back</button>
+    <button>⇪</button>
+  </div>
+  <div class="author-hero">
+    <img class="cover" id="authCover" alt="">
+    <img class="av" id="authAv" alt="">
+  </div>
+  <div class="author-pad">
+    <div class="author-name-row">
+      <h1 id="authName"></h1>
+      <span class="author-vbadge" title="Verified by Newsreel">✓</span>
+    </div>
+    <div class="author-class-chip" id="authClass"></div>
+    <div class="author-role" id="authRole"></div>
+
+    <div class="author-section">
+      <div class="author-eyebrow">About — by Newsreel</div>
+      <div class="author-byus" id="authByUs"></div>
+      <div class="author-verified-stamp">
+        <span class="check">✓</span>
+        <span>Identity, credentials, and disclosures verified by Newsreel · <span id="authVDate"></span> · <a href="#" onclick="event.preventDefault();alert('How we vet: identity, prior bylines, ethics pledge, disclosures filed. Re-vetted yearly.')">How we vet ›</a></span>
+      </div>
+    </div>
+
+    <div class="author-section">
+      <div class="author-eyebrow">In their own words — mission</div>
+      <div class="author-mission" id="authMission"></div>
+    </div>
+
+    <div class="author-section">
+      <div class="author-eyebrow">Beats</div>
+      <div class="author-beats" id="authBeats"></div>
+    </div>
+
+    <div class="author-section">
+      <div class="author-eyebrow">Disclosures</div>
+      <div class="author-disc" id="authDisc"></div>
+    </div>
+
+    <div class="author-stats">
+      <div><div class="s-num">393</div><div class="s-lbl">Readers this month</div></div>
+      <div><div class="s-num" id="authStoryCount">—</div><div class="s-lbl">Stories</div></div>
+      <div><div class="s-num">71%</div><div class="s-lbl">Quiz Accuracy</div></div>
+    </div>
+
+    <div class="author-section">
+      <div class="author-eyebrow">Self bio</div>
+      <div class="author-self" id="authSelf"></div>
+    </div>
+
+    <div class="author-section">
+      <div class="author-eyebrow">Where else you can find me</div>
+      <div class="author-socials" id="authSocials"></div>
+    </div>
+
+    <div class="author-section">
+      <div class="author-eyebrow">Latest stories</div>
+      <div class="author-grid" id="authGrid"></div>
+    </div>
   </div>
 </div>
 
@@ -3336,7 +3505,7 @@ function renderFeed() {
         ${s.slides.map((_, j) => `<div class="card-dot${j === 0 ? ' active' : ''}"></div>`).join('')}
       </div>
       <div class="card-pills">
-        <div class="card-pill"><div class="card-pill-av">${s.author.initials}</div>${s.author.name}</div>
+        <div class="card-pill" style="cursor:pointer" onclick="event.stopPropagation();openAuthor('${s.author.name}')"><div class="card-pill-av">${s.author.initials}</div>${s.author.name}</div>
         ${s.tag ? `<div class="card-pill">${s.tag}</div>` : ''}
       </div>
       <div class="card-headline">${s.headline}</div>
@@ -6043,6 +6212,92 @@ function shareStory(idx) {
     setTimeout(() => { btn.style.background = ''; }, 600);
   }
 }
+
+/* ═══════════════════════════════════════════════
+   AUTHOR PROFILE OVERLAY
+   ═══════════════════════════════════════════════ */
+const AUTHORS = {
+  "Nadya Yeh": {
+    initials:"NY",
+    role:"Senior Editor at Newsreel",
+    classification:"Reporter",
+    avatar:"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop",
+    cover:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Marc_Chagall%2C_1915%2C_Birthday_%28L%27anniversaire%29%2C_oil_on_cardboard%2C_80.6_x_99.7_cm%2C_Museum_of_Modern_Art%2C_New_York.jpg/640px-Marc_Chagall%2C_1915%2C_Birthday_%28L%27anniversaire%29%2C_oil_on_cardboard%2C_80.6_x_99.7_cm%2C_Museum_of_Modern_Art%2C_New_York.jpg",
+    vettedDate:"Mar 2026",
+    byUs:"Nadya Yeh leads Newsreel's coverage of China, tech policy, and the Asian diaspora. She joined from The China Project, where she edited daily original reporting that U.S. outlets routinely missed. At Newsreel, she sets the editorial bar — and edits with a reporter's instinct for primary sources.",
+    mission:"I cover the stories that get flattened by Western shorthand — the people, policies, and power inside China and the Asian diaspora.",
+    beats:["China","Tech policy","Asian diaspora"],
+    disclosures:"None disclosed. Salaried by Newsreel. No outside sponsorships on stories.",
+    selfBio:"Nadya Yeh is Senior Editor at Newsreel. Previously Senior Editor at The China Project. Master's from NYU.",
+    socials:[
+      {label:"X / @nadyayeh", url:"#"},
+      {label:"LinkedIn", url:"#"},
+      {label:"Personal site", url:"#"},
+      {label:"RSS", url:"#"}
+    ]
+  },
+  "Jack Brewster": {
+    initials:"JB", role:"CEO at Newsreel", classification:"Reporter",
+    avatar:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop",
+    cover:"https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800&h=400&fit=crop",
+    vettedDate:"Jan 2026",
+    byUs:"Jack Brewster founded Newsreel after years investigating disinformation networks for Forbes and NewsGuard. He reports on AI's collision with the news.",
+    mission:"Build a vetted home for journalists. Cover the people trying to break the information ecosystem.",
+    beats:["AI & news","Disinformation","Media business"],
+    disclosures:"CEO and founder of Newsreel Media Corp. Equity holder. Cited in NYT, WaPo, Forbes.",
+    selfBio:"Forbes 30 Under 30. Former NewsGuard investigator. Based in Brooklyn.",
+    socials:[{label:"X", url:"#"},{label:"LinkedIn", url:"#"},{label:"Personal site", url:"#"}]
+  }
+};
+const CLASS_COPY = {
+  "Reporter":"Reporter — original reporting, sourced facts.",
+  "Commentator (Left)":"Commentator · Left-leaning opinion.",
+  "Commentator (Right)":"Commentator · Right-leaning opinion.",
+  "Organization":"Organization account."
+};
+function getAuthor(name) {
+  if (AUTHORS[name]) return AUTHORS[name];
+  const s = STORIES.find(x => x.author.name === name);
+  return {
+    initials: s ? s.author.initials : "??",
+    role: s ? s.author.role : "Newsreel contributor",
+    classification: "Reporter",
+    avatar: "",
+    cover: s ? s.image : "",
+    vettedDate: "2026",
+    byUs: `${name} writes for Newsreel.`,
+    mission: "—",
+    beats: [],
+    disclosures: "None disclosed.",
+    selfBio: "—",
+    socials: []
+  };
+}
+function openAuthor(name) {
+  const a = getAuthor(name);
+  const stories = STORIES.filter(s => s.author.name === name);
+  document.getElementById('authName').textContent = name;
+  document.getElementById('authClass').textContent = a.classification;
+  document.getElementById('authClass').title = CLASS_COPY[a.classification] || '';
+  document.getElementById('authRole').textContent = a.role;
+  document.getElementById('authCover').src = a.cover || '';
+  document.getElementById('authAv').src = a.avatar || '';
+  document.getElementById('authByUs').textContent = a.byUs;
+  document.getElementById('authVDate').textContent = a.vettedDate;
+  document.getElementById('authMission').textContent = a.mission;
+  document.getElementById('authBeats').innerHTML = a.beats.map(b => `<span class="author-beat">${b}</span>`).join('');
+  document.getElementById('authDisc').innerHTML = `<div class="author-disc-tag">✓ Checked by Newsreel</div>${a.disclosures}`;
+  document.getElementById('authStoryCount').textContent = stories.length || '—';
+  document.getElementById('authSelf').textContent = a.selfBio;
+  document.getElementById('authSocials').innerHTML = a.socials.map(s => `<a class="author-soc" href="${s.url}" onclick="event.preventDefault()">${s.label}</a>`).join('') || '<span style="color:var(--nr-ash);font-size:13px">No links shared.</span>';
+  document.getElementById('authGrid').innerHTML = stories.slice(0,9).map(s =>
+    `<div class="tile"><img src="${s.image}" alt=""></div>`
+  ).join('') || '<span style="color:var(--nr-ash);font-size:13px;grid-column:1/-1">No stories yet.</span>';
+  const ov = document.getElementById('authorOv');
+  ov.classList.add('show');
+  ov.scrollTop = 0;
+}
+function closeAuthor() { document.getElementById('authorOv').classList.remove('show'); }
 
 /* ═══════════════════════════════════════════════
    INIT
