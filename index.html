@@ -4060,7 +4060,7 @@ function openCarousel(idx, startSlide) {
             <button class="car-abtn">${ICONS.cc}</button>
             <button class="car-abtn">${ICONS.share}</button>
           </div>
-          <div class="car-journalist"><div class="car-j-av">${story.author.initials}</div><span class="car-j-name">${story.author.name}</span></div>
+          <div class="car-journalist" style="cursor:pointer" onclick="event.stopPropagation();closeCarousel&&closeCarousel();openAuthor('${story.author.name}')"><div class="car-j-av">${story.author.initials}</div><span class="car-j-name">${story.author.name}</span></div>
         </div>`).join('')}
         <div class="car-slide" style="align-items:center;justify-content:center;cursor:pointer" onclick="openPoll(${idx})">
           <div style="text-align:center;padding:40px"><div style="font-family:var(--font-headline);font-size:30px;color:var(--nr-white);margin-bottom:10px">Where do you stand?</div><div style="color:var(--nr-ash);font-size:14px">Tap to share your opinion</div></div>
@@ -4880,7 +4880,7 @@ function openBrowserFor(idx) {
         <article style="padding:20px 22px 60px;font-family:Georgia,serif;color:#111">
           <div style="font-size:11px;color:#c41e3a;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-family:'Helvetica Neue',sans-serif">${rm.source}</div>
           <h1 style="font-size:26px;font-weight:700;line-height:1.2;margin:0 0 14px 0;color:#111">${rm.title}</h1>
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #e5e5e5">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #e5e5e5;cursor:pointer" onclick="event.stopPropagation();openAuthor('${story.author.name}')">
             <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#c41e3a,#e85d75);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;font-family:'Helvetica Neue',sans-serif">${story.author.initials}</div>
             <div>
               <div style="font-size:13px;font-weight:600;color:#111;font-family:'Helvetica Neue',sans-serif">${story.author.name}</div>
