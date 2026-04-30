@@ -2026,20 +2026,18 @@ body {
 .share-action-btn:active { transform:scale(0.96); }
 .share-action-btn.primary { background:var(--nr-red); border-color:var(--nr-red); }
 
-/* AUTHOR PROFILE OVERLAY */
+/* AUTHOR PROFILE OVERLAY — editorial minimalism */
 .author-ov { position:fixed; inset:0; width:393px; height:852px; left:50%; transform:translateX(-50%); background:#000; z-index:4000; display:none; overflow-y:auto; font-family:var(--font-body); color:var(--nr-white); -webkit-overflow-scrolling:touch; }
 .author-ov.show { display:block; }
-.author-ov-back { position:absolute; top:0; left:0; right:0; z-index:5; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; pointer-events:none; }
-.author-ov-back button { pointer-events:auto; background:rgba(0,0,0,0.6); border:0; width:36px; height:36px; border-radius:50%; color:#fff; font-size:18px; cursor:pointer; backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; }
-.author-hero { position:relative; height:230px; background:linear-gradient(135deg,#1F1F1F,#3A3A3A); }
-.author-hero .cover { width:100%; height:100%; object-fit:cover; display:block; }
-.author-hero::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 50%,#000); }
-.author-hero .av-wrap { position:absolute; left:24px; bottom:-44px; z-index:2; }
-.author-hero .av { width:96px; height:96px; border-radius:50%; border:4px solid #000; object-fit:cover; background:linear-gradient(135deg,var(--nr-red),var(--nr-yellow)); display:block; }
-.author-hero .av-fallback { width:96px; height:96px; border-radius:50%; border:4px solid #000; background:linear-gradient(135deg,var(--nr-red),var(--nr-yellow)); display:flex; align-items:center; justify-content:center; font-family:var(--font-headline); font-size:36px; color:#fff; }
-.author-pad { padding:60px 24px 100px; }
-.author-name-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-.author-name-row h1 { font-family:var(--font-headline); font-size:30px; font-weight:400; margin:0; color:var(--nr-white); letter-spacing:-0.3px; }
+.author-ov-top { position:sticky; top:0; z-index:5; padding:12px 16px; background:rgba(0,0,0,0.85); backdrop-filter:blur(12px); display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--nr-iron); }
+.author-ov-top button { background:none; border:0; color:var(--nr-white); font-size:15px; cursor:pointer; padding:6px 4px; font-family:var(--font-body); font-weight:500; }
+.author-pad { padding:32px 24px 100px; }
+.author-id { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+.author-av { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,var(--nr-red),var(--nr-yellow)); display:flex; align-items:center; justify-content:center; font-family:var(--font-headline); font-size:28px; color:#fff; flex-shrink:0; overflow:hidden; }
+.author-av img { width:100%; height:100%; object-fit:cover; }
+.author-id-meta { flex:1; min-width:0; }
+.author-name-row { display:flex; align-items:center; gap:8px; }
+.author-name-row h1 { font-family:var(--font-headline); font-size:26px; font-weight:400; margin:0; color:var(--nr-white); letter-spacing:-0.2px; line-height:1.1; }
 .author-vbadge { width:22px; height:22px; border-radius:50%; background:var(--nr-yellow); display:inline-flex; align-items:center; justify-content:center; color:#000; font-size:12px; font-weight:700; }
 .author-meta-row { display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap; }
 .author-class-chip { display:inline-block; padding:4px 10px; border-radius:6px; background:rgba(255,99,67,0.15); color:var(--nr-red); font-family:var(--font-mono); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px; }
@@ -2149,21 +2147,24 @@ body {
 
 <!-- AUTHOR PROFILE OVERLAY -->
 <div class="author-ov" id="authorOv">
-  <div class="author-ov-back">
+  <div class="author-ov-top">
     <button onclick="closeAuthor()">‹ Back</button>
-    <button>⇪</button>
-  </div>
-  <div class="author-hero">
-    <img class="cover" id="authCover" alt="">
-    <img class="av" id="authAv" alt="">
+    <button>Share</button>
   </div>
   <div class="author-pad">
-    <div class="author-name-row">
-      <h1 id="authName"></h1>
-      <span class="author-vbadge" title="Verified by Newsreel">✓</span>
+    <div class="author-id">
+      <div class="author-av" id="authAv"></div>
+      <div class="author-id-meta">
+        <div class="author-name-row">
+          <h1 id="authName"></h1>
+          <span class="author-vbadge" title="Verified by Newsreel">✓</span>
+        </div>
+        <div class="author-meta-row">
+          <span class="author-class-chip" id="authClass"></span>
+          <span class="author-role" id="authRole"></span>
+        </div>
+      </div>
     </div>
-    <div class="author-class-chip" id="authClass"></div>
-    <div class="author-role" id="authRole"></div>
 
     <div class="author-section">
       <div class="author-eyebrow">About — by Newsreel</div>
@@ -5150,8 +5151,8 @@ function openAuthor(name) {
   document.getElementById('authName').textContent = name;
   document.getElementById('authClass').textContent = a.classification;
   document.getElementById('authRole').textContent = a.role;
-  document.getElementById('authCover').src = a.cover || '';
-  document.getElementById('authAv').src = a.avatar || '';
+  const avEl = document.getElementById('authAv');
+  avEl.innerHTML = a.avatar ? `<img src="${a.avatar}" alt="" onerror="this.parentElement.innerHTML='${a.initials}'">` : a.initials;
   document.getElementById('authByUs').textContent = a.byUs;
   document.getElementById('authVDate').textContent = a.vettedDate;
   document.getElementById('authMission').textContent = a.mission;
