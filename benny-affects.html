@@ -378,14 +378,54 @@
   .car-abtn { width:40px; height:40px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; }
   .car-abtn svg { width:22px; height:22px; color:var(--nr-white); }
   .car-read-more { display:inline-flex; align-items:center; gap:6px; margin-top:10px; background:none; border:none; padding:0; cursor:pointer; font-family:var(--font-m); font-size:11px; letter-spacing:0.05em; color:rgba(255,255,255,0.62); text-decoration:underline; text-decoration-color:rgba(255,255,255,0.25); text-underline-offset:3px; }
-  /* Final Benny CTA slide inside carousel */
-  .car-slide--benny { background:linear-gradient(170deg, var(--nr-black) 0%, var(--nr-charcoal) 70%); align-items:center; justify-content:center; padding:40px 24px; text-align:center; }
-  .car-benny-mascot { width:112px; height:112px; margin-bottom:18px; animation:bennyIdle 5.2s ease-in-out infinite; filter:drop-shadow(0 6px 20px rgba(255,99,67,0.35)); }
-  .car-benny-mascot img { width:100%; height:100%; object-fit:contain; }
-  .car-benny-eyebrow { font-family:var(--font-m); font-size:11px; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; margin-bottom:10px; }
-  .car-benny-headline { font-family:var(--font-h); font-size:26px; line-height:1.18; color:var(--nr-white); margin-bottom:10px; }
-  .car-benny-sub { font-family:var(--font-b); font-size:14px; line-height:1.5; color:var(--nr-silver); margin-bottom:24px; max-width:300px; }
-  .car-benny-cta { background:var(--nr-red); color:#000; border:none; border-radius:999px; padding:13px 22px; font-family:var(--font-b); font-size:14px; font-weight:600; cursor:pointer; }
+  /* ── Final carousel slide: Benny IS the button ── */
+  .car-slide--benny { background:radial-gradient(ellipse at 50% 55%, #1a0a07 0%, var(--nr-black) 65%); padding:0; overflow:hidden; }
+  .cb-stage { position:absolute; inset:0; display:flex; flex-direction:column; padding:64px 24px 36px; transition:padding 0.6s cubic-bezier(0.2,0.8,0.2,1); }
+  .cb-context { font-family:var(--font-m); font-size:10px; letter-spacing:0.24em; color:var(--nr-ash); text-transform:uppercase; margin-bottom:10px; }
+  .cb-headline { font-family:var(--font-h); font-size:22px; line-height:1.22; color:var(--nr-white); margin-bottom:0; transition:font-size 0.5s ease, opacity 0.4s ease; }
+  .cb-orb-wrap { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; transition:flex 0.6s cubic-bezier(0.2,0.8,0.2,1); }
+  .cb-orb-btn { position:relative; width:220px; height:220px; border-radius:50%; border:none; padding:0; background:transparent; cursor:pointer; -webkit-tap-highlight-color:transparent;
+    transition:width 0.6s cubic-bezier(0.2,0.8,0.2,1), height 0.6s cubic-bezier(0.2,0.8,0.2,1); }
+  .cb-orb-btn:active { transform:scale(0.97); transition:transform 0.12s ease; }
+  /* The glowing aura — multiple stacked radial layers, breathing */
+  .cb-orb-aura { position:absolute; inset:-60px; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle, rgba(255,99,67,0.45) 0%, rgba(255,99,67,0.18) 32%, rgba(255,99,67,0) 62%);
+    filter:blur(8px); animation:cbAura 3.6s ease-in-out infinite; }
+  .cb-orb-aura.two { inset:-30px; background:radial-gradient(circle, rgba(255,140,80,0.55) 0%, rgba(255,99,67,0) 60%); animation-delay:-1.2s; animation-duration:4.4s; }
+  @keyframes cbAura { 0%,100% { opacity:0.7; transform:scale(0.96); } 50% { opacity:1; transform:scale(1.06); } }
+  /* The orb body itself — solid red disc with Benny on top */
+  .cb-orb-disc { position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at 50% 38%, #FF8966 0%, #FF6343 45%, #C84527 100%);
+    box-shadow: inset 0 -22px 40px rgba(0,0,0,0.35), inset 0 8px 24px rgba(255,255,255,0.18), 0 14px 50px rgba(255,99,67,0.45);
+  }
+  .cb-orb-mascot { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .cb-orb-mascot img { width:62%; height:62%; object-fit:contain; animation:bennyIdle 5.2s ease-in-out infinite; transform-origin:50% 60%; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
+  .cb-tap-hint { font-family:var(--font-m); font-size:11px; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; opacity:0; animation:cbHintIn 0.6s ease 0.4s forwards, cbHintPulse 2.4s ease-in-out 1s infinite; }
+  @keyframes cbHintIn { to { opacity:1; } }
+  @keyframes cbHintPulse { 0%,100% { opacity:0.55; } 50% { opacity:1; } }
+
+  /* OPENED state — orb shrinks to top-left, take fades in below */
+  .car-slide--benny.opened .cb-orb-wrap { flex:0 0 auto; flex-direction:row; align-items:center; justify-content:flex-start; gap:14px; }
+  .car-slide--benny.opened .cb-orb-btn { width:64px; height:64px; pointer-events:none; }
+  .car-slide--benny.opened .cb-orb-aura { inset:-12px; filter:blur(4px); animation-duration:5s; }
+  .car-slide--benny.opened .cb-orb-aura.two { inset:-6px; }
+  .car-slide--benny.opened .cb-headline { font-size:17px; opacity:0.7; }
+  .car-slide--benny.opened .cb-tap-hint { display:none; }
+  .car-slide--benny.opened .cb-orb-byline { display:flex; flex-direction:column; align-items:flex-start; gap:2px; }
+  .cb-orb-byline { display:none; }
+  .cb-orb-byline-label { font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; }
+  .cb-orb-byline-name { font-family:var(--font-h); font-size:18px; color:var(--nr-white); }
+
+  .cb-take { position:absolute; left:24px; right:24px; bottom:36px; top:auto; max-height:0; overflow:hidden; opacity:0;
+    transition:max-height 0.7s cubic-bezier(0.2,0.8,0.2,1), opacity 0.5s ease 0.15s; }
+  .car-slide--benny.opened .cb-take { max-height:62vh; opacity:1; }
+  .cb-take-body { font-family:var(--font-h); font-size:20px; line-height:1.35; color:var(--nr-white); margin-bottom:18px; }
+  .cb-take-body em { color:var(--nr-red); font-style:normal; }
+  .cb-take-meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px; }
+  .cb-take-chip { font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; color:var(--nr-silver); text-transform:uppercase; padding:5px 9px; border:1px solid var(--nr-iron); border-radius:999px; }
+  .cb-take-cta { display:block; width:100%; background:transparent; color:var(--nr-white); border:1px solid var(--nr-iron); border-radius:14px; padding:14px; font-family:var(--font-b); font-size:14px; cursor:pointer; text-align:left; display:flex; justify-content:space-between; align-items:center; }
+  .cb-take-cta:hover { border-color:var(--nr-red); }
+  .cb-take-cta-arrow { font-family:var(--font-m); color:var(--nr-red); }
 </style>
 </head>
 <body>
@@ -518,13 +558,39 @@
           <button class="car-abtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
         </div>
       </div>
-      <!-- Slide 4: Benny CTA -->
-      <div class="car-slide car-slide--benny">
-        <div class="car-benny-mascot"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
-        <div class="car-benny-eyebrow">Benny · Story impact</div>
-        <h2 class="car-benny-headline">What this means <em>for you</em>.</h2>
-        <p class="car-benny-sub">Benny read the story and broke down how it hits your rent, your loans, your job market.</p>
-        <button class="car-benny-cta" onclick="show('slide')">See Benny's take →</button>
+      <!-- Slide 4: Benny IS the button -->
+      <div class="car-slide car-slide--benny" id="bennySlide">
+        <div class="cb-stage">
+          <div class="cb-context">You just read</div>
+          <h2 class="cb-headline">Fed holds rates steady, signals one cut by year-end</h2>
+
+          <div class="cb-orb-wrap">
+            <button class="cb-orb-btn" id="cbOrb" aria-label="Tap Benny for what this means for you">
+              <div class="cb-orb-aura"></div>
+              <div class="cb-orb-aura two"></div>
+              <div class="cb-orb-disc"></div>
+              <div class="cb-orb-mascot"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
+            </button>
+            <div class="cb-orb-byline">
+              <span class="cb-orb-byline-label">Benny · Story impact</span>
+              <span class="cb-orb-byline-name">For you, Percy</span>
+            </div>
+            <span class="cb-tap-hint">Tap Benny</span>
+          </div>
+
+          <div class="cb-take" id="cbTake">
+            <p class="cb-take-body">Your <em>$2,800 Brooklyn rent</em> isn't moving down in 2026 — landlords have no pressure to cut. Refinancing your student loans gets cheaper if that one cut lands in Q4, but only by a fraction of a point. The Fed thinks the economy is <em>still too hot</em>, which usually means tech hiring stays soft another quarter.</p>
+            <div class="cb-take-meta">
+              <span class="cb-take-chip">Brooklyn</span>
+              <span class="cb-take-chip">Tech, 27</span>
+              <span class="cb-take-chip">Student loans</span>
+            </div>
+            <button class="cb-take-cta" onclick="show('slide')">
+              <span>Read deeper · adjust the level</span>
+              <span class="cb-take-cta-arrow">→</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -677,7 +743,10 @@ function carGo(i) {
   carPrev.disabled = carIdx === 0;
   carNext.disabled = carIdx === carSlideCount-1;
 }
-function resetCarousel() { carGo(0); }
+function resetCarousel() { carGo(0); document.getElementById('bennySlide')?.classList.remove('opened'); }
+document.getElementById('cbOrb')?.addEventListener('click', () => {
+  document.getElementById('bennySlide').classList.add('opened');
+});
 carPrev.addEventListener('click', () => carGo(carIdx-1));
 carNext.addEventListener('click', () => carGo(carIdx+1));
 // touch swipe
