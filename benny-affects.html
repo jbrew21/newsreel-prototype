@@ -176,9 +176,30 @@
     margin-bottom:18px; position:relative;
     transition:opacity .25s;
   }
-  .benny-take { font-size:14px; line-height:1.5; color:var(--nr-smoke); }
+  .benny-take { font-size:15px; line-height:1.55; color:var(--nr-smoke); }
   .benny-take p + p { margin-top:12px; }
   .benny-take strong { color:var(--nr-white); font-weight:600; }
+  .benny-take .tappable {
+    color:var(--nr-white); font-weight:600;
+    border-bottom:1px dashed rgba(255,99,67,0.6); cursor:pointer;
+    padding-bottom:1px;
+  }
+  .benny-take .tappable:active { background:rgba(255,99,67,0.18); }
+
+  /* Reading level slider */
+  .reading-level {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 0 14px; margin-bottom:14px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .rl-label { font-family:var(--font-m); font-size:10px; letter-spacing:1.5px; color:var(--nr-ash); text-transform:uppercase; flex:0 0 auto; }
+  .rl-track { flex:1; position:relative; height:24px; display:flex; align-items:center; }
+  .rl-bar { position:absolute; left:0; right:0; height:3px; background:var(--nr-iron); border-radius:2px; }
+  .rl-stops { position:absolute; left:0; right:0; display:flex; justify-content:space-between; pointer-events:none; }
+  .rl-stop { width:8px; height:8px; border-radius:50%; background:var(--nr-iron); }
+  .rl-stop.active { background:var(--nr-red); box-shadow:0 0 0 4px rgba(255,99,67,0.18); }
+  .rl-input { position:absolute; left:0; right:0; width:100%; height:24px; opacity:0; cursor:pointer; }
+  .rl-current { font-family:var(--font-m); font-size:11px; color:var(--nr-red); font-weight:600; min-width:62px; text-align:right; }
 
   /* Writing / loader state inside the AI box */
   .ai-box.loading .benny-take { display:none; }
@@ -245,6 +266,12 @@
   @keyframes bennyThink {
     0%,100% { transform:rotate(-3deg) scale(1.04); filter:brightness(1.05); }
     50%     { transform:rotate(3deg) scale(1.1); filter:brightness(1.15); }
+  }
+  @keyframes bennyNod {
+    0%   { transform:rotate(0) scale(1); }
+    30%  { transform:rotate(-8deg) scale(0.95); }
+    60%  { transform:rotate(6deg) scale(1.06); }
+    100% { transform:rotate(0) scale(1); }
   }
 </style>
 </head>
@@ -339,9 +366,20 @@
     <h1 class="benny-headline">What this means <em>for you</em>, Percy.</h1>
 
     <div class="ai-box" id="aiBox">
+      <div class="reading-level">
+        <span class="rl-label">Level</span>
+        <div class="rl-track">
+          <div class="rl-bar"></div>
+          <div class="rl-stops">
+            <span class="rl-stop"></span><span class="rl-stop active"></span><span class="rl-stop"></span><span class="rl-stop"></span>
+          </div>
+          <input type="range" min="0" max="3" value="1" step="1" class="rl-input" id="rlInput">
+        </div>
+        <span class="rl-current" id="rlCurrent">Standard</span>
+      </div>
       <div class="benny-take" id="bennyTake">
-        <p>The Fed holding rates means your <strong>$2,800 Brooklyn rent isn't moving down</strong> in 2026 — landlords have no pressure to cut. Refinancing your student loans gets cheaper if that one cut lands in Q4, but only by a fraction of a point.</p>
-        <p>The bigger signal: the Fed thinks the economy is <strong>still too hot</strong> — which usually means tech hiring stays soft for another quarter. <strong>What to watch:</strong> September jobs report. If hiring slows, more cuts come fast.</p>
+        <p>The Fed holding rates means your <span class="tappable" data-edit="rent" data-current="$2,800">$2,800</span> Brooklyn rent isn't moving down in 2026 — landlords have no pressure to cut. Refinancing your student loans gets cheaper if that one cut lands in Q4, but only by a fraction of a point.</p>
+        <p>The bigger signal: the Fed thinks the economy is <strong>still too hot</strong> — which usually means tech hiring stays soft for another quarter. <strong>What to watch:</strong> <span class="tappable" data-edit="watch" data-current="September jobs report">September jobs report</span>. If hiring slows, more cuts come fast.</p>
       </div>
       <div class="ai-loader">
         <div class="ai-loader-mark">B</div>
@@ -472,6 +510,69 @@ if (quickInput) {
     }
   });
 }
+
+// Reading level slider — rewrites the take
+const TAKES = {
+  0: `<p>The Fed didn't lower interest rates. That means stuff like rent and loans stay expensive for now. They might lower rates once before the year ends, but not by much.</p><p><strong>Watch for:</strong> the next jobs report. If fewer people are getting hired, the Fed will probably move faster.</p>`,
+  1: `<p>The Fed holding rates means your <span class="tappable" data-edit="rent" data-current="$2,800">$2,800</span> Brooklyn rent isn't moving down in 2026 — landlords have no pressure to cut. Refinancing your student loans gets cheaper if that one cut lands in Q4, but only by a fraction of a point.</p><p>The bigger signal: the Fed thinks the economy is <strong>still too hot</strong> — which usually means tech hiring stays soft for another quarter. <strong>What to watch:</strong> <span class="tappable" data-edit="watch" data-current="September jobs report">September jobs report</span>. If hiring slows, more cuts come fast.</p>`,
+  2: `<p>The FOMC's hold + dot-plot signaling one cut by Q4 keeps the real funds rate restrictive against a 2% core PCE backdrop. For your <span class="tappable" data-edit="rent" data-current="$2,800">$2,800</span> rent: NYC vacancy is at multi-year lows; landlords have no pricing pressure until cuts cumulate. Tech labor demand correlates ~0.6 with the funds rate — expect soft hiring through Q3.</p><p><strong>Watch:</strong> Sept NFP + JOLTS for capitulation signals. A sub-100k print likely accelerates the cutting cycle.</p>`,
+  3: `<p>FOMC voted unanimously to hold the target range at 5.25–5.50% with median dots projecting one 25bp cut by Q4'26 vs market-implied two. Real rates remain ~150bps restrictive against trimmed-mean PCE. Multifamily cap-rate spreads suggest no near-term rent compression in tier-1 metros (NYC vacancy 3.2% vs 5.1% national). Tech hiring tracks with a 6mo lag to financial conditions; expect continued payroll softness in IT/info through Q3.</p><p><strong>Forward markers:</strong> Sept NFP, JOLTS quits-rate (a leading indicator we like), August core CPI trim. Sub-100k NFP w/ rising u-rate likely triggers Powell pivot.</p>`,
+};
+const TAKE_LABELS = ['Simple', 'Standard', 'Expert', 'Wonk'];
+const rlInput = document.getElementById('rlInput');
+const rlCurrent = document.getElementById('rlCurrent');
+if (rlInput) {
+  rlInput.addEventListener('input', () => {
+    const v = parseInt(rlInput.value);
+    document.querySelectorAll('.rl-stop').forEach((s,i) => s.classList.toggle('active', i === v));
+    rlCurrent.textContent = TAKE_LABELS[v];
+    const box = document.getElementById('aiBox');
+    const benny = document.getElementById('bennyMini');
+    box.classList.add('loading');
+    benny?.classList.add('benny-thinking');
+    setTimeout(() => {
+      document.getElementById('bennyTake').innerHTML = TAKES[v];
+      box.classList.remove('loading');
+      benny?.classList.remove('benny-thinking');
+    }, 900);
+  });
+}
+
+// Tap-to-edit any bolded "stat" inside the take
+document.getElementById('bennyTake')?.addEventListener('click', (e) => {
+  const t = e.target.closest('.tappable');
+  if (!t || t.querySelector('input')) return;
+  const original = t.textContent;
+  const input = document.createElement('input');
+  input.type = 'text'; input.value = original;
+  input.style.cssText = 'background:transparent;border:none;border-bottom:1px solid var(--nr-red);outline:none;color:#fff;font-weight:600;font-family:inherit;font-size:inherit;width:'+Math.max(60,original.length*9)+'px';
+  t.textContent = ''; t.appendChild(input);
+  input.focus(); input.select();
+  const commit = () => {
+    const v = input.value.trim() || original;
+    t.textContent = v; t.dataset.current = v;
+    if (v !== original) rerunBenny();
+  };
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
+    if (ev.key === 'Escape') { t.textContent = original; input.blur(); }
+  });
+});
+
+// Tap Benny mascot — read aloud (Web Speech API) + nod
+document.getElementById('bennyMini')?.addEventListener('click', () => {
+  const benny = document.getElementById('bennyMini');
+  benny.style.animation = 'bennyNod 0.5s ease-out';
+  setTimeout(() => benny.style.animation = '', 500);
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    const text = document.getElementById('bennyTake').innerText;
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.05; u.pitch = 1.05;
+    speechSynthesis.speak(u);
+  }
+});
 </script>
 </body>
 </html>
