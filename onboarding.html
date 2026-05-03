@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Newsreel — Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --nr-red: #FF6343;
+  --nr-black: #000;
+  --nr-charcoal: #0F0F0F;
+  --nr-lead: #1F1F1F;
+  --nr-iron: #3A3A3A;
+  --nr-ash: #898989;
+  --nr-silver: #ADADAD;
+  --nr-white: #FFF;
+  --font-headline: 'Bree Serif', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; }
+body {
+  font-family: var(--font-body);
+  background: radial-gradient(ellipse at top, #2a0f08 0%, #000 70%);
+  color: var(--nr-white);
+  width: 100%; min-height: 100vh;
+  display: flex; align-items: stretch; justify-content: center;
+  overflow-x: hidden;
+}
+.frame {
+  width: 100%; max-width: 430px; min-height: 100vh;
+  padding: 60px 28px 40px;
+  display: none;
+  flex-direction: column;
+}
+.frame.active { display: flex; }
+
+.logo { font-family: var(--font-headline); font-size: 44px; text-align: center; margin: 40px 0 56px; letter-spacing: -1px; }
+h1 { font-family: var(--font-headline); font-size: 32px; line-height: 1.15; margin-bottom: 14px; }
+.sub { color: var(--nr-silver); font-size: 16px; line-height: 1.45; margin-bottom: 28px; }
+
+.spacer { flex: 1; }
+
+.btn {
+  width: 100%; padding: 18px; border-radius: 12px; border: none;
+  font-family: var(--font-mono); font-size: 15px; letter-spacing: 0.5px;
+  cursor: pointer; margin-bottom: 12px; text-transform: uppercase;
+}
+.btn-primary { background: var(--nr-red); color: #000; font-weight: 600; }
+.btn-secondary { background: transparent; color: var(--nr-silver); border: none; text-decoration: underline; padding: 14px; }
+
+/* Benny screen */
+.benny-bullets { list-style: none; margin: 18px 0 24px; }
+.benny-bullets li { padding: 10px 0; color: var(--nr-white); font-size: 15px; line-height: 1.45; display: flex; gap: 10px; }
+.benny-bullets li::before { content: "•"; color: var(--nr-red); font-weight: 700; }
+.transparency { font-size: 13px; color: var(--nr-ash); line-height: 1.5; padding: 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid var(--nr-iron); margin-bottom: 22px; }
+
+.input-wrap {
+  background: var(--nr-charcoal); border: 1px solid var(--nr-iron); border-radius: 14px;
+  padding: 14px; margin-bottom: 16px; transition: border-color .2s;
+}
+.input-wrap:focus-within { border-color: var(--nr-red); }
+.input-wrap textarea {
+  width: 100%; min-height: 90px; background: transparent; border: none; resize: none;
+  color: var(--nr-white); font-family: var(--font-body); font-size: 15px; line-height: 1.45;
+  outline: none;
+}
+.input-wrap textarea::placeholder { color: var(--nr-ash); }
+.input-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.mic-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--nr-lead); color: var(--nr-white);
+  border: 1px solid var(--nr-iron); border-radius: 999px;
+  padding: 8px 14px; font-family: var(--font-mono); font-size: 12px; cursor: pointer;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.mic-btn.recording { background: var(--nr-red); color: #000; border-color: var(--nr-red); animation: pulse 1.2s infinite; }
+.mic-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--nr-red); }
+.mic-btn.recording .mic-dot { background: #000; }
+.char-count { font-family: var(--font-mono); font-size: 11px; color: var(--nr-ash); }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* Skip modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000;
+  display: none; align-items: center; justify-content: center; padding: 24px;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--nr-charcoal); border: 1px solid var(--nr-iron); border-radius: 16px;
+  padding: 26px; max-width: 360px; width: 100%;
+}
+.modal h3 { font-family: var(--font-headline); font-size: 22px; margin-bottom: 12px; }
+.modal p { color: var(--nr-silver); font-size: 15px; line-height: 1.45; margin-bottom: 20px; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btns .btn { margin-bottom: 0; flex: 1; padding: 14px; }
+.btn-ghost { background: transparent; color: var(--nr-silver); border: 1px solid var(--nr-iron); }
+
+/* Dev nav */
+.devnav {
+  position: fixed; top: 8px; right: 8px; z-index: 500;
+  background: rgba(0,0,0,0.7); border: 1px solid var(--nr-iron); border-radius: 8px;
+  padding: 6px; display: flex; gap: 4px;
+}
+.devnav button { background: var(--nr-lead); color: var(--nr-white); border: none; border-radius: 4px; padding: 4px 8px; font-family: var(--font-mono); font-size: 10px; cursor: pointer; }
+.devnav button.active { background: var(--nr-red); color: #000; }
+</style>
+</head>
+<body>
+
+<!-- Dev nav (jump between screens while iterating) -->
+<div class="devnav">
+  <button onclick="show('signup')">1</button>
+  <button onclick="show('verify')">2</button>
+  <button onclick="show('welcome')">3</button>
+  <button onclick="show('benny')" class="active">4</button>
+  <button onclick="show('notif')">5</button>
+  <button onclick="show('access')">6</button>
+</div>
+
+<!-- 1. SIGNUP (placeholder, mirrors iOS) -->
+<div class="frame" id="signup">
+  <div class="logo">newsreel</div>
+  <div class="sub" style="text-align:center; margin-top:-30px;">Sign up screen — placeholder</div>
+  <div class="spacer"></div>
+  <button class="btn btn-primary" onclick="show('verify')">Sign Up</button>
+</div>
+
+<!-- 2. VERIFY (placeholder) -->
+<div class="frame" id="verify">
+  <div class="logo">newsreel</div>
+  <h1 style="text-align:center;">Verify your email</h1>
+  <div class="sub" style="text-align:center;">6-digit code — placeholder</div>
+  <div class="spacer"></div>
+  <button class="btn btn-primary" onclick="show('welcome')">Verify</button>
+</div>
+
+<!-- 3. WELCOME (placeholder) -->
+<div class="frame" id="welcome">
+  <h1>Welcome, Percy!</h1>
+  <div class="sub">Here's how we're delivering the news differently...</div>
+  <div class="sub" style="margin-top:auto; color:var(--nr-ash);">(value props placeholder)</div>
+  <div class="spacer"></div>
+  <button class="btn btn-primary" onclick="show('benny')">Continue</button>
+</div>
+
+<!-- 4. BENNY — THE NEW SCREEN -->
+<div class="frame active" id="benny">
+  <h1>Meet Benny, your AI sidekick.</h1>
+  <div class="sub">
+    Humans write and report all the news on Newsreel. Benny is the sidekick — he helps you:
+  </div>
+  <ul class="benny-bullets">
+    <li>Understand how a story impacts <em>your</em> life</li>
+    <li>Adjust the reading level up or down</li>
+    <li>Add context when you need it</li>
+  </ul>
+  <div class="transparency">
+    Benny never writes the news. Every AI assist is labeled, and you can turn him off any time in Settings.
+  </div>
+
+  <div class="input-wrap">
+    <textarea id="bennyInput" placeholder="Tap to tell Benny what you care about and who you are — it's how he'll explain how stories actually affect you."></textarea>
+    <div class="input-row">
+      <button class="mic-btn" id="micBtn" type="button">
+        <span class="mic-dot"></span>
+        <span id="micLabel">Hold to speak</span>
+      </button>
+      <span class="char-count" id="charCount">0</span>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+  <button class="btn btn-primary" onclick="show('notif')">Continue</button>
+  <button class="btn btn-secondary" onclick="trySkipBenny()">Maybe later</button>
+</div>
+
+<!-- 5. NOTIFICATIONS (placeholder) -->
+<div class="frame" id="notif">
+  <h1>One ping. Your stack is ready.</h1>
+  <div class="sub">Every morning we send a single notification when your five stories drop. No streak guilt, no breaking-news spam — just a tap to start your day informed.</div>
+  <div class="transparency" style="margin-top:8px;">You can change this any time in Settings. We'll never sell or share your data.</div>
+  <div class="spacer"></div>
+  <button class="btn btn-primary" onclick="show('access')">Turn on notifications</button>
+  <button class="btn btn-secondary" onclick="show('access')">Maybe later</button>
+</div>
+
+<!-- 6. ACCESS CODE (placeholder) -->
+<div class="frame" id="access">
+  <h1>Do you have an access code for premium content?</h1>
+  <div class="sub">Enter your access code to unlock premium features and content. You can always redeem codes later in settings.</div>
+  <div class="spacer"></div>
+  <button class="btn btn-primary" onclick="finish()">Continue</button>
+  <button class="btn btn-secondary" onclick="finish()">Skip for now</button>
+</div>
+
+<!-- Skip modal -->
+<div class="modal-overlay" id="skipModal">
+  <div class="modal">
+    <h3>Are you sure?</h3>
+    <p>Skip and you'll miss out on understanding what's happening around you and how to make sense of it.</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeSkip()">Go back</button>
+      <button class="btn btn-primary" onclick="confirmSkip()">Skip anyway</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.frame').forEach(f => f.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.devnav button').forEach(b => b.classList.remove('active'));
+  const idx = ['signup','verify','welcome','benny','notif','access'].indexOf(id);
+  if (idx >= 0) document.querySelectorAll('.devnav button')[idx].classList.add('active');
+  window.scrollTo(0, 0);
+}
+function finish() { window.location.href = 'app.html'; }
+
+// Skip flow
+function trySkipBenny() { document.getElementById('skipModal').classList.add('show'); }
+function closeSkip() { document.getElementById('skipModal').classList.remove('show'); }
+function confirmSkip() { closeSkip(); show('notif'); }
+
+// Char count
+const ta = document.getElementById('bennyInput');
+const cc = document.getElementById('charCount');
+ta.addEventListener('input', () => { cc.textContent = ta.value.length; });
+
+// Web Speech API — hold-to-speak
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const micBtn = document.getElementById('micBtn');
+const micLabel = document.getElementById('micLabel');
+let recog = null;
+let baseText = '';
+
+if (SR) {
+  recog = new SR();
+  recog.continuous = true;
+  recog.interimResults = true;
+  recog.lang = 'en-US';
+  recog.onresult = (e) => {
+    let interim = '', finalT = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalT += t;
+      else interim += t;
+    }
+    ta.value = (baseText + ' ' + finalT + ' ' + interim).trim();
+    cc.textContent = ta.value.length;
+  };
+  recog.onend = () => stopRec();
+  recog.onerror = () => stopRec();
+} else {
+  micBtn.style.opacity = 0.4;
+  micBtn.title = 'Speech recognition not supported in this browser';
+}
+
+function startRec() {
+  if (!recog) return;
+  baseText = ta.value;
+  try { recog.start(); } catch(e) {}
+  micBtn.classList.add('recording');
+  micLabel.textContent = 'Listening…';
+}
+function stopRec() {
+  if (!recog) return;
+  try { recog.stop(); } catch(e) {}
+  micBtn.classList.remove('recording');
+  micLabel.textContent = 'Hold to speak';
+  baseText = ta.value;
+}
+
+let holdTimer;
+const startEvents = ['mousedown','touchstart'];
+const endEvents = ['mouseup','mouseleave','touchend','touchcancel'];
+startEvents.forEach(ev => micBtn.addEventListener(ev, (e) => { e.preventDefault(); startRec(); }));
+endEvents.forEach(ev => micBtn.addEventListener(ev, (e) => { e.preventDefault(); stopRec(); }));
+</script>
+</body>
+</html>
