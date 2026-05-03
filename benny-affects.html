@@ -50,7 +50,26 @@
 
   .home-card-title { font-family:var(--font-h); font-size:22px; line-height:1.2; padding:14px 16px 16px; }
 
-  /* ────── BENNY SLIDE (lives inside the story flow) ────── */
+  /* ────── ENGAGEMENT-STYLE BENNY SLIDE (matches quiz/poll pattern: pure black, no image) ────── */
+  .scene.engagement { padding:0; min-height:100vh; display:flex; flex-direction:column; }
+  .eng-topbar {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:54px 18px 14px; gap:14px;
+  }
+  .eng-dots { display:flex; gap:8px; align-items:center; }
+  .eng-content { flex:1; padding:8px 22px 32px; display:flex; flex-direction:column; }
+
+  .benny-eyebrow-row { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+  .benny-mini-icon {
+    width:34px; height:34px;
+    animation:bennyIdle 5.2s ease-in-out infinite, bennyBob 2.8s ease-in-out infinite;
+    transform-origin:50% 60%;
+    filter: drop-shadow(0 2px 8px rgba(255,99,67,0.35));
+  }
+  .benny-mini-icon img { width:100%; height:100%; object-fit:contain; }
+  .benny-eyebrow-text { font-family:var(--font-m); font-size:11px; letter-spacing:2.5px; color:var(--nr-red); text-transform:uppercase; }
+
+  /* ────── (legacy story-flow styles — kept for reference, unused now) ────── */
   .story-bg {
     position:absolute; inset:0; z-index:0;
     background:
@@ -146,7 +165,7 @@
   .benny-thinking { animation: bennyThink 1.1s ease-in-out infinite !important; }
   .benny-eyebrow { font-family:var(--font-m); font-size:10px; letter-spacing:2.5px; color:var(--nr-red); text-transform:uppercase; margin-top:14px; }
 
-  .benny-headline { font-family:var(--font-h); font-size:26px; line-height:1.15; letter-spacing:-0.3px; margin:0 0 14px; }
+  .benny-headline { font-family:var(--font-h); font-size:32px; line-height:1.12; letter-spacing:-0.4px; margin:0 0 22px; }
   .benny-headline em { font-style:normal; color:var(--nr-red); }
 
   /* AI box — soft container that signifies "this is AI" (inspo: 5Ws app) */
@@ -156,11 +175,6 @@
     border-radius:14px; padding:14px;
     margin-bottom:18px; position:relative;
     transition:opacity .25s;
-  }
-  .ai-box::before {
-    content:"BENNY"; position:absolute; top:-9px; left:16px;
-    background:var(--nr-black); padding:0 8px;
-    font-family:var(--font-m); font-size:10px; letter-spacing:2.5px; color:var(--nr-red);
   }
   .benny-take { font-size:14px; line-height:1.5; color:var(--nr-smoke); }
   .benny-take p + p { margin-top:12px; }
@@ -301,117 +315,81 @@
   </p>
 </div>
 
-<!-- ─────────────────── BENNY SLIDE — lives inside story flow ─────────────────── -->
-<div class="scene scene--full" id="slide">
+<!-- ─────────────────── BENNY SLIDE — quiz/poll-style clean modal ─────────────────── -->
+<div class="scene engagement" id="slide">
 
-  <div class="story-bg"></div>
-  <div class="photo-credit">Photo by Reuters</div>
-
-  <div class="story-topbar">
+  <div class="eng-topbar">
     <button class="slide-back" onclick="show('home')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
-    <div class="slide-dots">
-      <span class="dot done"></span>
-      <span class="dot done"></span>
-      <span class="dot done"></span>
-      <span class="dot done"></span>
-      <span class="dot done"></span>
+    <div class="eng-dots">
+      <span class="dot"></span>
       <span class="dot benny"></span>
       <span class="dot"></span>
-      <span class="dot"></span>
     </div>
+    <span style="width:22px"></span>
   </div>
 
-  <div class="rail">
-    <button class="rail-btn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-    </button>
-    <button class="rail-btn"><span style="font-family:var(--font-m);font-size:10px;font-weight:600;">CC</span></button>
-    <button class="rail-btn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-    </button>
-    <div class="rail-progress">
-      <svg width="38" height="38" viewBox="0 0 38 38">
-        <circle class="ring-bg" cx="19" cy="19" r="18" fill="none" stroke-width="2"/>
-        <circle class="ring" cx="19" cy="19" r="18" fill="none" stroke-width="2"/>
-      </svg>
+  <div class="eng-content">
+    <div class="benny-eyebrow-row">
+      <div class="benny-mini-icon" id="bennyMini"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
+      <span class="benny-eyebrow-text">Benny · Made for you</span>
     </div>
-    <button class="rail-btn rail-btn--benny" id="bennyMini">
-      <img src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
-    </button>
-  </div>
 
-  <div class="story-card">
-    <div class="story-card-inner">
-      <div class="story-card-eyebrow">
-        <img src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
-        <span>Benny · Made for you</span>
+    <h1 class="benny-headline">What this means <em>for you</em>, Percy.</h1>
+
+    <div class="ai-box" id="aiBox">
+      <div class="benny-take" id="bennyTake">
+        <p>The Fed holding rates means your <strong>$2,800 Brooklyn rent isn't moving down</strong> in 2026 — landlords have no pressure to cut. Refinancing your student loans gets cheaper if that one cut lands in Q4, but only by a fraction of a point.</p>
+        <p>The bigger signal: the Fed thinks the economy is <strong>still too hot</strong> — which usually means tech hiring stays soft for another quarter. <strong>What to watch:</strong> September jobs report. If hiring slows, more cuts come fast.</p>
       </div>
-      <h1 class="benny-headline">What this means <em>for you</em>, Percy.</h1>
-      <div class="ai-box" id="aiBox">
-        <div class="benny-take" id="bennyTake">
-          <p>The Fed holding rates means your <strong>$2,800 Brooklyn rent isn't moving down</strong> in 2026 — landlords have no pressure to cut. Refinancing your student loans gets cheaper if that one cut lands in Q4, but only by a fraction of a point.</p>
-          <p>The bigger signal: the Fed thinks the economy is <strong>still too hot</strong> — which usually means tech hiring stays soft for another quarter. <strong>What to watch:</strong> September jobs report. If hiring slows, more cuts come fast.</p>
-        </div>
-        <div class="ai-loader">
-          <div class="ai-loader-mark">B</div>
-          <div class="ai-loader-label">Benny is writing for you</div>
-        </div>
+      <div class="ai-loader">
+        <div class="ai-loader-mark">B</div>
+        <div class="ai-loader-label">Benny is writing for you</div>
       </div>
-      <div class="basedon">
-        <div class="basedon-head">
-          <span class="basedon-label">Based on</span>
-          <button class="basedon-edit" id="editBtn" onclick="toggleEdit()">EDIT ✎</button>
-        </div>
-        <div class="basedon-chips" id="chips">
-          <span class="b-chip" data-icon="📍" data-val="Brooklyn, NY"><span class="b-chip-icon">📍</span><span class="b-chip-text">Brooklyn, NY</span></span>
-          <span class="b-chip" data-icon="🎂" data-val="27"><span class="b-chip-icon">🎂</span><span class="b-chip-text">27</span></span>
-          <span class="b-chip" data-icon="💼" data-val="Tech"><span class="b-chip-icon">💼</span><span class="b-chip-text">Tech</span></span>
-          <span class="b-chip" data-icon="🎓" data-val="Student loans"><span class="b-chip-icon">🎓</span><span class="b-chip-text">Student loans</span></span>
-        </div>
-      </div>
-      <button class="continue-btn" onclick="show('home')">Continue to quiz</button>
     </div>
+
+    <div class="basedon">
+      <div class="basedon-head">
+        <span class="basedon-label">Based on</span>
+        <button class="basedon-edit" id="editBtn" onclick="toggleEdit()">EDIT ✎</button>
+      </div>
+      <div class="basedon-chips" id="chips">
+        <span class="b-chip" data-val="Brooklyn, NY"><span class="b-chip-icon">📍</span><span class="b-chip-text">Brooklyn, NY</span></span>
+        <span class="b-chip" data-val="27"><span class="b-chip-icon">🎂</span><span class="b-chip-text">27</span></span>
+        <span class="b-chip" data-val="Tech"><span class="b-chip-icon">💼</span><span class="b-chip-text">Tech</span></span>
+        <span class="b-chip" data-val="Student loans"><span class="b-chip-icon">🎓</span><span class="b-chip-text">Student loans</span></span>
+      </div>
+    </div>
+
+    <button class="continue-btn" onclick="show('home')">Continue to quiz</button>
   </div>
 </div>
 
 <!-- ─────────────────── EMPTY STATE — user skipped Benny onboarding ─────────────────── -->
-<div class="scene scene--full" id="empty">
-  <div class="story-bg"></div>
-  <div class="photo-credit">Photo by Reuters</div>
-
-  <div class="story-topbar">
+<div class="scene engagement" id="empty">
+  <div class="eng-topbar">
     <button class="slide-back" onclick="show('home')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
-    <div class="slide-dots">
-      <span class="dot done"></span><span class="dot done"></span><span class="dot done"></span>
-      <span class="dot done"></span><span class="dot done"></span>
-      <span class="dot benny"></span><span class="dot"></span><span class="dot"></span>
+    <div class="eng-dots">
+      <span class="dot"></span><span class="dot benny"></span><span class="dot"></span>
     </div>
+    <span style="width:22px"></span>
   </div>
 
-  <div class="rail">
-    <button class="rail-btn rail-btn--benny">
-      <img src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
-    </button>
-  </div>
-
-  <div class="story-card">
-    <div class="story-card-inner">
-      <div class="story-card-eyebrow">
-        <img src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
-        <span>Benny · Made for you</span>
-      </div>
-      <h1 class="benny-headline">Tell me <em>two things</em>.</h1>
-      <p style="color:var(--nr-silver); font-size:14px; line-height:1.5; margin-bottom:14px;">Where you live + what you do. I'll show you what this story actually means for your life.</p>
-      <div class="quick-input" style="margin-bottom:14px;">
-        <input type="text" placeholder="e.g. Brooklyn, tech" id="quickInput">
-        <button onclick="document.getElementById('bennyMini')?.classList.add('benny-thinking'); setTimeout(()=>show('slide'),1100)">RUN</button>
-      </div>
-      <button class="continue-btn" style="background:transparent; color:var(--nr-silver); border:1px solid var(--nr-iron);" onclick="show('home')">Skip — continue to quiz</button>
+  <div class="eng-content">
+    <div class="benny-eyebrow-row">
+      <div class="benny-mini-icon"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
+      <span class="benny-eyebrow-text">Benny · Made for you</span>
     </div>
+    <h1 class="benny-headline">Tell me <em>two things</em>.</h1>
+    <p style="color:var(--nr-silver); font-size:15px; line-height:1.5; margin-bottom:18px;">Where you live + what you do. I'll show you what this story actually means for your life.</p>
+    <div class="quick-input" style="margin-bottom:18px;">
+      <input type="text" placeholder="e.g. Brooklyn, tech" id="quickInput">
+      <button onclick="document.getElementById('bennyMini')?.classList.add('benny-thinking'); setTimeout(()=>show('slide'),1100)">RUN</button>
+    </div>
+    <button class="continue-btn" style="background:transparent; color:var(--nr-silver); border:1px solid var(--nr-iron);" onclick="show('home')">Skip — continue to quiz</button>
   </div>
 </div>
 
