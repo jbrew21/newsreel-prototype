@@ -86,6 +86,15 @@ h1 { font-family: var(--font-headline); font-size: 32px; line-height: 1.15; marg
 }
 .mic-hint { margin-top: 16px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 1px; color: var(--nr-ash); text-transform: uppercase; }
 
+.share-hints { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center; margin: 18px 0 4px; padding: 0 8px; }
+.hint-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; color: var(--nr-ash); text-transform: uppercase; margin-right: 4px; }
+.hint-chip {
+  font-family: var(--font-body); font-size: 12px;
+  padding: 4px 10px; border-radius: 999px;
+  background: rgba(255,255,255,0.04); color: var(--nr-silver);
+  border: 1px solid var(--nr-iron);
+}
+
 .type-instead { margin-top: 8px; }
 .type-instead summary {
   list-style: none; cursor: pointer; text-align: center;
@@ -187,9 +196,17 @@ h1 { font-family: var(--font-headline); font-size: 32px; line-height: 1.15; marg
     <div class="mic-hint" id="micLabel">Hold to speak</div>
   </div>
 
+  <div class="share-hints">
+    <span class="hint-label">Share:</span>
+    <span class="hint-chip">location</span>
+    <span class="hint-chip">age</span>
+    <span class="hint-chip">what you do</span>
+    <span class="hint-chip">what you care about</span>
+  </div>
+
   <details class="type-instead">
     <summary>or type instead</summary>
-    <textarea id="bennyInput" placeholder="What do you do? What matters to you?"></textarea>
+    <textarea id="bennyInput" placeholder="e.g., I'm 27, live in Brooklyn, work in tech. I care about housing, AI, and climate."></textarea>
   </details>
 
   <div class="spacer"></div>
