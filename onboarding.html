@@ -53,36 +53,47 @@ h1 { font-family: var(--font-headline); font-size: 32px; line-height: 1.15; marg
 .btn-primary { background: var(--nr-red); color: #000; font-weight: 600; }
 .btn-secondary { background: transparent; color: var(--nr-silver); border: none; text-decoration: underline; padding: 14px; }
 
-/* Benny screen */
-.benny-bullets { list-style: none; margin: 18px 0 24px; }
-.benny-bullets li { padding: 10px 0; color: var(--nr-white); font-size: 15px; line-height: 1.45; display: flex; gap: 10px; }
-.benny-bullets li::before { content: "•"; color: var(--nr-red); font-weight: 700; }
-.transparency { font-size: 13px; color: var(--nr-ash); line-height: 1.5; padding: 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid var(--nr-iron); margin-bottom: 22px; }
+/* Benny screen — airy, single-focus */
+.benny-eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--nr-red); margin-bottom: 14px; }
+.benny-h1 { font-family: var(--font-headline); font-size: 44px; line-height: 1.05; margin-bottom: 16px; letter-spacing: -1px; }
+.benny-lede { color: var(--nr-silver); font-size: 17px; line-height: 1.45; margin-bottom: 40px; max-width: 320px; }
 
-.input-wrap {
-  background: var(--nr-charcoal); border: 1px solid var(--nr-iron); border-radius: 14px;
-  padding: 14px; margin-bottom: 16px; transition: border-color .2s;
+.mic-stage { display: flex; flex-direction: column; align-items: center; padding: 20px 0 24px; }
+.mic-circle {
+  width: 116px; height: 116px; border-radius: 50%;
+  background: var(--nr-charcoal); border: 1px solid var(--nr-iron);
+  color: var(--nr-white); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .2s; position: relative;
 }
-.input-wrap:focus-within { border-color: var(--nr-red); }
-.input-wrap textarea {
-  width: 100%; min-height: 90px; background: transparent; border: none; resize: none;
+.mic-circle:active, .mic-circle.recording {
+  background: var(--nr-red); color: #000; border-color: var(--nr-red);
+  transform: scale(1.04);
+  box-shadow: 0 0 0 12px rgba(255,99,67,0.15), 0 0 0 24px rgba(255,99,67,0.08);
+}
+.mic-circle.recording { animation: pulseGlow 1.4s ease-in-out infinite; }
+@keyframes pulseGlow {
+  0%,100% { box-shadow: 0 0 0 12px rgba(255,99,67,0.15), 0 0 0 24px rgba(255,99,67,0.08); }
+  50%     { box-shadow: 0 0 0 18px rgba(255,99,67,0.22), 0 0 0 36px rgba(255,99,67,0.10); }
+}
+.mic-hint { margin-top: 16px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 1px; color: var(--nr-ash); text-transform: uppercase; }
+
+.type-instead { margin-top: 8px; }
+.type-instead summary {
+  list-style: none; cursor: pointer; text-align: center;
+  font-size: 14px; color: var(--nr-silver); text-decoration: underline; padding: 8px;
+}
+.type-instead summary::-webkit-details-marker { display: none; }
+.type-instead[open] summary { color: var(--nr-ash); }
+.type-instead textarea {
+  width: 100%; min-height: 80px; margin-top: 12px; padding: 14px;
+  background: var(--nr-charcoal); border: 1px solid var(--nr-iron); border-radius: 12px;
   color: var(--nr-white); font-family: var(--font-body); font-size: 15px; line-height: 1.45;
-  outline: none;
+  resize: none; outline: none;
 }
-.input-wrap textarea::placeholder { color: var(--nr-ash); }
-.input-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
-.mic-btn {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--nr-lead); color: var(--nr-white);
-  border: 1px solid var(--nr-iron); border-radius: 999px;
-  padding: 8px 14px; font-family: var(--font-mono); font-size: 12px; cursor: pointer;
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
-.mic-btn.recording { background: var(--nr-red); color: #000; border-color: var(--nr-red); animation: pulse 1.2s infinite; }
-.mic-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--nr-red); }
-.mic-btn.recording .mic-dot { background: #000; }
-.char-count { font-family: var(--font-mono); font-size: 11px; color: var(--nr-ash); }
-@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+.type-instead textarea:focus { border-color: var(--nr-red); }
+.type-instead textarea::placeholder { color: var(--nr-ash); }
+
+.trust-line { font-size: 12px; color: var(--nr-ash); line-height: 1.5; text-align: center; margin-bottom: 20px; padding: 0 8px; }
 
 /* Skip modal */
 .modal-overlay {
@@ -150,31 +161,26 @@ h1 { font-family: var(--font-headline); font-size: 32px; line-height: 1.15; marg
 
 <!-- 4. BENNY — THE NEW SCREEN -->
 <div class="frame active" id="benny">
-  <h1>Meet Benny, your AI sidekick.</h1>
-  <div class="sub">
-    Humans write and report all the news on Newsreel. Benny is the sidekick — he helps you:
-  </div>
-  <ul class="benny-bullets">
-    <li>Understand how a story impacts <em>your</em> life</li>
-    <li>Adjust the reading level up or down</li>
-    <li>Add context when you need it</li>
-  </ul>
-  <div class="transparency">
-    Benny never writes the news. Every AI assist is labeled, and you can turn him off any time in Settings.
+  <div class="benny-eyebrow">YOUR AI SIDEKICK</div>
+  <h1 class="benny-h1">Meet Benny.</h1>
+  <p class="benny-lede">Tell him what you care about. He'll show you how the news actually affects your life.</p>
+
+  <div class="mic-stage">
+    <button class="mic-circle" id="micBtn" type="button" aria-label="Hold to speak">
+      <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+    </button>
+    <div class="mic-hint" id="micLabel">Hold to speak</div>
   </div>
 
-  <div class="input-wrap">
-    <textarea id="bennyInput" placeholder="Tap to tell Benny what you care about and who you are — it's how he'll explain how stories actually affect you."></textarea>
-    <div class="input-row">
-      <button class="mic-btn" id="micBtn" type="button">
-        <span class="mic-dot"></span>
-        <span id="micLabel">Hold to speak</span>
-      </button>
-      <span class="char-count" id="charCount">0</span>
-    </div>
-  </div>
+  <details class="type-instead">
+    <summary>or type instead</summary>
+    <textarea id="bennyInput" placeholder="What do you do? What matters to you?"></textarea>
+  </details>
 
   <div class="spacer"></div>
+
+  <p class="trust-line">Humans write all the news on Newsreel. Benny just helps you understand it. Every AI assist is labeled.</p>
+
   <button class="btn btn-primary" onclick="show('notif')">Continue</button>
   <button class="btn btn-secondary" onclick="trySkipBenny()">Maybe later</button>
 </div>
@@ -226,17 +232,14 @@ function trySkipBenny() { document.getElementById('skipModal').classList.add('sh
 function closeSkip() { document.getElementById('skipModal').classList.remove('show'); }
 function confirmSkip() { closeSkip(); show('notif'); }
 
-// Char count
-const ta = document.getElementById('bennyInput');
-const cc = document.getElementById('charCount');
-ta.addEventListener('input', () => { cc.textContent = ta.value.length; });
-
 // Web Speech API — hold-to-speak
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const micBtn = document.getElementById('micBtn');
 const micLabel = document.getElementById('micLabel');
 let recog = null;
 let baseText = '';
+
+function getTA() { return document.getElementById('bennyInput'); }
 
 if (SR) {
   recog = new SR();
@@ -250,19 +253,25 @@ if (SR) {
       if (e.results[i].isFinal) finalT += t;
       else interim += t;
     }
-    ta.value = (baseText + ' ' + finalT + ' ' + interim).trim();
-    cc.textContent = ta.value.length;
+    const ta = getTA();
+    if (ta) {
+      // open the details so user sees transcript appearing
+      const det = document.querySelector('.type-instead');
+      if (det && !det.open) det.open = true;
+      ta.value = (baseText + ' ' + finalT + ' ' + interim).trim();
+    }
   };
   recog.onend = () => stopRec();
   recog.onerror = () => stopRec();
 } else {
-  micBtn.style.opacity = 0.4;
+  micBtn.style.opacity = 0.5;
   micBtn.title = 'Speech recognition not supported in this browser';
 }
 
 function startRec() {
   if (!recog) return;
-  baseText = ta.value;
+  const ta = getTA();
+  baseText = ta ? ta.value : '';
   try { recog.start(); } catch(e) {}
   micBtn.classList.add('recording');
   micLabel.textContent = 'Listening…';
@@ -272,7 +281,8 @@ function stopRec() {
   try { recog.stop(); } catch(e) {}
   micBtn.classList.remove('recording');
   micLabel.textContent = 'Hold to speak';
-  baseText = ta.value;
+  const ta = getTA();
+  baseText = ta ? ta.value : '';
 }
 
 let holdTimer;
