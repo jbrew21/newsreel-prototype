@@ -50,6 +50,61 @@
 
   .home-card-title { font-family:var(--font-h); font-size:22px; line-height:1.2; padding:14px 16px 16px; }
 
+  /* ────── SLIDE ENTRY ANIMATION ────── */
+  .scene.engagement.entering .benny-eyebrow-row,
+  .scene.engagement.entering .benny-headline,
+  .scene.engagement.entering .ai-box,
+  .scene.engagement.entering .basedon,
+  .scene.engagement.entering .continue-btn {
+    opacity:0; transform:translateY(8px);
+    animation:slideInUp 0.5s cubic-bezier(0.2,0.8,0.2,1) forwards;
+  }
+  .scene.engagement.entering .benny-eyebrow-row { animation-delay:0.05s; }
+  .scene.engagement.entering .benny-headline    { animation-delay:0.13s; }
+  .scene.engagement.entering .ai-box            { animation-delay:0.22s; }
+  .scene.engagement.entering .basedon           { animation-delay:0.34s; }
+  .scene.engagement.entering .continue-btn      { animation-delay:0.42s; }
+
+  @keyframes slideInUp {
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  /* Particle shimmer on the AI box when entering or thinking */
+  .ai-box::after {
+    content:""; position:absolute; inset:0; pointer-events:none; border-radius:14px;
+    background:linear-gradient(110deg, transparent 30%, rgba(255,99,67,0.18) 50%, transparent 70%);
+    background-size:220% 100%; background-position:-100% 0;
+    opacity:0;
+  }
+  .scene.engagement.entering .ai-box::after {
+    animation:shimmerSweep 1.4s cubic-bezier(0.4,0,0.2,1) 0.3s 1;
+  }
+  .ai-box.loading::after {
+    animation:shimmerSweep 1.4s linear infinite; opacity:1;
+  }
+  @keyframes shimmerSweep {
+    0%   { background-position:-100% 0; opacity:0; }
+    20%  { opacity:1; }
+    80%  { opacity:1; }
+    100% { background-position:200% 0; opacity:0; }
+  }
+
+  /* Tiny particles dispersing from Benny on entry */
+  .benny-eyebrow-row { position:relative; }
+  .scene.engagement.entering .benny-mini-icon::before,
+  .scene.engagement.entering .benny-mini-icon::after {
+    content:""; position:absolute; width:4px; height:4px; border-radius:50%;
+    background:var(--nr-red); pointer-events:none;
+    animation:particle 1.2s ease-out 0.3s forwards;
+  }
+  .scene.engagement.entering .benny-mini-icon::before { top:6px; left:8px; --dx:24px; --dy:-18px; }
+  .scene.engagement.entering .benny-mini-icon::after  { top:14px; left:14px; --dx:-22px; --dy:-22px; }
+  @keyframes particle {
+    0%   { opacity:0; transform:translate(0,0) scale(0.5); }
+    20%  { opacity:1; transform:translate(0,0) scale(1); }
+    100% { opacity:0; transform:translate(var(--dx),var(--dy)) scale(0.2); }
+  }
+
   /* ────── ENGAGEMENT-STYLE BENNY SLIDE (matches quiz/poll pattern: pure black, no image) ────── */
   .scene.engagement {
     padding:0; height:100vh; max-height:100vh;
@@ -235,6 +290,9 @@
   .ai-loader-label { font-family:var(--font-m); font-size:12px; letter-spacing:1.5px; color:var(--nr-ash); text-transform:uppercase; }
 
   .basedon { padding-top:12px; margin-bottom:12px; flex:0 0 auto; }
+  .basedon-count { font-family:var(--font-m); font-size:10px; color:var(--nr-ash); letter-spacing:1px; }
+  .ai-box--prompt { background:rgba(255,99,67,0.04); }
+  .prompt-line { color:var(--nr-silver); font-size:14px; line-height:1.5; }
   .basedon-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
   .basedon-label { font-family:var(--font-m); font-size:10px; letter-spacing:2px; color:var(--nr-ash); text-transform:uppercase; }
   .basedon-edit { font-family:var(--font-m); font-size:11px; color:var(--nr-red); background:none; border:none; cursor:pointer; letter-spacing:0.5px; }
@@ -247,6 +305,9 @@
   }
   .b-chip:active { background:rgba(255,99,67,0.12); border-color:var(--nr-red); }
   .b-chip-icon { font-size:13px; }
+  .b-chip--add { border-style:dashed; border-color:rgba(255,99,67,0.5); color:var(--nr-red); cursor:pointer; }
+  .b-chip--add:active { background:rgba(255,99,67,0.12); }
+  .b-chip--filled { border-style:solid; border-color:var(--nr-iron); color:var(--nr-smoke); }
   .b-chip.editable { cursor:pointer; border-color:var(--nr-red); background:rgba(255,99,67,0.06); }
   .b-chip.editable::after { content:"✎"; margin-left:4px; color:var(--nr-red); font-size:11px; }
   .b-chip input.b-chip-input {
@@ -422,7 +483,7 @@
   </div>
 </div>
 
-<!-- ─────────────────── EMPTY STATE — user skipped Benny onboarding ─────────────────── -->
+<!-- ─────────────────── EMPTY STATE — same layout, empty chips to fill ─────────────────── -->
 <div class="scene engagement" id="empty">
   <div class="eng-topbar">
     <button class="slide-back" onclick="show('home')">
@@ -439,20 +500,39 @@
       <div class="benny-mini-icon"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
       <span class="benny-eyebrow-text">Benny · Made for you</span>
     </div>
-    <h1 class="benny-headline">Tell me <em>two things</em>.</h1>
-    <p style="color:var(--nr-silver); font-size:15px; line-height:1.5; margin-bottom:18px;">Where you live + what you do. I'll show you what this story actually means for your life.</p>
-    <div class="quick-input" style="margin-bottom:18px;">
-      <input type="text" placeholder="e.g. Brooklyn, tech" id="quickInput">
-      <button onclick="document.getElementById('bennyMini')?.classList.add('benny-thinking'); setTimeout(()=>show('slide'),1100)">RUN</button>
+
+    <h1 class="benny-headline">Tell me a bit about you.</h1>
+
+    <div class="ai-box ai-box--prompt">
+      <p class="prompt-line">Tap any chip below to add a fact. The more you share, the more useful Benny is.</p>
     </div>
-    <button class="continue-btn" style="background:transparent; color:var(--nr-silver); border:1px solid var(--nr-iron);" onclick="show('home')">Skip — continue to quiz</button>
+
+    <div class="basedon">
+      <div class="basedon-head">
+        <span class="basedon-label">Add about you</span>
+        <span class="basedon-count" id="emptyCount">0 / 4</span>
+      </div>
+      <div class="basedon-chips" id="emptyChips">
+        <span class="b-chip b-chip--add" data-field="location"><span class="b-chip-text">+ Location</span></span>
+        <span class="b-chip b-chip--add" data-field="age"><span class="b-chip-text">+ Age</span></span>
+        <span class="b-chip b-chip--add" data-field="job"><span class="b-chip-text">+ What you do</span></span>
+        <span class="b-chip b-chip--add" data-field="cares"><span class="b-chip-text">+ What you care about</span></span>
+      </div>
+    </div>
+
+    <button class="continue-btn" id="emptyContinue" style="background:transparent; color:var(--nr-silver); border:1px solid var(--nr-iron);" onclick="show('home')">Skip — continue to quiz</button>
   </div>
 </div>
 
 <script>
 function show(id) {
-  document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.scene').forEach(s => { s.classList.remove('active'); s.classList.remove('entering'); });
+  const next = document.getElementById(id);
+  next.classList.add('active');
+  if (next.classList.contains('engagement')) {
+    next.classList.add('entering');
+    setTimeout(() => next.classList.remove('entering'), 1500);
+  }
   document.querySelectorAll('.demo-nav button').forEach(b => b.classList.remove('active'));
   const map = { home:0, slide:1, empty:2 };
   document.querySelectorAll('.demo-nav button')[map[id]].classList.add('active');
@@ -575,6 +655,46 @@ document.getElementById('bennyTake')?.addEventListener('click', (e) => {
   input.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
     if (ev.key === 'Escape') { t.textContent = original; input.blur(); }
+  });
+});
+
+// Empty-state: tap an "+ Add" chip → input → fill → updates count → unlocks Benny
+const FIELD_LABELS = { location:'Location', age:'Age', job:'What you do', cares:'What you care about' };
+const FIELD_PLACEHOLDERS = { location:'Brooklyn, NY', age:'27', job:'Tech', cares:'AI, climate' };
+let filled = {};
+document.getElementById('emptyChips')?.addEventListener('click', (e) => {
+  const chip = e.target.closest('.b-chip--add');
+  if (!chip || chip.querySelector('input')) return;
+  const field = chip.dataset.field;
+  const input = document.createElement('input');
+  input.type='text'; input.placeholder=FIELD_PLACEHOLDERS[field]; input.className='b-chip-input';
+  input.style.width = '120px';
+  chip.querySelector('.b-chip-text').replaceWith(input);
+  input.focus();
+  const commit = () => {
+    const v = input.value.trim();
+    if (!v) {
+      const span=document.createElement('span'); span.className='b-chip-text'; span.textContent='+ '+FIELD_LABELS[field];
+      if (input.parentNode) input.replaceWith(span);
+      return;
+    }
+    const span=document.createElement('span'); span.className='b-chip-text'; span.textContent=v;
+    if (input.parentNode) input.replaceWith(span);
+    chip.classList.remove('b-chip--add'); chip.classList.add('b-chip--filled');
+    filled[field] = v;
+    const n = Object.keys(filled).length;
+    document.getElementById('emptyCount').textContent = n+' / 4';
+    if (n >= 1) {
+      const btn = document.getElementById('emptyContinue');
+      btn.style.background = 'var(--nr-red)'; btn.style.color = '#000'; btn.style.border='none';
+      btn.textContent = 'See Benny\'s take';
+      btn.onclick = () => show('slide');
+    }
+  };
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
+    if (ev.key === 'Escape') { input.value=''; input.blur(); }
   });
 });
 
