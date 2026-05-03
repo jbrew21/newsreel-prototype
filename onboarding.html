@@ -53,6 +53,40 @@ h1 { font-family: var(--font-headline); font-size: 32px; line-height: 1.15; marg
 .btn-primary { background: var(--nr-red); color: #000; font-weight: 600; }
 .btn-secondary { background: transparent; color: var(--nr-silver); border: none; text-decoration: underline; padding: 14px; }
 
+/* Benny hero — paperboy w/ hand-drawn-feel animation */
+.benny-hero { display: flex; justify-content: center; margin-bottom: 18px; padding-top: 4px; }
+.benny-img {
+  width: 96px; height: 96px;
+  background: #fff; border-radius: 22px; padding: 6px;
+  box-shadow: 0 8px 32px rgba(255,99,67,0.18), 0 2px 8px rgba(0,0,0,0.4);
+  transform-origin: 50% 60%;
+  animation: bennyIdle 5.2s ease-in-out infinite, bennyBob 2.8s ease-in-out infinite;
+  will-change: transform;
+}
+.benny-img.thinking { animation: bennyThink 1.1s ease-in-out infinite; }
+.benny-img:active { animation: bennyNod 0.5s ease-out; }
+
+@keyframes bennyIdle {
+  0%, 100% { transform: rotate(-2.2deg) scale(1); filter: brightness(1); }
+  25%      { transform: rotate(1.8deg) scale(1.015); }
+  50%      { transform: rotate(-1deg) scale(1.03); filter: brightness(1.04); }
+  75%      { transform: rotate(2.4deg) scale(1.01); }
+}
+@keyframes bennyBob {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -3px; }
+}
+@keyframes bennyThink {
+  0%, 100% { transform: rotate(-3deg) scale(1.02); }
+  50%      { transform: rotate(3deg) scale(1.06); filter: brightness(1.08); }
+}
+@keyframes bennyNod {
+  0%   { transform: rotate(0) scale(1); }
+  30%  { transform: rotate(-6deg) scale(0.96); }
+  60%  { transform: rotate(4deg) scale(1.04); }
+  100% { transform: rotate(0) scale(1); }
+}
+
 /* Benny screen — airy, single-focus */
 .benny-eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--nr-red); margin-bottom: 14px; }
 .benny-h1 { font-family: var(--font-headline); font-size: 44px; line-height: 1.05; margin-bottom: 16px; letter-spacing: -1px; }
@@ -180,6 +214,9 @@ h1 { font-family: var(--font-headline); font-size: 32px; line-height: 1.15; marg
 
 <!-- 4. BENNY — THE NEW SCREEN -->
 <div class="frame active" id="benny">
+  <div class="benny-hero">
+    <img src="assets/benny/benny-paperboy-v2.png" alt="Benny" class="benny-img" id="bennyImg">
+  </div>
   <h1 class="benny-h1">Meet Benny.</h1>
   <p class="benny-lede">Tell him who you are and what you care about. He'll show you how every story actually affects <em>your</em> life.</p>
 
@@ -310,6 +347,7 @@ function startRec() {
   try { recog.start(); } catch(e) {}
   micBtn.classList.add('recording');
   micLabel.textContent = 'Listening…';
+  document.getElementById('bennyImg')?.classList.add('thinking');
 }
 function stopRec() {
   if (!recog) return;
@@ -318,6 +356,7 @@ function stopRec() {
   micLabel.textContent = 'Hold to speak';
   const ta = getTA();
   baseText = ta ? ta.value : '';
+  document.getElementById('bennyImg')?.classList.remove('thinking');
 }
 
 let holdTimer;
