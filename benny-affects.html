@@ -60,10 +60,10 @@
 
   .benny-slide-hero { display:flex; flex-direction:column; align-items:center; padding:8px 0 22px; }
   .benny-mini {
-    width:64px; height:64px; background:#fff; border-radius:18px; padding:4px;
-    box-shadow:0 6px 24px rgba(255,99,67,0.22), 0 2px 6px rgba(0,0,0,0.4);
+    width:72px; height:72px;
     transform-origin:50% 60%;
     animation:bennyIdle 5.2s ease-in-out infinite, bennyBob 2.8s ease-in-out infinite;
+    filter: drop-shadow(0 4px 16px rgba(255,99,67,0.28));
   }
   .benny-mini img { width:100%; height:100%; object-fit:contain; }
   .benny-thinking { animation: bennyThink 1.1s ease-in-out infinite !important; }
@@ -72,9 +72,41 @@
   .benny-headline { font-family:var(--font-h); font-size:36px; line-height:1.08; letter-spacing:-0.5px; margin:6px 0 22px; }
   .benny-headline em { font-style:normal; color:var(--nr-red); }
 
-  .benny-take { font-size:17px; line-height:1.55; color:var(--nr-smoke); margin-bottom:30px; }
-  .benny-take p + p { margin-top:14px; }
+  /* AI box — soft container that signifies "this is AI" (inspo: 5Ws app) */
+  .ai-box {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px; padding:20px 18px;
+    margin-bottom:24px; position:relative;
+    transition:opacity .25s;
+  }
+  .ai-box::before {
+    content:"BENNY"; position:absolute; top:-9px; left:16px;
+    background:var(--nr-black); padding:0 8px;
+    font-family:var(--font-m); font-size:10px; letter-spacing:2.5px; color:var(--nr-red);
+  }
+  .benny-take { font-size:16px; line-height:1.55; color:var(--nr-smoke); }
+  .benny-take p + p { margin-top:12px; }
   .benny-take strong { color:var(--nr-white); font-weight:600; }
+
+  /* Writing / loader state inside the AI box */
+  .ai-box.loading .benny-take { display:none; }
+  .ai-box.loading .ai-loader { display:flex; }
+  .ai-loader {
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+    padding:28px 0; gap:14px;
+  }
+  .ai-loader-mark {
+    width:46px; height:46px; border-radius:12px;
+    border:2px solid var(--nr-iron); display:flex; align-items:center; justify-content:center;
+    color:var(--nr-red); font-family:var(--font-h); font-size:22px;
+    animation:loaderPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes loaderPulse {
+    0%,100% { transform:scale(1); border-color:var(--nr-iron); }
+    50%     { transform:scale(1.06); border-color:var(--nr-red); box-shadow:0 0 0 6px rgba(255,99,67,0.08); }
+  }
+  .ai-loader-label { font-family:var(--font-m); font-size:12px; letter-spacing:1.5px; color:var(--nr-ash); text-transform:uppercase; }
 
   .basedon { border-top:1px solid var(--nr-lead); padding-top:18px; margin-bottom:24px; }
   .basedon-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
@@ -89,6 +121,12 @@
   }
   .b-chip:active { background:rgba(255,99,67,0.12); border-color:var(--nr-red); }
   .b-chip-icon { font-size:13px; }
+  .b-chip.editable { cursor:pointer; border-color:var(--nr-red); background:rgba(255,99,67,0.06); }
+  .b-chip.editable::after { content:"✎"; margin-left:4px; color:var(--nr-red); font-size:11px; }
+  .b-chip input.b-chip-input {
+    background:transparent; border:none; outline:none; color:#fff;
+    font-family:var(--font-b); font-size:13px; width:120px;
+  }
 
   .empty-state {
     background:rgba(255,99,67,0.06); border:1px dashed rgba(255,99,67,0.4);
@@ -135,7 +173,7 @@
   <div class="home-card">
     <div class="home-card-img fed">
       <div class="benny-badge">
-        <img src="assets/benny/benny-paperboy-v2.png" alt="">
+        <img src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
         <span>Made for you</span>
       </div>
       <div class="home-card-byline">
@@ -167,7 +205,7 @@
   <div class="home-card">
     <div class="home-card-img" style="background:linear-gradient(135deg,#1a3a1a,#0a0a0a);">
       <div class="benny-badge">
-        <img src="assets/benny/benny-paperboy-v2.png" alt="">
+        <img src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
         <span>Made for you</span>
       </div>
       <div class="home-card-byline">
@@ -206,28 +244,34 @@
   </div>
 
   <div class="benny-slide-hero">
-    <div class="benny-mini" id="bennyMini"><img src="assets/benny/benny-paperboy-v2.png" alt=""></div>
+    <div class="benny-mini" id="bennyMini"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
     <div class="benny-eyebrow">Benny · Made for you</div>
   </div>
 
   <h1 class="benny-headline">What this means <em>for you</em>, Percy.</h1>
 
-  <div class="benny-take" id="bennyTake">
-    <p>The Fed holding rates means your <strong>$2,800 Brooklyn rent isn't moving down</strong> in 2026 — landlords have no pressure to cut. Refinancing your student loans gets cheaper if that one cut lands in Q4, but only by a fraction of a point.</p>
-    <p>The bigger signal: the Fed thinks the economy is <strong>still too hot</strong> — which usually means tech hiring stays soft for another quarter. <strong>What to watch:</strong> September jobs report. If hiring slows, more cuts come fast.</p>
+  <div class="ai-box" id="aiBox">
+    <div class="benny-take" id="bennyTake">
+      <p>The Fed holding rates means your <strong>$2,800 Brooklyn rent isn't moving down</strong> in 2026 — landlords have no pressure to cut. Refinancing your student loans gets cheaper if that one cut lands in Q4, but only by a fraction of a point.</p>
+      <p>The bigger signal: the Fed thinks the economy is <strong>still too hot</strong> — which usually means tech hiring stays soft for another quarter. <strong>What to watch:</strong> September jobs report. If hiring slows, more cuts come fast.</p>
+    </div>
+    <div class="ai-loader">
+      <div class="ai-loader-mark">B</div>
+      <div class="ai-loader-label">Benny is writing for you</div>
+    </div>
   </div>
 
   <div class="basedon">
     <div class="basedon-head">
       <span class="basedon-label">Based on</span>
-      <button class="basedon-edit" onclick="alert('Inline edit panel — coming next iteration')">EDIT ✎</button>
+      <button class="basedon-edit" id="editBtn" onclick="toggleEdit()">EDIT ✎</button>
     </div>
-    <div class="basedon-chips">
-      <span class="b-chip"><span class="b-chip-icon">📍</span>Brooklyn, NY</span>
-      <span class="b-chip"><span class="b-chip-icon">🎂</span>27</span>
-      <span class="b-chip"><span class="b-chip-icon">💼</span>Tech</span>
-      <span class="b-chip"><span class="b-chip-icon">🎓</span>Has student loans</span>
-      <span class="b-chip"><span class="b-chip-icon">📰</span>Economy</span>
+    <div class="basedon-chips" id="chips">
+      <span class="b-chip" data-icon="📍" data-val="Brooklyn, NY"><span class="b-chip-icon">📍</span><span class="b-chip-text">Brooklyn, NY</span></span>
+      <span class="b-chip" data-icon="🎂" data-val="27"><span class="b-chip-icon">🎂</span><span class="b-chip-text">27</span></span>
+      <span class="b-chip" data-icon="💼" data-val="Tech"><span class="b-chip-icon">💼</span><span class="b-chip-text">Tech</span></span>
+      <span class="b-chip" data-icon="🎓" data-val="Has student loans"><span class="b-chip-icon">🎓</span><span class="b-chip-text">Has student loans</span></span>
+      <span class="b-chip" data-icon="📰" data-val="Economy"><span class="b-chip-icon">📰</span><span class="b-chip-text">Economy</span></span>
     </div>
   </div>
 
@@ -253,7 +297,7 @@
   </div>
 
   <div class="benny-slide-hero">
-    <div class="benny-mini"><img src="assets/benny/benny-paperboy-v2.png" alt=""></div>
+    <div class="benny-mini"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
     <div class="benny-eyebrow">Benny · Made for you</div>
   </div>
 
@@ -285,6 +329,70 @@ document.querySelectorAll('.home-card').forEach((c,i) => {
     if (c.querySelector('.benny-badge')) show('slide');
   });
 });
+
+// Inline edit: toggle editable mode → tap chip to edit → blur/enter saves + reruns Benny
+let editing = false;
+function toggleEdit() {
+  editing = !editing;
+  document.getElementById('editBtn').textContent = editing ? 'DONE' : 'EDIT ✎';
+  document.querySelectorAll('#chips .b-chip').forEach(chip => {
+    chip.classList.toggle('editable', editing);
+  });
+}
+
+document.getElementById('chips').addEventListener('click', (e) => {
+  if (!editing) return;
+  const chip = e.target.closest('.b-chip');
+  if (!chip || chip.querySelector('input')) return;
+  const textEl = chip.querySelector('.b-chip-text');
+  const current = textEl.textContent;
+  const input = document.createElement('input');
+  input.type = 'text'; input.value = current; input.className = 'b-chip-input';
+  input.style.width = Math.max(60, current.length * 8) + 'px';
+  textEl.replaceWith(input);
+  input.focus(); input.select();
+
+  const commit = () => {
+    const newVal = input.value.trim() || current;
+    const span = document.createElement('span');
+    span.className = 'b-chip-text'; span.textContent = newVal;
+    if (input.parentNode) input.replaceWith(span);
+    chip.dataset.val = newVal;
+    if (newVal !== current) rerunBenny();
+  };
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
+    if (ev.key === 'Escape') { input.value = current; input.blur(); }
+  });
+});
+
+// Re-run Benny: show writing loader + thinking animation, then swap text
+function rerunBenny() {
+  const box = document.getElementById('aiBox');
+  const benny = document.getElementById('bennyMini');
+  box.classList.add('loading');
+  benny?.classList.add('benny-thinking');
+  setTimeout(() => {
+    box.classList.remove('loading');
+    benny?.classList.remove('benny-thinking');
+    // Tiny demo flourish: tweak a number to show it changed
+    const take = document.getElementById('bennyTake');
+    take.style.opacity = 0;
+    setTimeout(() => { take.style.transition = 'opacity .4s'; take.style.opacity = 1; }, 50);
+  }, 1800);
+}
+
+// Empty-state RUN button — same animation
+const quickInput = document.getElementById('quickInput');
+if (quickInput) {
+  quickInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      document.getElementById('bennyMini')?.classList.add('benny-thinking');
+      setTimeout(() => show('slide'), 1100);
+    }
+  });
+}
 </script>
 </body>
 </html>
