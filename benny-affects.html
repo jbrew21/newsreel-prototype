@@ -349,12 +349,50 @@
     60%  { transform:rotate(6deg) scale(1.06); }
     100% { transform:rotate(0) scale(1); }
   }
+
+  /* ═══════════════════════════════════════════════
+     STORY CAROUSEL — exact match to app.html .car-*
+     ═══════════════════════════════════════════════ */
+  #carousel.scene { padding:0; max-width:393px; background:var(--nr-black); position:relative; min-height:100vh; display:none; flex-direction:column; }
+  #carousel.scene.active { display:flex; }
+  .car-top { display:flex; align-items:center; padding:56px 16px 8px; gap:10px; }
+  .car-back { width:32px; height:32px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; }
+  .car-back svg { width:22px; height:22px; color:var(--nr-white); }
+  .car-dots { display:flex; gap:5px; flex:1; justify-content:center; }
+  .car-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.2); transition:background 0.2s; }
+  .car-dot.on { background:var(--nr-red); }
+  .car-body { flex:1; position:relative; overflow:hidden; touch-action:pan-y; user-select:none; min-height:calc(100vh - 76px); }
+  .car-nav { position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; background:rgba(0,0,0,0.5); backdrop-filter:blur(6px); border:none; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10; }
+  .car-nav svg { width:22px; height:22px; color:var(--nr-white); }
+  .car-nav.l { left:10px; } .car-nav.r { right:10px; }
+  .car-nav:disabled { opacity:0.25; cursor:default; }
+  .car-track { display:flex; height:100%; transition:transform 0.35s cubic-bezier(0.2,0,0.2,1); }
+  .car-slide { min-width:393px; height:100%; position:relative; display:flex; flex-direction:column; }
+  .car-slide-img { width:100%; height:45%; object-fit:cover; display:block; }
+  .car-slide-fade { position:absolute; top:38%; left:0; right:0; bottom:0; background:linear-gradient(to bottom, transparent 0%, var(--nr-black) 35%); pointer-events:none; }
+  .car-slide-credit { position:absolute; top:8px; left:50%; transform:translateX(-50%); font-family:var(--font-m); font-size:10px; color:rgba(255,255,255,0.45); letter-spacing:0.3px; }
+  .car-slide-card { position:absolute; bottom:90px; left:16px; right:72px; background:rgba(31,31,31,0.82); backdrop-filter:blur(10px); border-radius:14px; padding:14px 18px; }
+  .car-slide-label { font-family:var(--font-h); font-size:17px; color:var(--nr-white); margin-bottom:6px; }
+  .car-slide-body { font-family:var(--font-b); font-size:14px; line-height:1.5; color:var(--nr-smoke); }
+  .car-slide-actions { position:absolute; right:12px; bottom:120px; display:flex; flex-direction:column; gap:14px; }
+  .car-abtn { width:40px; height:40px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; }
+  .car-abtn svg { width:22px; height:22px; color:var(--nr-white); }
+  .car-read-more { display:inline-flex; align-items:center; gap:6px; margin-top:10px; background:none; border:none; padding:0; cursor:pointer; font-family:var(--font-m); font-size:11px; letter-spacing:0.05em; color:rgba(255,255,255,0.62); text-decoration:underline; text-decoration-color:rgba(255,255,255,0.25); text-underline-offset:3px; }
+  /* Final Benny CTA slide inside carousel */
+  .car-slide--benny { background:linear-gradient(170deg, var(--nr-black) 0%, var(--nr-charcoal) 70%); align-items:center; justify-content:center; padding:40px 24px; text-align:center; }
+  .car-benny-mascot { width:96px; height:96px; border-radius:24px; background:#fff; padding:6px; margin-bottom:18px; animation:bennyIdle 5.2s ease-in-out infinite; }
+  .car-benny-mascot img { width:100%; height:100%; object-fit:contain; }
+  .car-benny-eyebrow { font-family:var(--font-m); font-size:11px; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; margin-bottom:10px; }
+  .car-benny-headline { font-family:var(--font-h); font-size:26px; line-height:1.18; color:var(--nr-white); margin-bottom:10px; }
+  .car-benny-sub { font-family:var(--font-b); font-size:14px; line-height:1.5; color:var(--nr-silver); margin-bottom:24px; max-width:300px; }
+  .car-benny-cta { background:var(--nr-red); color:#000; border:none; border-radius:999px; padding:13px 22px; font-family:var(--font-b); font-size:14px; font-weight:600; cursor:pointer; }
 </style>
 </head>
 <body>
 
 <div class="demo-nav">
   <button onclick="show('home')" class="active">HOME</button>
+  <button onclick="show('carousel')">CAROUSEL</button>
   <button onclick="show('slide')">SLIDE</button>
   <button onclick="show('empty')">SKIPPED</button>
 </div>
@@ -416,6 +454,80 @@
   <p style="text-align:center; color:var(--nr-ash); font-size:12px; margin-top:24px; line-height:1.6;">
     The orange "Story impact" badge appears only on stories where Benny<br>has a personal take. Editor-flagged.
   </p>
+</div>
+
+<!-- ─────────────────── STORY CAROUSEL — exact app.html styling ─────────────────── -->
+<div class="scene" id="carousel">
+  <div class="car-top">
+    <button class="car-back" onclick="show('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="car-dots" id="carDots"></div>
+    <span style="width:32px"></span>
+  </div>
+  <div class="car-body">
+    <button class="car-nav l" id="carPrev" aria-label="Previous">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="car-nav r" id="carNext" aria-label="Next">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="car-track" id="carTrack">
+      <!-- Slide 1 -->
+      <div class="car-slide">
+        <img class="car-slide-img" src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&h=600&fit=crop" alt="">
+        <div class="car-slide-fade"></div>
+        <div class="car-slide-credit">REUTERS</div>
+        <div class="car-slide-card">
+          <div class="car-slide-label">The headline</div>
+          <div class="car-slide-body">The Federal Reserve held its benchmark rate steady at 4.25–4.50%, signaling one more cut likely by year-end.</div>
+        </div>
+        <div class="car-slide-actions">
+          <button class="car-abtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <button class="car-abtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+          <button class="car-abtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+        </div>
+      </div>
+      <!-- Slide 2 -->
+      <div class="car-slide">
+        <img class="car-slide-img" src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=600&fit=crop" alt="">
+        <div class="car-slide-fade"></div>
+        <div class="car-slide-credit">AP PHOTO</div>
+        <div class="car-slide-card">
+          <div class="car-slide-label">Why now</div>
+          <div class="car-slide-body">Inflation is still running above the Fed's 2% target, but hiring has cooled — making policymakers cautious about cutting too fast.</div>
+        </div>
+        <div class="car-slide-actions">
+          <button class="car-abtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <button class="car-abtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+          <button class="car-abtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+        </div>
+      </div>
+      <!-- Slide 3 -->
+      <div class="car-slide">
+        <img class="car-slide-img" src="https://images.unsplash.com/photo-1620266757065-5814239881fd?w=800&h=600&fit=crop" alt="">
+        <div class="car-slide-fade"></div>
+        <div class="car-slide-credit">BLOOMBERG</div>
+        <div class="car-slide-card">
+          <div class="car-slide-label">Zoom out</div>
+          <div class="car-slide-body">Markets had priced in two cuts. One cut means borrowing — mortgages, car loans, credit cards — stays expensive longer than expected.</div>
+        </div>
+        <div class="car-slide-actions">
+          <button class="car-abtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <button class="car-abtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+          <button class="car-abtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+        </div>
+      </div>
+      <!-- Slide 4: Benny CTA -->
+      <div class="car-slide car-slide--benny">
+        <div class="car-benny-mascot"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
+        <div class="car-benny-eyebrow">Benny · Story impact</div>
+        <h2 class="car-benny-headline">What this means <em>for you</em>.</h2>
+        <p class="car-benny-sub">Benny read the story and broke down how it hits your rent, your loans, your job market.</p>
+        <button class="car-benny-cta" onclick="show('slide')">See Benny's take →</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ─────────────────── BENNY SLIDE — quiz/poll-style clean modal ─────────────────── -->
@@ -534,16 +646,50 @@ function show(id) {
     setTimeout(() => next.classList.remove('entering'), 1500);
   }
   document.querySelectorAll('.demo-nav button').forEach(b => b.classList.remove('active'));
-  const map = { home:0, slide:1, empty:2 };
+  const map = { home:0, carousel:1, slide:2, empty:3 };
   document.querySelectorAll('.demo-nav button')[map[id]].classList.add('active');
   window.scrollTo(0,0);
+  if (id === 'carousel') resetCarousel();
 }
-// Tap home cards to reach the slide
+// Tap home cards to enter the carousel (Benny stories) or open empty state
 document.querySelectorAll('.home-card').forEach((c,i) => {
   c.addEventListener('click', () => {
-    if (c.querySelector('.benny-badge')) show('slide');
+    if (c.querySelector('.benny-badge')) show('carousel');
   });
 });
+
+// ─── CAROUSEL: dots, prev/next, swipe ───
+const carTrack = document.getElementById('carTrack');
+const carDots  = document.getElementById('carDots');
+const carPrev  = document.getElementById('carPrev');
+const carNext  = document.getElementById('carNext');
+const carSlideCount = carTrack.children.length;
+let carIdx = 0;
+for (let i=0; i<carSlideCount; i++) {
+  const d = document.createElement('span');
+  d.className = 'car-dot' + (i===0 ? ' on' : '');
+  carDots.appendChild(d);
+}
+function carGo(i) {
+  carIdx = Math.max(0, Math.min(carSlideCount-1, i));
+  carTrack.style.transform = `translateX(-${carIdx * 393}px)`;
+  [...carDots.children].forEach((d,j) => d.classList.toggle('on', j===carIdx));
+  carPrev.disabled = carIdx === 0;
+  carNext.disabled = carIdx === carSlideCount-1;
+}
+function resetCarousel() { carGo(0); }
+carPrev.addEventListener('click', () => carGo(carIdx-1));
+carNext.addEventListener('click', () => carGo(carIdx+1));
+// touch swipe
+let touchX = null;
+carTrack.parentElement.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, {passive:true});
+carTrack.parentElement.addEventListener('touchend', e => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 40) carGo(carIdx + (dx < 0 ? 1 : -1));
+  touchX = null;
+});
+carGo(0);
 
 // Inline edit: toggle editable mode → tap chip to edit → blur/enter saves + reruns Benny
 let editing = false;
