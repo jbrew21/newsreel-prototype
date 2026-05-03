@@ -56,7 +56,16 @@ h1 { font-family: var(--font-headline); font-size: 32px; line-height: 1.15; marg
 /* Benny screen — airy, single-focus */
 .benny-eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--nr-red); margin-bottom: 14px; }
 .benny-h1 { font-family: var(--font-headline); font-size: 44px; line-height: 1.05; margin-bottom: 16px; letter-spacing: -1px; }
-.benny-lede { color: var(--nr-silver); font-size: 17px; line-height: 1.45; margin-bottom: 40px; max-width: 320px; }
+.benny-lede { color: var(--nr-silver); font-size: 17px; line-height: 1.45; margin-bottom: 22px; max-width: 340px; }
+.benny-lede em { color: var(--nr-white); font-style: normal; font-weight: 600; }
+
+.example-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.ex-pill {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.3px;
+  padding: 6px 10px; border-radius: 999px;
+  background: rgba(255,99,67,0.10); color: var(--nr-red);
+  border: 1px solid rgba(255,99,67,0.25);
+}
 
 .mic-stage { display: flex; flex-direction: column; align-items: center; padding: 20px 0 24px; }
 .mic-circle {
@@ -161,9 +170,15 @@ h1 { font-family: var(--font-headline); font-size: 32px; line-height: 1.15; marg
 
 <!-- 4. BENNY — THE NEW SCREEN -->
 <div class="frame active" id="benny">
-  <div class="benny-eyebrow">YOUR AI SIDEKICK</div>
+  <div class="benny-eyebrow">A FIRST IN NEWS</div>
   <h1 class="benny-h1">Meet Benny.</h1>
-  <p class="benny-lede">Tell him what you care about. He'll show you how the news actually affects your life.</p>
+  <p class="benny-lede">No app has ever done this. Tell Benny who you are and what you care about — and he'll show you how every story actually affects <em>your</em> life.</p>
+
+  <div class="example-row" aria-hidden="true">
+    <span class="ex-pill">How this hits your rent</span>
+    <span class="ex-pill">What it means for your job</span>
+    <span class="ex-pill">Why your industry should care</span>
+  </div>
 
   <div class="mic-stage">
     <button class="mic-circle" id="micBtn" type="button" aria-label="Hold to speak">
