@@ -416,7 +416,7 @@
   .bt-action-icon img { width:18px; height:18px; }
   .bt-action-label { font-family:var(--font-b); font-size:14px; font-weight:600; line-height:1.2; color:#fff; }
   /* Input bar */
-  .bt-input { padding:8px 14px 28px; flex-shrink:0; background:linear-gradient(to top, #000 60%, rgba(0,0,0,0)); }
+  .bt-input { padding:8px 14px calc(86px + env(safe-area-inset-bottom)); flex-shrink:0; background:linear-gradient(to top, #000 70%, rgba(0,0,0,0)); }
   .bt-input-wrap { background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.08); border-radius:22px; padding:8px 8px 8px 14px; display:flex; align-items:center; gap:8px; }
   .bt-input-field { flex:1; background:none; border:none; color:#fff; font-family:var(--font-b); font-size:15px; outline:none; padding:8px 0; }
   .bt-input-field::placeholder { color:var(--nr-ash); }
