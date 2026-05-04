@@ -83,7 +83,15 @@
     max-width:80%; text-align:center; line-height:1.35; }
 
   /* Bottom overlay: author chip → headline → read more */
-  .b-overlay { position:absolute; left:0; right:0; bottom:96px; z-index:3; padding:0 18px; }
+  .b-overlay { position:absolute; left:0; right:0; bottom:96px; z-index:3; padding:0 18px; transition:bottom 0.3s ease; }
+  /* Compact mode = slides 2+ : just a tiny author chip, no headline/tag */
+  .b-overlay.compact .b-eyebrow-row,
+  .b-overlay.compact .b-headline { display:none; }
+  .b-overlay.compact { bottom:72px; }
+  .b-overlay.compact .author-chip { padding:4px 12px 4px 4px; background:rgba(0,0,0,0.4); }
+  .b-overlay.compact .author-av { width:24px; height:24px; }
+  .b-overlay.compact .author-name { font-size:13px; font-weight:500; }
+  .b-overlay.compact .author-verif { width:12px; height:12px; }
   .author-chip {
     display:inline-flex; align-items:center; gap:8px; padding:5px 14px 5px 5px; border-radius:999px;
     background:rgba(0,0,0,0.5); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1);
@@ -539,6 +547,8 @@ function goSlide(storyI, k) {
   slideIdx[storyI] = k;
   const track = document.querySelector(`.slide-track[data-story="${storyI}"]`);
   track.style.transform = `translateX(-${k * 100}%)`;
+  const overlay = document.querySelector(`.story[data-i="${storyI}"] .b-overlay`);
+  if (overlay) overlay.classList.toggle('compact', k > 0);
   updateSegs();
 }
 
