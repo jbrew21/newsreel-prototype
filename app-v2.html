@@ -15,135 +15,139 @@
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html, body { height:100%; background:#000; color:var(--nr-white); font-family:var(--font-b); overflow:hidden; }
 
-  /* Phone frame — center on desktop, full on mobile */
   .phone {
     width:100%; max-width:430px; height:100vh; margin:0 auto;
-    background:var(--nr-black); position:relative; overflow:hidden;
-    display:flex; flex-direction:column;
+    background:#000; position:relative; overflow:hidden;
   }
 
-  /* ─── Top header (logo + date/avatar) ─── */
-  .nr-header {
-    flex:0 0 auto;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:60px 22px 14px;
-  }
-  .nr-logo { display:flex; align-items:center; gap:6px; }
-  .nr-logo-mark {
-    font-family:var(--font-b); font-weight:700; font-size:30px; letter-spacing:-1.2px;
-    color:var(--nr-white); line-height:1;
-  }
-  .nr-logo-chev { width:14px; height:14px; color:var(--nr-silver); margin-top:6px; }
-  .nr-header-right { display:flex; align-items:center; gap:10px; }
-  .nr-date { font-family:var(--font-m); font-size:12px; letter-spacing:0.16em; color:var(--nr-silver); text-transform:uppercase; }
-  .nr-avatar {
-    width:30px; height:30px; border-radius:50%;
-    background:linear-gradient(135deg, var(--nr-iron), var(--nr-charcoal));
-    border:1.5px solid var(--nr-silver);
-  }
-
-  /* ─── Story stack (vertical swipe between stories) ─── */
-  .nr-stories { flex:1; overflow:hidden; position:relative; }
-  .nr-story {
+  /* ─── Story stage (full-bleed, vertical paging between stories) ─── */
+  .stories { position:absolute; inset:0; }
+  .story {
     position:absolute; inset:0;
-    display:flex; flex-direction:column;
-    padding:0 16px;
-    transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1), opacity 0.3s ease;
+    transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1);
   }
-  .nr-story.next { transform:translateY(100%); opacity:0; }
-  .nr-story.prev { transform:translateY(-100%); opacity:0; }
+  .story.next { transform:translateY(100%); }
+  .story.prev { transform:translateY(-100%); }
 
-  /* Media card */
-  .nr-media {
-    position:relative; width:100%; aspect-ratio:4/5;
-    border-radius:22px; overflow:hidden;
-    background:var(--nr-lead);
-    flex:0 0 auto;
+  /* Horizontal slide track inside a story */
+  .slide-track {
+    display:flex; height:100%; width:100%;
+    transition:transform 0.35s cubic-bezier(0.2,0.8,0.2,1);
+    will-change:transform;
   }
-  .nr-media-img {
-    width:100%; height:100%; object-fit:cover; display:block;
-    user-select:none; -webkit-user-drag:none;
+  .slide {
+    flex:0 0 100%; height:100%; position:relative;
+    background:#000;
   }
-  /* Video controls overlay */
-  .nr-vc {
-    position:absolute; top:14px; left:14px; right:14px;
-    display:flex; justify-content:space-between; align-items:center; pointer-events:none;
+  .slide-img {
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; user-select:none; -webkit-user-drag:none;
   }
-  .nr-vc-l { display:flex; gap:8px; pointer-events:auto; }
-  .nr-vc-btn {
-    width:36px; height:36px; border-radius:10px;
+  /* Top + bottom darkening for text legibility */
+  .slide::before {
+    content:""; position:absolute; left:0; right:0; top:0; height:160px;
+    background:linear-gradient(to bottom, rgba(0,0,0,0.55), transparent);
+    pointer-events:none; z-index:1;
+  }
+  .slide::after {
+    content:""; position:absolute; left:0; right:0; bottom:0; height:280px;
+    background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 50%, transparent 100%);
+    pointer-events:none; z-index:1;
+  }
+
+  /* ─── newsreel wordmark, centered overlay ─── */
+  .nr-mark {
+    position:absolute; top:60px; left:50%; transform:translateX(-50%); z-index:5;
+    font-family:var(--font-b); font-weight:700; font-size:24px; letter-spacing:-1px;
+    color:var(--nr-white); line-height:1;
+    display:flex; align-items:center; gap:5px;
+    text-shadow:0 1px 6px rgba(0,0,0,0.5);
+  }
+  .nr-mark svg { width:12px; height:12px; color:rgba(255,255,255,0.85); margin-top:4px; }
+
+  /* Video controls overlay (top-left pause+vol, top-right fullscreen) */
+  .vc { position:absolute; top:108px; left:14px; right:14px; z-index:4; display:flex; justify-content:space-between; }
+  .vc-l { display:flex; gap:8px; }
+  .vc-btn {
+    width:40px; height:40px; border-radius:50%;
     background:rgba(0,0,0,0.45); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
     display:flex; align-items:center; justify-content:center;
     border:none; cursor:pointer; color:var(--nr-white);
   }
-  .nr-vc-btn svg { width:16px; height:16px; }
-  /* Subtitle (optional, faux from video) */
-  .nr-sub {
-    position:absolute; left:50%; top:48%; transform:translate(-50%,-50%);
+  .vc-btn svg { width:16px; height:16px; }
+
+  /* Side action stack — for multi-slide stories (Phase 2 territory but stub here) */
+  .actions {
+    position:absolute; right:10px; bottom:200px; z-index:4;
+    display:flex; flex-direction:column; gap:14px;
+  }
+
+  /* Optional video subtitle */
+  .subtitle {
+    position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); z-index:2;
     background:rgba(0,0,0,0.55); color:#fff;
-    font-size:14px; font-weight:500; padding:6px 12px; border-radius:6px;
+    font-size:15px; font-weight:500; padding:6px 12px; border-radius:6px;
     backdrop-filter:blur(4px); pointer-events:none;
-  }
-  /* Attribution strip at bottom of media */
-  .nr-attr {
-    position:absolute; left:14px; right:14px; bottom:14px;
-    background:rgba(0,0,0,0.55); backdrop-filter:blur(10px);
-    padding:8px 12px; border-radius:10px;
-    font-family:var(--font-m); font-size:10px; letter-spacing:0.08em; font-weight:500;
-    color:rgba(255,255,255,0.85); text-transform:uppercase;
+    max-width:80%; text-align:center; line-height:1.35;
   }
 
-  /* Pagination dot below media */
-  .nr-pag { display:flex; justify-content:center; gap:5px; padding:14px 0 10px; flex:0 0 auto; }
-  .nr-pag-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.18); }
-  .nr-pag-dot.on { background:var(--nr-white); }
-
-  /* Pill row: author + tag */
-  .nr-pills { display:flex; gap:8px; padding:0 4px 12px; align-items:center; flex:0 0 auto; }
-  .nr-pill {
-    display:inline-flex; align-items:center; gap:8px; height:36px;
-    padding:0 14px 0 6px; border-radius:999px;
-    background:var(--nr-lead); color:var(--nr-white);
+  /* ─── Bottom overlay: eyebrow + headline + read more ─── */
+  .b-overlay {
+    position:absolute; left:0; right:0; bottom:96px; z-index:3;
+    padding:0 22px;
+  }
+  .b-eyebrow {
+    font-family:var(--font-m); font-size:11px; font-weight:500;
+    letter-spacing:0.22em; color:rgba(255,255,255,0.55);
+    text-transform:uppercase; margin-bottom:10px;
+  }
+  .b-headline {
+    font-family:var(--font-h); font-size:28px; line-height:1.15;
+    color:var(--nr-white); margin-bottom:10px;
+    text-shadow:0 1px 8px rgba(0,0,0,0.4);
+  }
+  .b-read {
+    display:inline-flex; align-items:center; gap:6px;
     font-family:var(--font-b); font-size:14px; font-weight:500;
-    border:1px solid rgba(255,255,255,0.04);
+    color:var(--nr-white); background:none; border:none; cursor:pointer;
+    padding:6px 0;
+    text-shadow:0 1px 6px rgba(0,0,0,0.5);
   }
-  .nr-pill--tag { padding:0 14px; gap:0; color:var(--nr-smoke); border-color:rgba(255,255,255,0.08); background:transparent; }
-  .nr-pill-av { width:24px; height:24px; border-radius:50%; object-fit:cover; background:var(--nr-iron); flex-shrink:0; }
-  .nr-pill-verif { width:14px; height:14px; flex-shrink:0; }
+  .b-read-row { display:flex; justify-content:flex-end; }
 
-  /* Headline */
-  .nr-headline {
-    font-family:var(--font-h); font-size:30px; line-height:1.12;
-    color:var(--nr-white); padding:2px 4px 0;
-    flex:0 0 auto;
+  /* Slide pagination dots (when multi-slide) */
+  .slide-dots {
+    position:absolute; left:50%; transform:translateX(-50%); bottom:78px; z-index:3;
+    display:flex; gap:5px;
   }
+  .slide-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.3); }
+  .slide-dot.on { background:var(--nr-white); }
 
-  /* ─── Bottom tab bar ─── */
-  .nr-tabs {
-    flex:0 0 auto;
+  /* ─── Tab bar (overlay so video shows through faintly) ─── */
+  .tabs {
+    position:absolute; left:0; right:0; bottom:0; z-index:6;
     display:flex; justify-content:space-around; align-items:flex-start;
-    padding:10px 8px 28px;
-    border-top:1px solid rgba(255,255,255,0.06);
-    background:var(--nr-black);
+    padding:8px 8px 28px;
+    background:linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0));
   }
-  .nr-tab {
+  .tab {
     background:none; border:none; cursor:pointer;
-    display:flex; flex-direction:column; align-items:center; gap:4px;
-    color:var(--nr-silver); padding:6px 8px;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    color:rgba(255,255,255,0.6); padding:6px 8px;
   }
-  .nr-tab svg { width:24px; height:24px; }
-  .nr-tab-label { font-family:var(--font-b); font-size:11px; font-weight:500; }
-  .nr-tab.active { color:var(--nr-red); }
+  .tab svg { width:22px; height:22px; }
+  .tab-label { font-family:var(--font-b); font-size:10px; font-weight:500; }
+  .tab.active { color:var(--nr-red); }
 
   /* Dev nav */
   .dev {
-    position:fixed; top:6px; left:50%; transform:translateX(-50%); z-index:99;
+    position:fixed; top:6px; left:6px; z-index:99;
     background:rgba(0,0,0,0.6); border:1px solid var(--nr-iron); border-radius:8px;
     padding:4px; display:flex; gap:4px; backdrop-filter:blur(8px);
   }
   .dev button {
     background:var(--nr-lead); color:#fff; border:none; border-radius:4px;
-    padding:4px 10px; font-family:var(--font-m); font-size:9px; cursor:pointer; letter-spacing:0.4px;
+    padding:4px 8px; font-family:var(--font-m); font-size:9px; cursor:pointer;
   }
   .dev button.on { background:var(--nr-red); color:#000; }
 </style>
@@ -151,157 +155,191 @@
 <body>
 
 <div class="dev">
-  <button class="on" onclick="goStory(0)">1</button>
-  <button onclick="goStory(1)">2</button>
-  <button onclick="goStory(2)">3</button>
+  <button class="on" onclick="goStory(0)">S1</button>
+  <button onclick="goStory(1)">S2</button>
+  <button onclick="goStory(2)">S3</button>
 </div>
 
 <div class="phone">
-
-  <!-- Header -->
-  <div class="nr-header">
-    <div class="nr-logo">
-      <span class="nr-logo-mark">newsreel</span>
-      <svg class="nr-logo-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-    <div class="nr-header-right">
-      <span class="nr-date" id="nrDate">MAY 3</span>
-      <div class="nr-avatar"></div>
-    </div>
+  <div class="nr-mark">
+    newsreel
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
   </div>
 
-  <!-- Stories -->
-  <div class="nr-stories" id="nrStories"></div>
+  <div class="stories" id="stories"></div>
 
-  <!-- Tabs -->
-  <div class="nr-tabs">
-    <button class="nr-tab active">
+  <div class="tabs">
+    <button class="tab active">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="8" y1="3" x2="8" y2="8"/></svg>
-      <span class="nr-tab-label">Today</span>
+      <span class="tab-label">Today</span>
     </button>
-    <button class="nr-tab">
+    <button class="tab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span class="nr-tab-label">Activity</span>
+      <span class="tab-label">Activity</span>
     </button>
-    <button class="nr-tab">
+    <button class="tab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-      <span class="nr-tab-label">Explore</span>
+      <span class="tab-label">Explore</span>
     </button>
-    <button class="nr-tab">
+    <button class="tab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M5.5 19a7 7 0 0 1 13 0"/></svg>
-      <span class="nr-tab-label">Profile</span>
+      <span class="tab-label">Profile</span>
     </button>
   </div>
-
 </div>
 
 <script>
 const STORIES = [
   {
-    img: "https://images.unsplash.com/photo-1554224155-1696413565d3?w=900&h=1100&fit=crop",
-    sub: "Congratulations!",
-    attr: "ARTICLE BY TALMON JOSEPH SMITH, NEW YORK TIMES.",
-    author: { name:"Dave Jorgenson", verified:true,
-      avatar:"https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop" },
     tag: "Business",
     headline: "The US economy is fine probably",
+    slides: [
+      {
+        img:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=900&h=1600&fit=crop",
+        subtitle:"The U.S. economy grew at a 2% pace in the first quarter of the year.",
+      },
+      {
+        img:"https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&h=1600&fit=crop",
+        subtitle:"But Wall Street wanted faster.",
+      },
+    ],
   },
   {
-    img: "https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=900&h=1100&fit=crop",
-    attr: "REPORTING BY ELIZA HAVERSTOCK, NEWSREEL.",
-    author: { name:"Eliza Haverstock", verified:false,
-      avatar:"https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop" },
     tag: "Politics",
     headline: "Trump threatens to block new bridge to Canada",
+    slides: [
+      { img:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=900&h=1600&fit=crop" },
+    ],
   },
   {
-    img: "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=900&h=1100&fit=crop",
-    attr: "ANALYSIS BY THE ATLANTIC.",
-    author: { name:"The Atlantic", verified:true,
-      avatar:"https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&h=120&fit=crop" },
     tag: "Climate",
     headline: "EPA's new methane rule could reshape every gas bill",
+    slides: [
+      { img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=900&h=1600&fit=crop" },
+      { img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=900&h=1600&fit=crop" },
+      { img:"https://images.unsplash.com/photo-1620266757065-5814239881fd?w=900&h=1600&fit=crop" },
+    ],
   },
 ];
 
-const VERIF_SVG = `<svg class="nr-pill-verif" viewBox="0 0 24 24" fill="#EDBD1F"><path d="M12 1.5l2.6 2.3 3.4-.5.7 3.4 3.1 1.6-1.4 3.2 1.4 3.2-3.1 1.6-.7 3.4-3.4-.5L12 22.5l-2.6-2.3-3.4.5-.7-3.4-3.1-1.6 1.4-3.2-1.4-3.2 3.1-1.6.7-3.4 3.4.5L12 1.5z"/><polyline points="8 12 11 15 16 9.5" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-
-const stage = document.getElementById('nrStories');
-let idx = 0;
+const stage = document.getElementById('stories');
+let storyIdx = 0;
+const slideIdx = STORIES.map(()=>0);
 
 function renderStory(s, i) {
+  const slidesHtml = s.slides.map((sl,k) => `
+    <div class="slide">
+      <img class="slide-img" src="${sl.img}" alt="">
+      ${sl.subtitle ? `<div class="subtitle">${sl.subtitle}</div>` : ''}
+    </div>
+  `).join('');
+
+  const dotsHtml = s.slides.length > 1
+    ? `<div class="slide-dots" data-story="${i}">
+         ${s.slides.map((_,k)=>`<span class="slide-dot ${k===0?'on':''}"></span>`).join('')}
+       </div>`
+    : '';
+
   return `
-    <div class="nr-story ${i===idx?'':'next'}" data-i="${i}">
-      <div class="nr-media">
-        <img class="nr-media-img" src="${s.img}" alt="">
-        <div class="nr-vc">
-          <div class="nr-vc-l">
-            <button class="nr-vc-btn" aria-label="Pause">
-              <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
-            </button>
-            <button class="nr-vc-btn" aria-label="Volume">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-            </button>
-          </div>
-          <button class="nr-vc-btn" aria-label="Fullscreen">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V5a2 2 0 0 1 2-2h4"/><path d="M21 9V5a2 2 0 0 0-2-2h-4"/><path d="M3 15v4a2 2 0 0 0 2 2h4"/><path d="M21 15v4a2 2 0 0 1-2 2h-4"/></svg>
+    <div class="story ${i===storyIdx?'':'next'}" data-i="${i}">
+      <div class="slide-track" data-story="${i}" style="transform:translateX(0)">
+        ${slidesHtml}
+      </div>
+
+      <div class="vc">
+        <div class="vc-l">
+          <button class="vc-btn" aria-label="Pause">
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          </button>
+          <button class="vc-btn" aria-label="Volume">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
           </button>
         </div>
-        ${s.sub ? `<div class="nr-sub">${s.sub}</div>` : ''}
-        <div class="nr-attr">${s.attr}</div>
+        <button class="vc-btn" aria-label="Fullscreen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V5a2 2 0 0 1 2-2h4"/><path d="M21 9V5a2 2 0 0 0-2-2h-4"/><path d="M3 15v4a2 2 0 0 0 2 2h4"/><path d="M21 15v4a2 2 0 0 1-2 2h-4"/></svg>
+        </button>
       </div>
 
-      <div class="nr-pag">
-        ${STORIES.map((_,j)=>`<span class="nr-pag-dot ${j===i?'on':''}"></span>`).join('')}
-      </div>
+      ${dotsHtml}
 
-      <div class="nr-pills">
-        <span class="nr-pill">
-          <img class="nr-pill-av" src="${s.author.avatar}" alt="">
-          <span>${s.author.name}</span>
-          ${s.author.verified ? VERIF_SVG : ''}
-        </span>
-        <span class="nr-pill nr-pill--tag">${s.tag}</span>
+      <div class="b-overlay">
+        <div class="b-eyebrow">${s.tag}</div>
+        <h1 class="b-headline">${s.headline}</h1>
+        <div class="b-read-row">
+          <button class="b-read">Read more</button>
+        </div>
       </div>
-
-      <h1 class="nr-headline">${s.headline}</h1>
     </div>
   `;
 }
 
 function render() {
-  stage.innerHTML = STORIES.map((s,i) => renderStory(s,i)).join('');
+  stage.innerHTML = STORIES.map(renderStory).join('');
 }
 
 function goStory(i) {
   if (i < 0 || i >= STORIES.length) return;
-  idx = i;
-  document.querySelectorAll('.nr-story').forEach((el, j) => {
+  storyIdx = i;
+  document.querySelectorAll('.story').forEach((el, j) => {
     el.classList.remove('next','prev');
-    if (j < idx) el.classList.add('prev');
-    else if (j > idx) el.classList.add('next');
+    if (j < storyIdx) el.classList.add('prev');
+    else if (j > storyIdx) el.classList.add('next');
   });
-  document.querySelectorAll('.dev button').forEach((b,j) => b.classList.toggle('on', j===idx));
+  document.querySelectorAll('.dev button').forEach((b,j) => b.classList.toggle('on', j===storyIdx));
 }
 
-// Vertical swipe between stories
-let touchY = null;
-document.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, {passive:true});
+function goSlide(storyI, k) {
+  const s = STORIES[storyI];
+  if (k < 0 || k >= s.slides.length) return;
+  slideIdx[storyI] = k;
+  const track = document.querySelector(`.slide-track[data-story="${storyI}"]`);
+  track.style.transform = `translateX(-${k * 100}%)`;
+  const dotsEl = document.querySelector(`.slide-dots[data-story="${storyI}"]`);
+  if (dotsEl) [...dotsEl.children].forEach((d, j) => d.classList.toggle('on', j===k));
+}
+
+// ─── Touch handling: detect direction (vertical = story, horizontal = slide) ───
+let tx=null, ty=null, axis=null;
+document.addEventListener('touchstart', e => {
+  tx = e.touches[0].clientX; ty = e.touches[0].clientY; axis = null;
+}, {passive:true});
+document.addEventListener('touchmove', e => {
+  if (tx === null || axis) return;
+  const dx = e.touches[0].clientX - tx;
+  const dy = e.touches[0].clientY - ty;
+  if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
+    axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+  }
+}, {passive:true});
 document.addEventListener('touchend', e => {
-  if (touchY === null) return;
-  const dy = e.changedTouches[0].clientY - touchY;
-  if (Math.abs(dy) > 60) goStory(idx + (dy < 0 ? 1 : -1));
-  touchY = null;
+  if (tx === null) { return; }
+  const dx = e.changedTouches[0].clientX - tx;
+  const dy = e.changedTouches[0].clientY - ty;
+  if (axis === 'y' && Math.abs(dy) > 60) {
+    goStory(storyIdx + (dy < 0 ? 1 : -1));
+  } else if (axis === 'x' && Math.abs(dx) > 50) {
+    goSlide(storyIdx, slideIdx[storyIdx] + (dx < 0 ? 1 : -1));
+  }
+  tx = ty = axis = null;
 });
-// Wheel for desktop
+
+// Wheel for desktop (vertical = stories)
 let wheelLock = false;
 document.addEventListener('wheel', e => {
   if (wheelLock) return;
   if (Math.abs(e.deltaY) < 30) return;
   wheelLock = true;
-  goStory(idx + (e.deltaY > 0 ? 1 : -1));
+  goStory(storyIdx + (e.deltaY > 0 ? 1 : -1));
   setTimeout(() => wheelLock = false, 500);
 }, {passive:true});
+
+// Arrow keys for desktop (left/right = slides within story)
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown') goStory(storyIdx + 1);
+  if (e.key === 'ArrowUp') goStory(storyIdx - 1);
+  if (e.key === 'ArrowRight') goSlide(storyIdx, slideIdx[storyIdx] + 1);
+  if (e.key === 'ArrowLeft') goSlide(storyIdx, slideIdx[storyIdx] - 1);
+});
 
 render();
 </script>
