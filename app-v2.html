@@ -93,6 +93,8 @@
   .b-overlay.compact .author-av { width:24px; height:24px; }
   .b-overlay.compact .author-name { font-size:13px; font-weight:500; }
   .b-overlay.compact .author-verif { width:12px; height:12px; }
+  /* Hide bottom author overlay completely on Benny slide */
+  .b-overlay.hidden-overlay { display:none; }
   .author-chip {
     display:inline-flex; align-items:center; gap:8px; padding:5px 14px 5px 5px; border-radius:999px;
     background:rgba(0,0,0,0.5); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1);
@@ -152,14 +154,18 @@
     box-shadow: inset 0 -22px 40px rgba(0,0,0,0.35), inset 0 8px 24px rgba(255,255,255,0.18), 0 14px 50px rgba(255,99,67,0.45);
   }
   .bn-mascot { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
-  .bn-mascot img { width:58%; height:58%; object-fit:contain; animation:bnIdle 5.2s ease-in-out infinite; transform-origin:50% 60%; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3)); transform:translateX(-12%); }
-  /* User face inside the orb, opposite Benny */
-  .bn-me { position:absolute; right:8%; bottom:14%; width:42%; height:42%; border-radius:50%;
-    overflow:hidden;
-    border:3px solid rgba(0,0,0,0.45);
-    box-shadow:0 6px 16px rgba(0,0,0,0.4);
-    animation:bnIdle 5.2s ease-in-out infinite reverse; }
-  .bn-me img { width:100%; height:100%; object-fit:cover; display:block; }
+  .bn-mascot img { width:64%; height:64%; object-fit:contain; animation:bnIdle 5.2s ease-in-out infinite; transform-origin:50% 60%; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
+  /* "For you" chip below the orb (tasteful, not jammed inside) */
+  .bn-foryou { display:inline-flex; align-items:center; gap:8px; padding:5px 14px 5px 5px; border-radius:999px;
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#fff;
+    font-family:var(--font-m); font-size:10px; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; }
+  .bn-foryou img { width:24px; height:24px; border-radius:50%; object-fit:cover; }
+  /* Story Impact eyebrow — prominent header */
+  .bn-impact-label { display:inline-flex; align-items:center; gap:6px; padding:5px 12px 5px 5px; border-radius:999px;
+    background:rgba(255,99,67,0.14); border:1px solid rgba(255,99,67,0.45);
+    font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.2em; color:#FFD9CC; text-transform:uppercase;
+    margin-bottom:14px; align-self:flex-start; }
+  .bn-impact-label img { width:18px; height:18px; }
   /* Concentric ripples (pre-tap = breathing; post-tap = bursting) */
   .bn-ripple { position:absolute; inset:0; border-radius:50%; border:2px solid rgba(255,99,67,0.55); opacity:0; pointer-events:none; }
   .slide--benny.opened .bn-ripple { animation:bnRipple 1.4s ease-out 0.05s 1; }
@@ -419,20 +425,21 @@ function renderSlide(sl, i, k) {
           <div class="bn-context">${sl.context}</div>
           <h2 class="bn-headline">${sl.headline}</h2>
           <div class="bn-orb-wrap">
+            <span class="bn-impact-label"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt="">Story Impact</span>
             <button class="bn-orb-btn" onclick="openBenny(${i}, ${k})">
               <div class="bn-aura"></div>
               <div class="bn-aura two"></div>
               <div class="bn-disc"></div>
               <div class="bn-mascot"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
-              <div class="bn-me"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop" alt=""></div>
               <div class="bn-ripple"></div>
               <div class="bn-ripple r2"></div>
               <div class="bn-ripple r3"></div>
             </button>
             <div class="bn-byline">
-              <span class="bn-byline-label">Benny · Story impact</span>
+              <span class="bn-byline-label">Benny · Story Impact</span>
               <span class="bn-byline-name">For you</span>
             </div>
+            <span class="bn-foryou"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" alt="">For you</span>
             <span class="bn-hint">Tap Benny</span>
           </div>
           <div class="bn-take">
@@ -545,7 +552,11 @@ function goSlide(storyI, k) {
   const track = document.querySelector(`.slide-track[data-story="${storyI}"]`);
   track.style.transform = `translateX(-${k * 100}%)`;
   const overlay = document.querySelector(`.story[data-i="${storyI}"] .b-overlay`);
-  if (overlay) overlay.classList.toggle('compact', k > 0);
+  if (overlay) {
+    overlay.classList.toggle('compact', k > 0);
+    const hideTypes = ['benny','xp'];
+    overlay.classList.toggle('hidden-overlay', hideTypes.includes(s.slides[k].type));
+  }
   updateSegs();
 }
 
