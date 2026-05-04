@@ -155,6 +155,38 @@
   .quiz-opt.right { border-color:var(--nr-green); background:rgba(26,173,23,0.1); }
   .quiz-opt.wrong { border-color:var(--nr-red); background:rgba(255,99,67,0.1); }
 
+  /* ─────────── POLL (Where do you stand?) SLIDE ─────────── */
+  .slide--poll { background:#000; }
+  .slide--poll::before, .slide--poll::after { display:none; }
+  .pl-wrap { position:absolute; inset:0; padding:120px 24px 130px; display:flex; flex-direction:column; align-items:center; }
+  .pl-title { font-family:var(--font-h); font-size:36px; line-height:1.1; color:#fff; align-self:flex-start; margin-bottom:22px; }
+  .pl-q { font-family:var(--font-b); font-size:21px; line-height:1.35; color:#fff; text-align:center; margin-bottom:auto; padding-top:8px; }
+  .pl-slider-wrap { width:100%; padding:34px 24px; border-radius:16px; background:var(--nr-lead); margin-top:24px; }
+  .pl-track { position:relative; height:24px; touch-action:none; user-select:none; }
+  .pl-track-line { position:absolute; left:0; right:0; top:50%; height:2px; background:var(--nr-yellow); transform:translateY(-50%); border-radius:1px; }
+  .pl-track-tick { position:absolute; top:50%; transform:translate(-50%,-50%); width:2px; height:14px; background:rgba(237,189,31,0.55); border-radius:1px; }
+  .pl-track-knob { position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:24px; background:var(--nr-yellow); border-radius:3px; transition:left 0.18s cubic-bezier(0.2,0.8,0.2,1); cursor:grab; box-shadow:0 0 12px rgba(237,189,31,0.55); }
+  .pl-track-knob:active { cursor:grabbing; }
+  .pl-labels { display:flex; justify-content:space-between; margin-top:18px; padding:0 4px; gap:8px; }
+  .pl-label { flex:1; font-family:var(--font-b); font-size:12px; font-weight:500; color:var(--nr-silver); text-align:center; line-height:1.2; transition:color 0.18s ease; cursor:pointer; }
+  .pl-label.active { color:var(--nr-yellow); font-weight:600; }
+  .pl-foot { margin-top:28px; font-family:var(--font-b); font-size:13px; color:var(--nr-silver); text-align:center; }
+  .pl-write { display:block; margin:18px auto 0; font-family:var(--font-b); font-size:13px; color:var(--nr-silver); text-decoration:underline; text-align:center; cursor:pointer; background:none; border:none; }
+
+  /* Results view (after voting) */
+  .pl-results { width:100%; margin-top:20px; opacity:0; max-height:0; overflow:hidden; transition:opacity 0.4s ease, max-height 0.5s cubic-bezier(0.2,0.8,0.2,1); }
+  .slide--poll.voted .pl-results { opacity:1; max-height:400px; }
+  .pl-res-toggle { display:flex; gap:6px; margin-bottom:14px; padding:4px; border-radius:999px; background:var(--nr-lead); }
+  .pl-res-tab { flex:1; padding:8px 10px; border-radius:999px; border:none; background:transparent; color:var(--nr-silver); font-family:var(--font-b); font-size:12px; font-weight:600; cursor:pointer; }
+  .pl-res-tab.active { background:var(--nr-yellow); color:#000; }
+  .pl-res-bars { display:flex; align-items:flex-end; gap:6px; height:96px; padding:0 4px; }
+  .pl-res-bar { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end; }
+  .pl-res-bar-fill { width:100%; background:var(--nr-iron); border-radius:6px 6px 2px 2px; transition:height 0.5s cubic-bezier(0.2,0.8,0.2,1), background 0.18s ease; min-height:4px; }
+  .pl-res-bar.you .pl-res-bar-fill { background:var(--nr-yellow); }
+  .pl-res-bar-pct { font-family:var(--font-m); font-size:10px; font-weight:600; color:var(--nr-silver); }
+  .pl-res-bar.you .pl-res-bar-pct { color:var(--nr-yellow); }
+  .pl-res-foot { font-family:var(--font-b); font-size:11px; color:var(--nr-ash); margin-top:10px; text-align:center; }
+
   /* ─────────── BENNY (Story Impact) SLIDE ─────────── */
   .slide--benny { background:radial-gradient(ellipse at 50% 55%, #1a0a07 0%, #000 65%); }
   .slide--benny::before, .slide--benny::after { display:none; }
@@ -791,6 +823,8 @@ const STORIES = [
       { type:"quiz",
         q:"The economy grew by 2% last quarter, but Wall Street analysts were hoping to hit what number?",
         opts:["3%","2.5%","2.2%","4%"], answer:0 },
+      { type:"poll",
+        q:"The Fed should have cut rates today rather than holding steady." },
       { type:"benny",
         context:"You just read",
         headline:"The US economy is fine probably",
@@ -825,7 +859,40 @@ const feedEl = document.getElementById('feed');
 let storyIdx = 0;
 const slideIdx = STORIES.map(()=>0);
 
+const POLL_LABELS = ["Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"];
+
 function renderSlide(sl, i, k) {
+  if (sl.type === 'poll') {
+    return `
+      <div class="slide slide--poll" id="pl-${i}-${k}">
+        <div class="pl-wrap">
+          <h2 class="pl-title">Where do you stand?</h2>
+          <p class="pl-q">${sl.q}</p>
+          <div class="pl-slider-wrap">
+            <div class="pl-track" data-poll="${i}-${k}">
+              <div class="pl-track-line"></div>
+              ${[0,1,2,3,4].map(j => `<div class="pl-track-tick" style="left:${j*25}%"></div>`).join('')}
+              <div class="pl-track-knob" id="plKnob-${i}-${k}" style="left:50%"></div>
+            </div>
+            <div class="pl-labels" id="plLabels-${i}-${k}">
+              ${POLL_LABELS.map((l, j) => `<span class="pl-label ${j===2?'active':''}" onclick="setPoll(${i},${k},${j})">${l}</span>`).join('')}
+            </div>
+          </div>
+          <div class="pl-foot">Visible only to your Close Circle.</div>
+          <div class="pl-results" id="plRes-${i}-${k}">
+            <div class="pl-res-toggle">
+              <button class="pl-res-tab active" onclick="togglePollGroup(${i},${k},'friends')">Friends</button>
+              <button class="pl-res-tab" onclick="togglePollGroup(${i},${k},'contributors')">Contributors</button>
+              <button class="pl-res-tab" onclick="togglePollGroup(${i},${k},'whole')">Whole app</button>
+            </div>
+            <div class="pl-res-bars" id="plBars-${i}-${k}"></div>
+            <div class="pl-res-foot" id="plFoot-${i}-${k}">42 friends voted</div>
+          </div>
+          <button class="pl-write">Have more you want to say? Write to us!</button>
+        </div>
+      </div>
+    `;
+  }
   if (sl.type === 'xp') {
     const pct = sl.levelCurrent / sl.levelMax;
     const dash = 565 * (1 - pct);
@@ -1079,6 +1146,71 @@ function toggleBennyEdit(i, k) {
     c.contentEditable = editing;
     if (editing) c.focus();
   });
+  // When user finishes editing, regenerate Benny's take using new chip values
+  if (!editing) regenerateBennyTake(i, k);
+}
+
+function regenerateBennyTake(i, k) {
+  const chips = [...document.querySelectorAll(`#bnChips-${i}-${k} .bn-take-chip`)].map(c => c.textContent.trim());
+  const body = document.getElementById(`bnBody-${i}-${k}`);
+  if (!body) return;
+  const [c1, c2, c3] = chips;
+  // Brief "Benny is rewriting" flash, then new take
+  body.innerHTML = `<span style="opacity:0.5; font-style:italic;">Benny is rewriting for you<span class="bn-writing-dots"></span></span>`;
+  setTimeout(() => {
+    body.innerHTML = `For a <em>${c1 || 'someone like you'}</em> ${c2 ? `(${c2})` : ''}, the Fed holding rates means borrowing costs aren't moving down in 2026. ${c3 ? `Your <em>${c3}</em> situation gets cheaper only if that one cut lands in Q4 — and only by a fraction.` : ''} The Fed thinks the economy is <em>still too hot</em>, which usually means tech hiring stays soft another quarter.`;
+  }, 700);
+}
+
+// Poll mock distributions per group [strDis, dis, neut, agr, strAgr]
+const POLL_DATA = {
+  friends:      { dist:[5, 12, 18, 38, 27], n:42, label:"42 friends voted" },
+  contributors: { dist:[18, 28, 24, 22, 8], n:31, label:"31 contributors voted" },
+  whole:        { dist:[11, 19, 26, 28, 16], n:8412, label:"8,412 readers voted" },
+};
+const pollChoice = {}; // key `${i}-${k}` → user index
+const pollGroup  = {}; // key `${i}-${k}` → group
+
+function setPoll(i, k, idx) {
+  const key = `${i}-${k}`;
+  pollChoice[key] = idx;
+  pollGroup[key] = pollGroup[key] || 'friends';
+  // knob
+  const knob = document.getElementById(`plKnob-${i}-${k}`);
+  if (knob) knob.style.left = `${idx * 25}%`;
+  // labels
+  const lbls = document.getElementById(`plLabels-${i}-${k}`);
+  if (lbls) [...lbls.children].forEach((el, j) => el.classList.toggle('active', j === idx));
+  // mark slide voted, render results
+  document.getElementById(`pl-${i}-${k}`)?.classList.add('voted');
+  renderPollBars(i, k);
+}
+
+function togglePollGroup(i, k, group) {
+  const key = `${i}-${k}`;
+  pollGroup[key] = group;
+  // toggle tabs
+  const tabs = document.querySelectorAll(`#plRes-${i}-${k} .pl-res-tab`);
+  const groups = ['friends','contributors','whole'];
+  tabs.forEach((t, j) => t.classList.toggle('active', groups[j] === group));
+  renderPollBars(i, k);
+}
+
+function renderPollBars(i, k) {
+  const key = `${i}-${k}`;
+  const group = pollGroup[key] || 'friends';
+  const data = POLL_DATA[group];
+  const max = Math.max(...data.dist);
+  const choice = pollChoice[key];
+  const bars = document.getElementById(`plBars-${i}-${k}`);
+  if (!bars) return;
+  bars.innerHTML = data.dist.map((pct, j) => `
+    <div class="pl-res-bar ${j===choice?'you':''}">
+      <span class="pl-res-bar-pct">${pct}%</span>
+      <div class="pl-res-bar-fill" style="height:${(pct/max)*100}%"></div>
+    </div>
+  `).join('');
+  document.getElementById(`plFoot-${i}-${k}`).textContent = data.label;
 }
 
 function answerQuiz(i, k, oi) {
