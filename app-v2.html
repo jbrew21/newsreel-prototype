@@ -309,6 +309,89 @@
   /* ─────────── CREATOR PROFILE ─────────── */
   .creator { position:absolute; inset:0; background:#000; transform:translateX(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:30; overflow-y:auto; }
   .creator.on { transform:translateX(0); }
+
+  /* ─────────── EXPLORE SCENE ─────────── */
+  .explore { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:25; overflow-y:auto; padding-bottom:90px; }
+  .explore.on { transform:translateY(0); }
+  /* Search row */
+  .ex-top { display:flex; align-items:center; gap:10px; padding:60px 18px 14px; }
+  .ex-search { flex:1; height:42px; border-radius:14px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; padding:0 14px; gap:10px; }
+  .ex-search svg { width:16px; height:16px; color:var(--nr-silver); flex-shrink:0; }
+  .ex-search input { flex:1; background:none; border:none; color:#fff; font-family:var(--font-b); font-size:14px; outline:none; }
+  .ex-search input::placeholder { color:var(--nr-ash); }
+  .ex-search-benny { width:30px; height:30px; border-radius:50%; background:rgba(237,189,31,0.18); border:1px solid rgba(237,189,31,0.55); padding:3px; cursor:pointer; flex-shrink:0; }
+  .ex-search-benny img { width:100%; height:100%; object-fit:contain; }
+
+  /* Today's Briefing */
+  .ex-section { padding:8px 18px 24px; }
+  .ex-section--briefing { padding-top:18px; padding-bottom:30px; border-bottom:1px solid rgba(255,255,255,0.06); margin-bottom:8px; }
+  .ex-bf-title { font-family:var(--font-h); font-size:34px; line-height:1.1; color:#fff; margin-bottom:8px; }
+  .ex-bf-meta { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+  .ex-bf-date { font-family:var(--font-m); font-size:11px; letter-spacing:0.24em; color:var(--nr-ash); text-transform:uppercase; }
+  .ex-bf-progress { font-family:var(--font-b); font-size:13px; color:var(--nr-silver); }
+  .ex-bf-progress strong { color:var(--nr-green); font-weight:600; }
+  .ex-bf-list { display:flex; flex-direction:column; }
+  .ex-bf-row { display:flex; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer; background:none; border-top:none; border-left:none; border-right:none; text-align:left; width:100%; }
+  .ex-bf-row:last-child { border-bottom:none; }
+  .ex-bf-step { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-b); font-size:13px; font-weight:600; }
+  .ex-bf-step--done { background:var(--nr-green); color:#fff; }
+  .ex-bf-step--done svg { width:14px; height:14px; }
+  .ex-bf-step--idle { border:1.5px solid var(--nr-iron); color:var(--nr-silver); background:transparent; }
+  .ex-bf-thumb { width:54px; height:54px; border-radius:10px; background:var(--nr-lead); flex-shrink:0; overflow:hidden; }
+  .ex-bf-thumb img { width:100%; height:100%; object-fit:cover; }
+  .ex-bf-text { flex:1; min-width:0; }
+  .ex-bf-headline { font-family:var(--font-b); font-size:15px; font-weight:600; color:#fff; line-height:1.3; margin-bottom:4px; }
+  .ex-bf-row.done .ex-bf-headline { color:var(--nr-silver); }
+  .ex-bf-sub { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
+
+  /* Section header */
+  .ex-h { display:flex; align-items:flex-end; justify-content:space-between; padding:8px 18px 12px; }
+  .ex-h-title { font-family:var(--font-h); font-size:22px; color:#fff; }
+  .ex-h-link { font-family:var(--font-b); font-size:12px; font-weight:500; color:var(--nr-red); background:none; border:none; cursor:pointer; }
+
+  /* Topic chips */
+  .ex-chips { display:flex; gap:8px; padding:0 18px 8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .ex-chips::-webkit-scrollbar { display:none; }
+  .ex-chip { flex-shrink:0; padding:8px 14px; border-radius:999px; border:1px solid var(--nr-iron); background:transparent; color:var(--nr-smoke); font-family:var(--font-b); font-size:13px; font-weight:500; cursor:pointer; }
+  .ex-chip.active { background:#fff; color:#000; border-color:#fff; }
+
+  /* Hero featured story */
+  .ex-hero { margin:8px 18px 0; border-radius:18px; overflow:hidden; position:relative; aspect-ratio:16/9; background:var(--nr-lead); cursor:pointer; }
+  .ex-hero img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .ex-hero-fade { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%); }
+  .ex-hero-body { position:absolute; left:16px; right:16px; bottom:14px; }
+  .ex-hero-eyebrow { font-family:var(--font-m); font-size:10px; letter-spacing:0.2em; color:var(--nr-red); text-transform:uppercase; margin-bottom:6px; font-weight:600; }
+  .ex-hero-headline { font-family:var(--font-h); font-size:22px; line-height:1.18; color:#fff; }
+
+  /* Trending list */
+  .ex-tr-row { display:flex; align-items:center; gap:14px; padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.06); background:none; border-top:none; border-left:none; border-right:none; text-align:left; width:100%; cursor:pointer; }
+  .ex-tr-num { font-family:var(--font-h); font-size:18px; color:var(--nr-iron); flex-shrink:0; width:18px; }
+  .ex-tr-text { flex:1; min-width:0; }
+  .ex-tr-headline { font-family:var(--font-b); font-size:14px; font-weight:600; color:#fff; line-height:1.3; margin-bottom:4px; }
+  .ex-tr-meta { display:flex; align-items:center; gap:6px; }
+  .ex-tr-faces { display:flex; }
+  .ex-tr-face { width:18px; height:18px; border-radius:50%; border:2px solid #000; object-fit:cover; }
+  .ex-tr-face + .ex-tr-face { margin-left:-6px; }
+  .ex-tr-meta-text { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
+
+  /* Verified journalists carousel */
+  .ex-jl-row { display:flex; gap:14px; padding:0 18px 8px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  .ex-jl-row::-webkit-scrollbar { display:none; }
+  .ex-jl { flex-shrink:0; width:74px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; background:none; border:none; padding:0; }
+  .ex-jl-av-wrap { position:relative; width:64px; height:64px; }
+  .ex-jl-av { width:64px; height:64px; border-radius:50%; object-fit:cover; border:2px solid var(--nr-red); padding:2px; background:#000; }
+  .ex-jl-verif { position:absolute; right:-2px; bottom:-2px; width:18px; height:18px; }
+  .ex-jl-name { font-family:var(--font-b); font-size:11px; font-weight:500; color:#fff; text-align:center; line-height:1.2; }
+
+  /* Discover grid */
+  .ex-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:2px; padding:6px 0 24px; }
+  .ex-tile { position:relative; aspect-ratio:9/14; background:var(--nr-lead); overflow:hidden; cursor:pointer; }
+  .ex-tile img { width:100%; height:100%; object-fit:cover; }
+  .ex-tile-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.7), transparent 40%); }
+  .ex-tile-tag { position:absolute; top:8px; left:8px; font-family:var(--font-m); font-size:8px; font-weight:600; letter-spacing:0.16em; color:#fff; text-transform:uppercase; background:rgba(0,0,0,0.45); backdrop-filter:blur(6px); padding:3px 6px; border-radius:4px; }
+  .ex-tile-author { position:absolute; bottom:8px; left:8px; display:flex; align-items:center; gap:5px; }
+  .ex-tile-author img { width:18px; height:18px; border-radius:50%; border:1.5px solid #000; }
+  .ex-tile-author span { font-family:var(--font-b); font-size:11px; font-weight:500; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.6); }
   .cr-top { display:flex; align-items:center; justify-content:space-between; padding:60px 16px 8px; }
   .cr-icon-btn { width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.06); border:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
   .cr-icon-btn svg { width:18px; height:18px; }
@@ -353,7 +436,7 @@
     <div class="stories" id="stories"></div>
 
     <div class="tabs">
-      <button class="tab active">
+      <button class="tab active" onclick="closeExplore()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="8" y1="3" x2="8" y2="8"/></svg>
         <span class="tab-label">Today</span>
       </button>
@@ -361,7 +444,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span class="tab-label">Activity</span>
       </button>
-      <button class="tab">
+      <button class="tab" onclick="openExplore()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
         <span class="tab-label">Explore</span>
       </button>
@@ -391,6 +474,9 @@
 
   <!-- Creator profile scene -->
   <div class="creator" id="creator"></div>
+
+  <!-- Explore scene -->
+  <div class="explore" id="explore"></div>
 
 </div>
 
@@ -820,6 +906,146 @@ function renderCreator(c) {
     </div>
   `;
 }
+
+// ─── Explore scene ───
+const exploreEl = document.getElementById('explore');
+const COMPLETED = new Set([0]); // story 0 marked complete for prototype
+
+const TOPICS = ["For You","Politics","Tech","Climate","Business","World","Media","Culture"];
+
+const TRENDING = [
+  { id:0, headline:"U.S. begins guiding ships out of the Strait of Hormuz", creators:[1,0], meta:"Politics · 142 stories" },
+  { id:1, headline:"3 dead from suspected hantavirus on Atlantic cruise ship, WHO says", creators:[1], meta:"World · 88 stories" },
+  { id:0, headline:"The Fed's one-cut signal — what it means for your loans", creators:[0], meta:"Business · 67 stories" },
+  { id:2, headline:"EPA's methane rule reshapes residential gas pricing", creators:[2], meta:"Climate · 41 stories" },
+];
+
+const DISCOVER = [
+  { sId:0, tag:"Business",   img:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=400&h=620&fit=crop" },
+  { sId:1, tag:"Politics",   img:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=400&h=620&fit=crop" },
+  { sId:2, tag:"Climate",    img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=400&h=620&fit=crop" },
+  { sId:0, tag:"Markets",    img:"https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=620&fit=crop" },
+  { sId:1, tag:"World",      img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400&h=620&fit=crop" },
+  { sId:2, tag:"Energy",     img:"https://images.unsplash.com/photo-1620266757065-5814239881fd?w=400&h=620&fit=crop" },
+  { sId:0, tag:"Economy",    img:"https://images.unsplash.com/photo-1535320903710-d993d3d77d29?w=400&h=620&fit=crop" },
+  { sId:1, tag:"Defense",    img:"https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=400&h=620&fit=crop" },
+  { sId:2, tag:"Atlantic",   img:"https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=620&fit=crop" },
+];
+
+function renderExplore() {
+  const todayLabel = "MAY 4, 2026";
+  const briefingHtml = STORIES.map((s, i) => {
+    const c = CREATORS[s.creatorId];
+    const done = COMPLETED.has(i);
+    return `
+      <button class="ex-bf-row ${done?'done':''}" onclick="jumpToStory(${i})">
+        <div class="ex-bf-step ${done?'ex-bf-step--done':'ex-bf-step--idle'}">
+          ${done ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : (i+1)}
+        </div>
+        <div class="ex-bf-thumb"><img src="${s.slides[0].img || 'https://images.unsplash.com/photo-1554224155-1696413565d3?w=200&h=200&fit=crop'}" alt=""></div>
+        <div class="ex-bf-text">
+          <div class="ex-bf-headline">${s.headline}</div>
+          <div class="ex-bf-sub">${c.name} · ${s.slides.length} slides</div>
+        </div>
+      </button>
+    `;
+  }).join('');
+
+  const chipsHtml = TOPICS.map((t, i) => `<button class="ex-chip ${i===0?'active':''}">${t}</button>`).join('');
+  const hero = STORIES[1];
+  const heroAuthor = CREATORS[hero.creatorId];
+  const trendingHtml = TRENDING.map((t, i) => {
+    const faces = t.creators.map(cid => `<img class="ex-tr-face" src="${CREATORS[cid].avatar}" alt="">`).join('');
+    return `
+      <button class="ex-tr-row" onclick="jumpToStory(${t.id})">
+        <span class="ex-tr-num">${i+1}</span>
+        <div class="ex-tr-text">
+          <div class="ex-tr-headline">${t.headline}</div>
+          <div class="ex-tr-meta"><div class="ex-tr-faces">${faces}</div><span class="ex-tr-meta-text">${t.meta}</span></div>
+        </div>
+      </button>
+    `;
+  }).join('');
+
+  const journalistsHtml = CREATORS.map((c, i) => `
+    <button class="ex-jl" onclick="closeExplore(); openCreator(${i})">
+      <div class="ex-jl-av-wrap">
+        <img class="ex-jl-av" src="${c.avatar}" alt="">
+        ${c.verified ? `<svg class="ex-jl-verif" viewBox="0 0 24 24" fill="#EDBD1F"><path d="M12 1.5l2.6 2.3 3.4-.5.7 3.4 3.1 1.6-1.4 3.2 1.4 3.2-3.1 1.6-.7 3.4-3.4-.5L12 22.5l-2.6-2.3-3.4.5-.7-3.4-3.1-1.6 1.4-3.2-1.4-3.2 3.1-1.6.7-3.4 3.4.5L12 1.5z"/><polyline points="8 12 11 15 16 9.5" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+      </div>
+      <span class="ex-jl-name">${c.name}</span>
+    </button>
+  `).join('');
+
+  const tilesHtml = DISCOVER.map(d => {
+    const c = CREATORS[STORIES[d.sId].creatorId];
+    return `
+      <button class="ex-tile" onclick="jumpToStory(${d.sId})">
+        <img src="${d.img}" alt="">
+        <div class="ex-tile-overlay"></div>
+        <div class="ex-tile-tag">${d.tag}</div>
+        <div class="ex-tile-author">
+          <img src="${c.avatar}" alt="">
+          <span>${c.name.split(' ')[0]}</span>
+        </div>
+      </button>
+    `;
+  }).join('');
+
+  exploreEl.innerHTML = `
+    <div class="ex-top">
+      <div class="ex-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="Ask Newsreel or search…" />
+      </div>
+      <button class="ex-search-benny" onclick="openBennyAssist(0)" aria-label="Ask Benny"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></button>
+    </div>
+
+    <div class="ex-section ex-section--briefing">
+      <h1 class="ex-bf-title">Today's Briefing</h1>
+      <div class="ex-bf-meta">
+        <span class="ex-bf-date">${todayLabel}</span>
+        <span class="ex-bf-progress"><strong>${COMPLETED.size}</strong> / ${STORIES.length} completed</span>
+      </div>
+      <div class="ex-bf-list">${briefingHtml}</div>
+    </div>
+
+    <div class="ex-h"><span class="ex-h-title">Browse</span></div>
+    <div class="ex-chips">${chipsHtml}</div>
+
+    <div class="ex-h" style="margin-top:6px;"><span class="ex-h-title">Featured</span></div>
+    <button class="ex-hero" onclick="jumpToStory(1)" style="display:block; padding:0; border:none;">
+      <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=900&h=600&fit=crop" alt="">
+      <div class="ex-hero-fade"></div>
+      <div class="ex-hero-body">
+        <div class="ex-hero-eyebrow">Featured · ${heroAuthor.name}</div>
+        <div class="ex-hero-headline">${hero.headline}</div>
+      </div>
+    </button>
+
+    <div class="ex-h" style="margin-top:24px;"><span class="ex-h-title">Trending today</span></div>
+    <div>${trendingHtml}</div>
+
+    <div class="ex-h" style="margin-top:18px;"><span class="ex-h-title">Verified journalists</span></div>
+    <div class="ex-jl-row">${journalistsHtml}</div>
+
+    <div class="ex-h" style="margin-top:18px;"><span class="ex-h-title">Discover</span></div>
+    <div class="ex-grid">${tilesHtml}</div>
+  `;
+}
+
+function openExplore() {
+  renderExplore();
+  exploreEl.classList.add('on');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab')[2]?.classList.add('active');
+}
+function closeExplore() {
+  exploreEl.classList.remove('on');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab')[0]?.classList.add('active');
+}
+function jumpToStory(i) { closeExplore(); goStory(i); goSlide(i, 0); }
 
 function openCreator(id) {
   creatorEl.innerHTML = renderCreator(CREATORS[id]);
