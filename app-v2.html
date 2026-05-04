@@ -409,6 +409,8 @@
 
   /* Friends' stories row (top of Wire) */
   .wr-circle { padding:6px 0 16px; border-bottom:1px solid rgba(255,255,255,0.06); margin-bottom:6px; }
+  .wr-section-h { font-family:var(--font-h); font-size:18px; color:#fff; padding:0 18px 12px; display:flex; align-items:baseline; gap:10px; }
+  .wr-section-h-sub { font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; color:var(--nr-ash); text-transform:uppercase; font-weight:600; }
   .wr-circle-label { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.2em; color:var(--nr-ash); text-transform:uppercase; padding:0 18px 10px; }
   .wr-circle-row { display:flex; gap:14px; padding:0 18px 4px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
   .wr-circle-row::-webkit-scrollbar { display:none; }
@@ -1419,10 +1421,11 @@ function renderWire(filter) {
       <h1 class="wr-title">The Wire</h1>
     </div>
     <div class="wr-circle">
-      <div class="wr-circle-label">Your circle's takes</div>
+      <h2 class="wr-section-h">Your Circle <span class="wr-section-h-sub">friends' takes</span></h2>
       <div class="wr-circle-row">${friendsHtml}</div>
     </div>
-    <div style="padding:14px 18px 6px;">
+    <h2 class="wr-section-h" style="padding-top:18px;">Newsroom <span class="wr-section-h-sub">verified reporters</span></h2>
+    <div style="padding:0 18px 6px;">
       <div class="wr-chips">
         <button class="wr-chip ${filter==='all'?'active':''}" onclick="renderWire('all')">All</button>
         <button class="wr-chip ${filter==='posts'?'active':''}" onclick="renderWire('posts')">Posts</button>
