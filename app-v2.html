@@ -43,8 +43,9 @@
   .nr-mark svg { width:11px; height:11px; color:rgba(255,255,255,0.85); }
   .me-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, var(--nr-red), var(--nr-yellow)); border:1.5px solid rgba(255,255,255,0.85); cursor:pointer; padding:0; }
   /* Instagram-style segmented bars */
-  .segs { display:flex; gap:3px; }
-  .seg { flex:1; height:1.5px; border-radius:1px; background:rgba(255,255,255,0.22); overflow:hidden; }
+  .segs { display:flex; gap:3px; height:1px; }
+  .segs.single { display:none; }
+  .seg { flex:1; height:1px; border-radius:1px; background:rgba(255,255,255,0.18); overflow:hidden; }
   .seg-fill { height:100%; background:#fff; width:0; transition:width 0.3s ease; }
   .seg.done .seg-fill { width:100%; }
   .seg.on .seg-fill { width:100%; }
@@ -142,7 +143,22 @@
     box-shadow: inset 0 -22px 40px rgba(0,0,0,0.35), inset 0 8px 24px rgba(255,255,255,0.18), 0 14px 50px rgba(255,99,67,0.45);
   }
   .bn-mascot { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
-  .bn-mascot img { width:62%; height:62%; object-fit:contain; animation:bnIdle 5.2s ease-in-out infinite; transform-origin:50% 60%; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
+  .bn-mascot img { width:58%; height:58%; object-fit:contain; animation:bnIdle 5.2s ease-in-out infinite; transform-origin:50% 60%; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3)); transform:translateX(-12%); }
+  /* User face inside the orb, opposite Benny */
+  .bn-me { position:absolute; right:8%; bottom:14%; width:42%; height:42%; border-radius:50%;
+    background:linear-gradient(135deg, var(--nr-yellow), var(--nr-red));
+    border:3px solid rgba(0,0,0,0.45);
+    box-shadow:0 6px 16px rgba(0,0,0,0.4);
+    animation:bnIdle 5.2s ease-in-out infinite reverse; }
+  /* Concentric ripples (pre-tap = breathing; post-tap = bursting) */
+  .bn-ripple { position:absolute; inset:0; border-radius:50%; border:2px solid rgba(255,99,67,0.55); opacity:0; pointer-events:none; }
+  .slide--benny.opened .bn-ripple { animation:bnRipple 1.4s ease-out 0.05s 1; }
+  .slide--benny.opened .bn-ripple.r2 { animation-delay:0.3s; }
+  .slide--benny.opened .bn-ripple.r3 { animation-delay:0.55s; }
+  @keyframes bnRipple {
+    0% { transform:scale(0.85); opacity:0.9; }
+    100% { transform:scale(2.4); opacity:0; }
+  }
   @keyframes bnIdle { 0%,100% { transform:rotate(-2deg) translateY(0); } 50% { transform:rotate(2deg) translateY(-3px); } }
   .bn-hint { font-family:var(--font-m); font-size:11px; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; animation:bnHintPulse 2.4s ease-in-out infinite; }
   @keyframes bnHintPulse { 0%,100% { opacity:0.55; } 50% { opacity:1; } }
@@ -158,10 +174,21 @@
   .bn-byline-label { font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; }
   .bn-byline-name { font-family:var(--font-h); font-size:18px; color:#fff; }
 
-  .bn-take { max-height:0; overflow:hidden; opacity:0; transition:max-height 0.7s cubic-bezier(0.2,0.8,0.2,1), opacity 0.5s ease 0.15s; }
+  .bn-take { position:relative; max-height:0; overflow:hidden; opacity:0; transition:max-height 0.7s cubic-bezier(0.2,0.8,0.2,1), opacity 0.5s ease 0.15s; }
   .slide--benny.opened .bn-take { max-height:60vh; opacity:1; }
   .bn-take-body { font-family:var(--font-h); font-size:19px; line-height:1.35; color:#fff; margin-bottom:16px; }
   .bn-take-body em { color:var(--nr-red); font-style:normal; }
+  /* Shimmer sweep across the take body when it reveals */
+  .bn-take::after { content:""; position:absolute; inset:0; pointer-events:none; border-radius:14px;
+    background:linear-gradient(110deg, transparent 30%, rgba(255,99,67,0.2) 50%, transparent 70%);
+    background-size:220% 100%; background-position:-100% 0; opacity:0; }
+  .slide--benny.opened .bn-take::after { animation:bnShimmer 1.6s cubic-bezier(0.4,0,0.2,1) 0.4s 1; }
+  @keyframes bnShimmer {
+    0% { background-position:-100% 0; opacity:0; }
+    20% { opacity:1; }
+    80% { opacity:1; }
+    100% { background-position:200% 0; opacity:0; }
+  }
   .bn-take-meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
   .bn-take-chip { font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; color:var(--nr-silver); text-transform:uppercase; padding:5px 9px; border:1px solid var(--nr-iron); border-radius:999px; }
 
@@ -387,6 +414,10 @@ function renderSlide(sl, i, k) {
               <div class="bn-aura two"></div>
               <div class="bn-disc"></div>
               <div class="bn-mascot"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
+              <div class="bn-me"></div>
+              <div class="bn-ripple"></div>
+              <div class="bn-ripple r2"></div>
+              <div class="bn-ripple r3"></div>
             </button>
             <div class="bn-byline">
               <span class="bn-byline-label">Benny · Story impact</span>
@@ -443,7 +474,7 @@ function renderStory(s, i) {
           <span class="nr-mark"><img src="assets/newsreel-wordmark-white.png" alt="newsreel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
           <button class="me-avatar" aria-label="Your profile"></button>
         </div>
-        <div class="segs" data-story="${i}">${segsHtml}</div>
+        <div class="segs ${s.slides.length===1?'single':''}" data-story="${i}">${segsHtml}</div>
       </div>
 
       <div class="vc">
