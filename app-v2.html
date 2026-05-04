@@ -43,8 +43,8 @@
   .nr-mark svg { width:11px; height:11px; color:rgba(255,255,255,0.85); }
   .me-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, var(--nr-red), var(--nr-yellow)); border:1.5px solid rgba(255,255,255,0.85); cursor:pointer; padding:0; }
   /* Instagram-style segmented bars */
-  .segs { display:flex; gap:4px; }
-  .seg { flex:1; height:3px; border-radius:2px; background:rgba(255,255,255,0.25); overflow:hidden; }
+  .segs { display:flex; gap:3px; }
+  .seg { flex:1; height:1.5px; border-radius:1px; background:rgba(255,255,255,0.22); overflow:hidden; }
   .seg-fill { height:100%; background:#fff; width:0; transition:width 0.3s ease; }
   .seg.done .seg-fill { width:100%; }
   .seg.on .seg-fill { width:100%; }
@@ -247,8 +247,8 @@
         <span class="tab-label">Explore</span>
       </button>
       <button class="tab">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M5.5 19a7 7 0 0 1 13 0"/></svg>
-        <span class="tab-label">Profile</span>
+        <img src="assets/benny/benny-paperboy-v2-transparent.png" alt="" style="width:24px;height:24px;object-fit:contain;">
+        <span class="tab-label">Benny</span>
       </button>
     </div>
   </div>
@@ -299,7 +299,7 @@ const STORIES = [
     headline:"The US economy is fine probably",
     creatorId:0,
     slides:[
-      { type:"video", img:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=900&h=1600&fit=crop", subtitle:"The U.S. economy grew at a 2% pace in the first quarter of the year." },
+      { type:"video", img:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=900&h=1600&fit=crop" },
       { type:"video", img:"https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&h=1600&fit=crop", subtitle:"But Wall Street wanted faster." },
       { type:"quiz",
         q:"The economy grew by 2% last quarter, but Wall Street analysts were hoping to hit what number?",
@@ -470,7 +470,6 @@ function renderStory(s, i) {
           ${s.slides.some(sl => sl.type==='benny') ? `<span class="b-impact-pill"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt="">Story impact</span>` : ''}
         </div>
         <h1 class="b-headline">${s.headline}</h1>
-        <div class="b-read-row"><button class="b-read">Read more</button></div>
       </div>
     </div>
   `;
