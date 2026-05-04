@@ -77,6 +77,27 @@
   .sa-btn--benny { background:rgba(237,189,31,0.18); border:1px solid rgba(237,189,31,0.6); padding:4px; }
   .sa-btn--benny img { width:100%; height:100%; object-fit:contain; }
 
+  /* ─────────── BENNY ASSISTANT SHEET ─────────── */
+  .ba-scrim { position:absolute; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(2px); z-index:50; opacity:0; pointer-events:none; transition:opacity 0.25s ease; }
+  .ba-scrim.on { opacity:1; pointer-events:auto; }
+  .ba-sheet { position:absolute; left:16px; right:64px; bottom:120px; z-index:51; display:flex; flex-direction:column; gap:10px;
+    transform:translateY(20px); opacity:0; pointer-events:none; transition:transform 0.3s cubic-bezier(0.2,0.8,0.2,1), opacity 0.25s ease; }
+  .ba-scrim.on ~ .ba-sheet, .ba-sheet.on { transform:translateY(0); opacity:1; pointer-events:auto; }
+  .ba-card { background:rgba(15,15,15,0.85); backdrop-filter:blur(10px);
+    border:1px solid rgba(237,189,31,0.55); border-radius:18px; padding:16px 18px; cursor:pointer; text-align:left;
+    color:#fff; transition:border-color 0.15s, transform 0.1s ease; }
+  .ba-card:hover { border-color:rgba(237,189,31,0.85); }
+  .ba-card:active { transform:scale(0.98); }
+  .ba-card-title { font-family:var(--font-h); font-size:18px; line-height:1.2; margin-bottom:4px; }
+  .ba-card-sub { font-family:var(--font-b); font-size:13px; line-height:1.4; color:var(--nr-silver); }
+  .ba-answer { background:rgba(15,15,15,0.92); backdrop-filter:blur(10px); border:1px solid var(--nr-iron); border-radius:18px; padding:18px; color:#fff; }
+  .ba-answer-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .ba-answer-head img { width:22px; height:22px; }
+  .ba-answer-label { font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; color:var(--nr-yellow); text-transform:uppercase; font-weight:600; }
+  .ba-answer-body { font-family:var(--font-b); font-size:15px; line-height:1.5; color:var(--nr-smoke); }
+  .ba-close { position:absolute; top:12px; right:12px; width:30px; height:30px; border-radius:50%; background:rgba(0,0,0,0.5); border:none; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .ba-close svg { width:14px; height:14px; }
+
   /* Subtitle */
   .subtitle { position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); z-index:2;
     background:rgba(0,0,0,0.55); color:#fff; font-size:15px; font-weight:500;
@@ -306,6 +327,23 @@
     </div>
   </div>
 
+  <!-- Benny assistant sheet (overlays current slide) -->
+  <div class="ba-scrim" id="baScrim" onclick="closeBennyAssist()"></div>
+  <div class="ba-sheet" id="baSheet">
+    <button class="ba-card" onclick="bennyAnswer('eli5')">
+      <div class="ba-card-title">Explain like I'm five</div>
+      <div class="ba-card-sub">Summarizes this slide in clear, simple language.</div>
+    </button>
+    <button class="ba-card" onclick="bennyAnswer('deeper')">
+      <div class="ba-card-title">Dig deeper</div>
+      <div class="ba-card-sub">Adds one layer of insight by unpacking what it really means.</div>
+    </button>
+    <button class="ba-card" onclick="bennyAnswer('matter')">
+      <div class="ba-card-title">Why does this matter?</div>
+      <div class="ba-card-sub">Shows why this slide is significant in the broader story.</div>
+    </button>
+  </div>
+
   <!-- Creator profile scene -->
   <div class="creator" id="creator"></div>
 
@@ -513,7 +551,7 @@ function renderStory(s, i) {
         <button class="sa-btn" aria-label="Captions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 15a2 2 0 1 1 0-4 2 2 0 0 1 1.7 1"/><path d="M14 15a2 2 0 1 1 0-4 2 2 0 0 1 1.7 1"/></svg></button>
         <button class="sa-btn" aria-label="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
         <button class="sa-btn sa-btn--streak" aria-label="Streak"></button>
-        <button class="sa-btn sa-btn--benny" aria-label="Benny"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></button>
+        <button class="sa-btn sa-btn--benny" aria-label="Ask Benny" onclick="openBennyAssist(${i})"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></button>
       </div>
 
       <div class="b-overlay">
@@ -580,6 +618,54 @@ function goSlide(storyI, k) {
 
 function openBenny(i, k) {
   document.getElementById(`bn-${i}-${k}`)?.classList.add('opened');
+}
+
+const BENNY_ANSWERS = {
+  eli5:  "The Fed left interest rates the same. They might lower them once before the year ends. That's it.",
+  deeper:"Holding rates means the Fed is fighting two things at once — inflation that's still above target, and a job market that's softening. One cut by year-end is the smallest possible signal that they're paying attention.",
+  matter:"Rates touch everything you pay for on credit. Mortgages, car loans, the rate on your savings, your student-loan refi. One cut barely moves the needle — your bills aren't getting cheaper any time soon."
+};
+
+function openBennyAssist(storyI) {
+  document.getElementById('baScrim').classList.add('on');
+  document.getElementById('baSheet').classList.add('on');
+}
+function closeBennyAssist() {
+  document.getElementById('baScrim').classList.remove('on');
+  document.getElementById('baSheet').classList.remove('on');
+  // Reset cards if an answer was shown
+  const sheet = document.getElementById('baSheet');
+  if (sheet.dataset.mode === 'answer') { sheet.dataset.mode = ''; renderBennyCards(); }
+}
+function renderBennyCards() {
+  document.getElementById('baSheet').innerHTML = `
+    <button class="ba-card" onclick="bennyAnswer('eli5')">
+      <div class="ba-card-title">Explain like I'm five</div>
+      <div class="ba-card-sub">Summarizes this slide in clear, simple language.</div>
+    </button>
+    <button class="ba-card" onclick="bennyAnswer('deeper')">
+      <div class="ba-card-title">Dig deeper</div>
+      <div class="ba-card-sub">Adds one layer of insight by unpacking what it really means.</div>
+    </button>
+    <button class="ba-card" onclick="bennyAnswer('matter')">
+      <div class="ba-card-title">Why does this matter?</div>
+      <div class="ba-card-sub">Shows why this slide is significant in the broader story.</div>
+    </button>`;
+}
+function bennyAnswer(key) {
+  const sheet = document.getElementById('baSheet');
+  sheet.dataset.mode = 'answer';
+  sheet.innerHTML = `
+    <div class="ba-answer">
+      <div class="ba-answer-head">
+        <img src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
+        <span class="ba-answer-label">Benny</span>
+      </div>
+      <div class="ba-answer-body">${BENNY_ANSWERS[key]}</div>
+    </div>
+    <button class="ba-card" onclick="closeBennyAssist()" style="text-align:center; padding:10px;">
+      <div class="ba-card-sub" style="font-family:var(--font-m); letter-spacing:0.18em; text-transform:uppercase; font-size:11px;">Done</div>
+    </button>`;
 }
 
 function toggleBennyEdit(i, k) {
