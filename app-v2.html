@@ -1327,65 +1327,74 @@ function jumpToStory(i) { closeExplore(); goStory(i); goSlide(i, 0); }
 // ─── The Wire ───
 const wireEl = document.getElementById('wire');
 
+// Friend-authored items use group:'circle', journalist items use group:'newsroom'
 const WIRE = [
-  { type:'post',  cId:1, time:'12 min', body:"Just got off the phone with a senior State Department official. Confirms 'Project Freedom' Navy escorts begin Monday — three U.S. destroyers already repositioning to the Strait. More tonight.", tag:'From the desk' },
-  { type:'poll',  cId:0, time:'34 min', q:"Should the Fed have cut rates today?", friends:67, journalists:42, friendsN:24, jrnN:31 },
-  { type:'drop',  cId:0, time:'1h', note:"Took me three days to get the Treasury sources to talk on record. Worth the wait — full piece up now.", storyId:0, headline:"The US economy is fine probably", thumb:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=200&h=200&fit=crop", tag:'Business' },
-  { type:'post',  cId:2, time:'2h', body:"The methane rule has been in EPA's drawer for 18 months. The reason it dropped today, not last quarter, has everything to do with the Senate calendar. We'll be tracking the floor vote.", tag:'Analysis' },
-  { type:'poll',  cId:1, time:'3h', q:"Is the U.S. right to demand half-ownership of the Gordie Howe Bridge?", friends:18, journalists:9, friendsN:31, jrnN:17 },
-  { type:'drop',  cId:1, time:'4h', note:"Working on this one for two weeks. The story isn't the threat — it's what Canada's quietly preparing in response.", storyId:1, headline:"Trump threatens to block new bridge to Canada", thumb:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=200&h=200&fit=crop", tag:'Politics' },
-  { type:'post',  cId:0, time:'5h', body:"Hot take from inside the Fed presser: Powell looked tired. Three reporters tried to get him on the dot-plot question. He swatted all three. Make of that what you will.", tag:'Hot take' },
+  { group:'newsroom', type:'post',  cId:1, time:'12 min', body:"Just got off the phone with a senior State Department official. Confirms 'Project Freedom' Navy escorts begin Monday — three U.S. destroyers already repositioning to the Strait. More tonight.", tag:'From the desk' },
+  { group:'circle',   type:'post',  fId:2, time:'18 min', body:"reading the bridge story now — feels like Trump's just trolling Trudeau. wild that this is how trade gets done now.", tag:'' },
+  { group:'newsroom', type:'poll',  cId:0, time:'34 min', q:"Should the Fed have cut rates today?", friends:67, journalists:42, friendsN:24, jrnN:31 },
+  { group:'circle',   type:'poll',  fId:1, time:'48 min', q:"Did you actually finish today's stack?", friends:78, journalists:null, friendsN:42 },
+  { group:'newsroom', type:'drop',  cId:0, time:'1h', note:"Took me three days to get the Treasury sources to talk on record. Worth the wait — full piece up now.", storyId:0, headline:"The US economy is fine probably", thumb:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=200&h=200&fit=crop", tag:'Business' },
+  { group:'circle',   type:'post',  fId:3, time:'1h', body:"if the Fed isn't cutting it's because they think there's recession risk later. the 'one cut' is a hedge. nobody saying that part out loud.", tag:'' },
+  { group:'newsroom', type:'post',  cId:2, time:'2h', body:"The methane rule has been in EPA's drawer for 18 months. The reason it dropped today, not last quarter, has everything to do with the Senate calendar. We'll be tracking the floor vote.", tag:'Analysis' },
+  { group:'circle',   type:'poll',  fId:4, time:'2h', q:"Are you tracking the Iran/Hormuz situation?", friends:54, journalists:null, friendsN:39 },
+  { group:'newsroom', type:'poll',  cId:1, time:'3h', q:"Is the U.S. right to demand half-ownership of the Gordie Howe Bridge?", friends:18, journalists:9, friendsN:31, jrnN:17 },
+  { group:'newsroom', type:'drop',  cId:1, time:'4h', note:"Working on this one for two weeks. The story isn't the threat — it's what Canada's quietly preparing in response.", storyId:1, headline:"Trump threatens to block new bridge to Canada", thumb:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=200&h=200&fit=crop", tag:'Politics' },
+  { group:'circle',   type:'post',  fId:5, time:'5h', body:"finally read the methane rule explainer. wild that this is the first real climate policy progress in 18 months and nobody's talking about it.", tag:'' },
+  { group:'newsroom', type:'post',  cId:0, time:'6h', body:"Hot take from inside the Fed presser: Powell looked tired. Three reporters tried to get him on the dot-plot question. He swatted all three. Make of that what you will.", tag:'Hot take' },
 ];
 
 const VERIF_TINY = `<svg class="wr-author-verif" viewBox="0 0 24 24" fill="#EDBD1F"><path d="M12 1.5l2.6 2.3 3.4-.5.7 3.4 3.1 1.6-1.4 3.2 1.4 3.2-3.1 1.6-.7 3.4-3.4-.5L12 22.5l-2.6-2.3-3.4.5-.7-3.4-3.1-1.6 1.4-3.2-1.4-3.2 3.1-1.6.7-3.4 3.4.5L12 1.5z"/><polyline points="8 12 11 15 16 9.5" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-function authorRow(c, time) {
+function authorRow(person, time, group) {
+  const meta = group === 'circle' ? 'Your circle' : 'Newsreel staff';
+  const verif = group === 'newsroom' && person.verified ? VERIF_TINY : '';
   return `
     <div class="wr-author">
-      <img class="wr-author-av" src="${c.avatar}" alt="">
+      <img class="wr-author-av" src="${person.avatar || person.av}" alt="">
       <div class="wr-author-info">
-        <span class="wr-author-name">${c.name}${c.verified ? VERIF_TINY : ''}</span>
-        <span class="wr-author-meta">Newsreel staff</span>
+        <span class="wr-author-name">${person.name}${verif}</span>
+        <span class="wr-author-meta">${meta}</span>
       </div>
       <span class="wr-time">${time} ago</span>
     </div>`;
 }
 
 function renderWireCard(item) {
-  const c = CREATORS[item.cId];
+  const person = item.group === 'circle' ? FRIENDS[item.fId] : CREATORS[item.cId];
   if (item.type === 'post') {
     return `<div class="wr-card">
-      ${authorRow(c, item.time)}
+      ${authorRow(person, item.time, item.group)}
       <div class="wr-post-body">${item.body}</div>
-      <div class="wr-tag">★ ${item.tag}</div>
+      ${item.tag ? `<div class="wr-tag">★ ${item.tag}</div>` : ''}
     </div>`;
   }
   if (item.type === 'drop') {
     return `<div class="wr-card">
-      ${authorRow(c, item.time)}
+      ${authorRow(person, item.time, item.group)}
       <div class="wr-drop-note">${item.note}</div>
       <button class="wr-drop-story" onclick="closeWire(); goStory(${item.storyId}); goSlide(${item.storyId},0);">
         <div class="wr-drop-thumb"><img src="${item.thumb}"></div>
         <div class="wr-drop-meta">
-          <span class="wr-drop-eyebrow">New from ${c.name.split(' ')[0]} · ${item.tag}</span>
+          <span class="wr-drop-eyebrow">New from ${person.name.split(' ')[0]} · ${item.tag}</span>
           <span class="wr-drop-headline">${item.headline}</span>
         </div>
       </button>
     </div>`;
   }
   if (item.type === 'poll') {
+    const hasJournalists = item.journalists != null;
     return `<div class="wr-card">
-      ${authorRow(c, item.time)}
+      ${authorRow(person, item.time, item.group)}
       <div class="wr-poll-q">${item.q}</div>
       <div class="wr-poll-row">
         <div class="wr-poll-label"><span class="wr-poll-label-left">Your friends agree</span><span class="wr-poll-pct">${item.friends}%</span></div>
         <div class="wr-poll-bar"><div class="wr-poll-bar-fill wr-poll-bar-fill--friends" style="width:${item.friends}%"></div></div>
       </div>
-      <div class="wr-poll-row">
+      ${hasJournalists ? `<div class="wr-poll-row">
         <div class="wr-poll-label"><span class="wr-poll-label-left">Verified journalists agree</span><span class="wr-poll-pct">${item.journalists}%</span></div>
         <div class="wr-poll-bar"><div class="wr-poll-bar-fill wr-poll-bar-fill--journalists" style="width:${item.journalists}%"></div></div>
-      </div>
-      <div class="wr-poll-foot">${item.friendsN} friends · ${item.jrnN} journalists voted</div>
+      </div>` : ''}
+      <div class="wr-poll-foot">${item.friendsN} friends${hasJournalists ? ` · ${item.jrnN} journalists` : ''} voted</div>
     </div>`;
   }
   return '';
@@ -1393,22 +1402,20 @@ function renderWireCard(item) {
 
 const FRIENDS = [
   { name:"You",      av:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop", state:'me' },
-  { name:"Maya",     av:"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop", state:'unviewed' },
-  { name:"Brijesh",  av:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=120&h=120&fit=crop", state:'unviewed' },
-  { name:"Annika",   av:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop", state:'unviewed' },
-  { name:"Roy",      av:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop", state:'viewed' },
-  { name:"Lauren",   av:"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&h=120&fit=crop", state:'viewed' },
+  { name:"Maya",     av:"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop", avatar:"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop", state:'unviewed' },
+  { name:"Brijesh",  av:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=120&h=120&fit=crop", avatar:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=120&h=120&fit=crop", state:'unviewed' },
+  { name:"Annika",   av:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop", avatar:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop", state:'unviewed' },
+  { name:"Roy",      av:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop", avatar:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop", state:'viewed' },
+  { name:"Lauren",   av:"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&h=120&fit=crop", avatar:"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&h=120&fit=crop", state:'viewed' },
   { name:"Kyle",     av:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop", state:'viewed' },
   { name:"Ava",      av:"https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=120&h=120&fit=crop", state:'viewed' },
 ];
 
-function renderWire(filter) {
-  filter = filter || 'all';
-  const filtered = filter === 'all' ? WIRE : WIRE.filter(w =>
-    (filter === 'posts' && w.type === 'post') ||
-    (filter === 'polls' && w.type === 'poll') ||
-    (filter === 'stories' && w.type === 'drop')
-  );
+let wireGroup = 'all'; // 'all' | 'circle' | 'newsroom'
+
+function renderWire(group) {
+  if (group) wireGroup = group;
+  const filtered = wireGroup === 'all' ? WIRE : WIRE.filter(w => w.group === wireGroup);
   const friendsHtml = FRIENDS.map(f => {
     const ringClass = f.state === 'me' ? 'wr-friend-ring--me' : (f.state === 'viewed' ? 'wr-friend-ring--viewed' : '');
     return `<button class="wr-friend">
@@ -1419,19 +1426,14 @@ function renderWire(filter) {
   wireEl.innerHTML = `
     <div class="wr-top">
       <h1 class="wr-title">The Wire</h1>
+      <div class="wr-chips" style="margin-top:8px;">
+        <button class="wr-chip ${wireGroup==='all'?'active':''}" onclick="renderWire('all')">All</button>
+        <button class="wr-chip ${wireGroup==='circle'?'active':''}" onclick="renderWire('circle')">Your Circle</button>
+        <button class="wr-chip ${wireGroup==='newsroom'?'active':''}" onclick="renderWire('newsroom')">Newsroom</button>
+      </div>
     </div>
     <div class="wr-circle">
-      <h2 class="wr-section-h">Your Circle <span class="wr-section-h-sub">friends' takes</span></h2>
       <div class="wr-circle-row">${friendsHtml}</div>
-    </div>
-    <h2 class="wr-section-h" style="padding-top:18px;">Newsroom <span class="wr-section-h-sub">verified reporters</span></h2>
-    <div style="padding:0 18px 6px;">
-      <div class="wr-chips">
-        <button class="wr-chip ${filter==='all'?'active':''}" onclick="renderWire('all')">All</button>
-        <button class="wr-chip ${filter==='posts'?'active':''}" onclick="renderWire('posts')">Posts</button>
-        <button class="wr-chip ${filter==='polls'?'active':''}" onclick="renderWire('polls')">Polls</button>
-        <button class="wr-chip ${filter==='stories'?'active':''}" onclick="renderWire('stories')">New stories</button>
-      </div>
     </div>
     ${filtered.map(renderWireCard).join('')}
   `;
