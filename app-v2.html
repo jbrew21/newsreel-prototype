@@ -135,10 +135,10 @@
   .b-read-row { display:flex; justify-content:flex-end; }
 
   /* Tabs */
-  .tabs { position:absolute; left:0; right:0; bottom:0; z-index:6;
+  .tabs { position:absolute; left:0; right:0; bottom:0; z-index:60;
     display:flex; justify-content:space-around; align-items:flex-start;
     padding:8px 8px 28px;
-    background:linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0)); }
+    background:linear-gradient(to top, rgba(0,0,0,0.95) 40%, rgba(0,0,0,0.6) 80%, rgba(0,0,0,0)); }
   .tab { background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; color:rgba(255,255,255,0.6); padding:6px 8px; }
   .tab svg { width:22px; height:22px; }
   .tab-label { font-family:var(--font-b); font-size:10px; font-weight:500; }
@@ -311,7 +311,7 @@
   .creator.on { transform:translateX(0); }
 
   /* ─────────── EXPLORE SCENE ─────────── */
-  .explore { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:25; overflow-y:auto; padding-bottom:90px; }
+  .explore { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:25; overflow-y:auto; padding-bottom:120px; }
   .explore.on { transform:translateY(0); }
   /* Search row */
   .ex-top { display:flex; align-items:center; gap:10px; padding:60px 18px 14px; }
@@ -345,9 +345,18 @@
   .ex-bf-sub { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
 
   /* Section header */
-  .ex-h { display:flex; align-items:flex-end; justify-content:space-between; padding:8px 18px 12px; }
-  .ex-h-title { font-family:var(--font-h); font-size:22px; color:#fff; }
+  .ex-h { display:flex; align-items:flex-end; justify-content:space-between; padding:18px 18px 4px; }
+  .ex-h-stack { display:flex; flex-direction:column; gap:2px; }
+  .ex-h-title { font-family:var(--font-h); font-size:22px; color:#fff; line-height:1.1; }
+  .ex-h-sub { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
   .ex-h-link { font-family:var(--font-b); font-size:12px; font-weight:500; color:var(--nr-red); background:none; border:none; cursor:pointer; }
+  .ex-section-pad { padding-bottom:8px; }
+  .ex-feat-second { display:flex; gap:12px; padding:12px 18px 4px; }
+  .ex-feat-second-card { flex:1; cursor:pointer; background:none; border:none; padding:0; text-align:left; }
+  .ex-feat-second-img { width:100%; aspect-ratio:1/1; border-radius:14px; overflow:hidden; background:var(--nr-lead); margin-bottom:8px; }
+  .ex-feat-second-img img { width:100%; height:100%; object-fit:cover; }
+  .ex-feat-second-tag { font-family:var(--font-m); font-size:9px; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; font-weight:600; margin-bottom:4px; }
+  .ex-feat-second-headline { font-family:var(--font-h); font-size:14px; line-height:1.2; color:#fff; }
 
   /* Topic chips */
   .ex-chips { display:flex; gap:8px; padding:0 18px 8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
@@ -435,24 +444,26 @@
   <div class="feed" id="feed">
     <div class="stories" id="stories"></div>
 
-    <div class="tabs">
-      <button class="tab active" onclick="closeExplore()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="8" y1="3" x2="8" y2="8"/></svg>
-        <span class="tab-label">Today</span>
-      </button>
-      <button class="tab">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span class="tab-label">Activity</span>
-      </button>
-      <button class="tab" onclick="openExplore()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-        <span class="tab-label">Explore</span>
-      </button>
-      <button class="tab">
-        <img src="assets/benny/benny-paperboy-v2-transparent.png" alt="" style="width:24px;height:24px;object-fit:contain;">
-        <span class="tab-label">Benny</span>
-      </button>
-    </div>
+  </div>
+
+  <!-- Tabs are sibling of scenes so they stay above Explore/Creator -->
+  <div class="tabs">
+    <button class="tab active" onclick="closeExplore()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="8" y1="3" x2="8" y2="8"/></svg>
+      <span class="tab-label">Today</span>
+    </button>
+    <button class="tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="tab-label">Activity</span>
+    </button>
+    <button class="tab" onclick="openExplore()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+      <span class="tab-label">Explore</span>
+    </button>
+    <button class="tab">
+      <img src="assets/benny/benny-paperboy-v2-transparent.png" alt="" style="width:24px;height:24px;object-fit:contain;">
+      <span class="tab-label">Benny</span>
+    </button>
   </div>
 
   <!-- Benny assistant sheet (overlays current slide) -->
@@ -951,7 +962,7 @@ function renderExplore() {
     `;
   }).join('');
 
-  const chipsHtml = TOPICS.map((t, i) => `<button class="ex-chip ${i===0?'active':''}">${t}</button>`).join('');
+  const chipsHtml = TOPICS.map((t, i) => `<button class="ex-chip ${i===0?'active':''}" onclick="pickTopic(this)">${t}</button>`).join('');
   const hero = STORIES[1];
   const heroAuthor = CREATORS[hero.creatorId];
   const trendingHtml = TRENDING.map((t, i) => {
@@ -1010,10 +1021,10 @@ function renderExplore() {
       <div class="ex-bf-list">${briefingHtml}</div>
     </div>
 
-    <div class="ex-h"><span class="ex-h-title">Browse</span></div>
+    <div class="ex-h"><div class="ex-h-stack"><span class="ex-h-title">Browse by topic</span><span class="ex-h-sub">Filter today's stories by section</span></div></div>
     <div class="ex-chips">${chipsHtml}</div>
 
-    <div class="ex-h" style="margin-top:6px;"><span class="ex-h-title">Featured</span></div>
+    <div class="ex-h"><div class="ex-h-stack"><span class="ex-h-title">Editor's picks</span><span class="ex-h-sub">What our team thinks you shouldn't miss</span></div></div>
     <button class="ex-hero" onclick="jumpToStory(1)" style="display:block; padding:0; border:none;">
       <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=900&h=600&fit=crop" alt="">
       <div class="ex-hero-fade"></div>
@@ -1022,14 +1033,26 @@ function renderExplore() {
         <div class="ex-hero-headline">${hero.headline}</div>
       </div>
     </button>
+    <div class="ex-feat-second">
+      <button class="ex-feat-second-card" onclick="jumpToStory(2)">
+        <div class="ex-feat-second-img"><img src="https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=400&h=400&fit=crop" alt=""></div>
+        <div class="ex-feat-second-tag">Climate</div>
+        <div class="ex-feat-second-headline">${STORIES[2].headline}</div>
+      </button>
+      <button class="ex-feat-second-card" onclick="jumpToStory(0)">
+        <div class="ex-feat-second-img"><img src="https://images.unsplash.com/photo-1554224155-1696413565d3?w=400&h=400&fit=crop" alt=""></div>
+        <div class="ex-feat-second-tag">Business</div>
+        <div class="ex-feat-second-headline">${STORIES[0].headline}</div>
+      </button>
+    </div>
 
-    <div class="ex-h" style="margin-top:24px;"><span class="ex-h-title">Trending today</span></div>
+    <div class="ex-h"><div class="ex-h-stack"><span class="ex-h-title">Trending now</span><span class="ex-h-sub">Most-read stories across Newsreel right now</span></div></div>
     <div>${trendingHtml}</div>
 
-    <div class="ex-h" style="margin-top:18px;"><span class="ex-h-title">Verified journalists</span></div>
+    <div class="ex-h"><div class="ex-h-stack"><span class="ex-h-title">Journalists to follow</span><span class="ex-h-sub">Verified reporters covering today's beats</span></div></div>
     <div class="ex-jl-row">${journalistsHtml}</div>
 
-    <div class="ex-h" style="margin-top:18px;"><span class="ex-h-title">Discover</span></div>
+    <div class="ex-h"><div class="ex-h-stack"><span class="ex-h-title">Discover</span><span class="ex-h-sub">Older stories worth your time</span></div></div>
     <div class="ex-grid">${tilesHtml}</div>
   `;
 }
@@ -1046,6 +1069,11 @@ function closeExplore() {
   document.querySelectorAll('.tab')[0]?.classList.add('active');
 }
 function jumpToStory(i) { closeExplore(); goStory(i); goSlide(i, 0); }
+
+function pickTopic(btn) {
+  btn.parentElement.querySelectorAll('.ex-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+}
 
 function openCreator(id) {
   creatorEl.innerHTML = renderCreator(CREATORS[id]);
