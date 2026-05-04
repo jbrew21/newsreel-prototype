@@ -42,13 +42,13 @@
   .nr-mark img { height:22px; width:auto; display:block; }
   .nr-mark svg { width:11px; height:11px; color:rgba(255,255,255,0.85); }
   .me-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, var(--nr-red), var(--nr-yellow)); border:1.5px solid rgba(255,255,255,0.85); cursor:pointer; padding:0; }
-  /* Instagram-style segmented bars */
-  .segs { display:flex; gap:3px; height:1px; }
+  /* Story-progress dots — design system pattern (app.html .car-dot) */
+  .segs { display:flex; gap:5px; justify-content:center; align-items:center; height:8px; }
   .segs.single { display:none; }
-  .seg { flex:1; height:1px; border-radius:1px; background:rgba(255,255,255,0.18); overflow:hidden; }
-  .seg-fill { height:100%; background:#fff; width:0; transition:width 0.3s ease; }
-  .seg.done .seg-fill { width:100%; }
-  .seg.on .seg-fill { width:100%; }
+  .seg { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.22); transition:background 0.25s ease, transform 0.25s ease, width 0.25s ease; }
+  .seg-fill { display:none; }
+  .seg.done { background:rgba(255,255,255,0.55); }
+  .seg.on { background:var(--nr-red); width:18px; border-radius:3px; }
 
   /* Video controls (only pause + volume — no fullscreen) */
   .vc { position:absolute; top:130px; left:14px; z-index:4; display:flex; gap:8px; }
