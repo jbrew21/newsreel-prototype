@@ -98,6 +98,49 @@
   .quiz-opt.right { border-color:var(--nr-green); background:rgba(26,173,23,0.1); }
   .quiz-opt.wrong { border-color:var(--nr-red); background:rgba(255,99,67,0.1); }
 
+  /* ─────────── BENNY (Story Impact) SLIDE ─────────── */
+  .slide--benny { background:radial-gradient(ellipse at 50% 55%, #1a0a07 0%, #000 65%); }
+  .slide--benny::before, .slide--benny::after { display:none; }
+  .bn-stage { position:absolute; inset:0; padding:140px 24px 130px; display:flex; flex-direction:column; }
+  .bn-context { font-family:var(--font-m); font-size:10px; letter-spacing:0.24em; color:var(--nr-ash); text-transform:uppercase; margin-bottom:8px; }
+  .bn-headline { font-family:var(--font-h); font-size:20px; line-height:1.22; color:#fff; margin-bottom:0; transition:font-size 0.5s ease, opacity 0.4s ease; }
+  .bn-orb-wrap { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; transition:flex 0.6s cubic-bezier(0.2,0.8,0.2,1); }
+  .bn-orb-btn { position:relative; width:200px; height:200px; border-radius:50%; border:none; padding:0; background:transparent; cursor:pointer;
+    transition:width 0.6s cubic-bezier(0.2,0.8,0.2,1), height 0.6s cubic-bezier(0.2,0.8,0.2,1); }
+  .bn-orb-btn:active { transform:scale(0.97); transition:transform 0.12s ease; }
+  .bn-aura { position:absolute; inset:-55px; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle, rgba(255,99,67,0.45) 0%, rgba(255,99,67,0.18) 32%, rgba(255,99,67,0) 62%);
+    filter:blur(8px); animation:bnAura 3.6s ease-in-out infinite; }
+  .bn-aura.two { inset:-25px; background:radial-gradient(circle, rgba(255,140,80,0.55) 0%, rgba(255,99,67,0) 60%); animation-delay:-1.2s; animation-duration:4.4s; }
+  @keyframes bnAura { 0%,100% { opacity:0.7; transform:scale(0.96); } 50% { opacity:1; transform:scale(1.06); } }
+  .bn-disc { position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at 50% 38%, #FF8966 0%, #FF6343 45%, #C84527 100%);
+    box-shadow: inset 0 -22px 40px rgba(0,0,0,0.35), inset 0 8px 24px rgba(255,255,255,0.18), 0 14px 50px rgba(255,99,67,0.45);
+  }
+  .bn-mascot { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .bn-mascot img { width:62%; height:62%; object-fit:contain; animation:bnIdle 5.2s ease-in-out infinite; transform-origin:50% 60%; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
+  @keyframes bnIdle { 0%,100% { transform:rotate(-2deg) translateY(0); } 50% { transform:rotate(2deg) translateY(-3px); } }
+  .bn-hint { font-family:var(--font-m); font-size:11px; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; animation:bnHintPulse 2.4s ease-in-out infinite; }
+  @keyframes bnHintPulse { 0%,100% { opacity:0.55; } 50% { opacity:1; } }
+
+  .slide--benny.opened .bn-orb-wrap { flex:0 0 auto; flex-direction:row; align-items:center; justify-content:flex-start; gap:14px; padding-top:0; }
+  .slide--benny.opened .bn-orb-btn { width:64px; height:64px; pointer-events:none; }
+  .slide--benny.opened .bn-aura { inset:-12px; filter:blur(4px); }
+  .slide--benny.opened .bn-aura.two { inset:-6px; }
+  .slide--benny.opened .bn-headline { font-size:16px; opacity:0.7; }
+  .slide--benny.opened .bn-hint { display:none; }
+  .slide--benny.opened .bn-byline { display:flex; flex-direction:column; align-items:flex-start; gap:2px; }
+  .bn-byline { display:none; }
+  .bn-byline-label { font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; }
+  .bn-byline-name { font-family:var(--font-h); font-size:18px; color:#fff; }
+
+  .bn-take { max-height:0; overflow:hidden; opacity:0; transition:max-height 0.7s cubic-bezier(0.2,0.8,0.2,1), opacity 0.5s ease 0.15s; }
+  .slide--benny.opened .bn-take { max-height:60vh; opacity:1; }
+  .bn-take-body { font-family:var(--font-h); font-size:19px; line-height:1.35; color:#fff; margin-bottom:16px; }
+  .bn-take-body em { color:var(--nr-red); font-style:normal; }
+  .bn-take-meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+  .bn-take-chip { font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; color:var(--nr-silver); text-transform:uppercase; padding:5px 9px; border:1px solid var(--nr-iron); border-radius:999px; }
+
   /* ─────────── CREATOR PROFILE ─────────── */
   .creator { position:absolute; inset:0; background:#000; transform:translateX(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:30; overflow-y:auto; }
   .creator.on { transform:translateX(0); }
@@ -215,6 +258,11 @@ const STORIES = [
       { type:"quiz",
         q:"The economy grew by 2% last quarter, but Wall Street analysts were hoping to hit what number?",
         opts:["3%","2.5%","2.2%","4%"], answer:0 },
+      { type:"benny",
+        context:"You just read",
+        headline:"The US economy is fine probably",
+        take:"Your <em>$2,800 Brooklyn rent</em> isn't moving down in 2026 — landlords have no pressure to cut. Refinancing your student loans gets cheaper if that one cut lands in Q4, but only by a fraction of a point. The Fed thinks the economy is <em>still too hot</em>, which usually means tech hiring stays soft another quarter.",
+        chips:["Brooklyn","Tech, 27","Student loans"] },
     ],
   },
   {
@@ -244,6 +292,35 @@ let storyIdx = 0;
 const slideIdx = STORIES.map(()=>0);
 
 function renderSlide(sl, i, k) {
+  if (sl.type === 'benny') {
+    return `
+      <div class="slide slide--benny" id="bn-${i}-${k}">
+        <div class="bn-stage">
+          <div class="bn-context">${sl.context}</div>
+          <h2 class="bn-headline">${sl.headline}</h2>
+          <div class="bn-orb-wrap">
+            <button class="bn-orb-btn" onclick="openBenny(${i}, ${k})">
+              <div class="bn-aura"></div>
+              <div class="bn-aura two"></div>
+              <div class="bn-disc"></div>
+              <div class="bn-mascot"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
+            </button>
+            <div class="bn-byline">
+              <span class="bn-byline-label">Benny · Story impact</span>
+              <span class="bn-byline-name">For you</span>
+            </div>
+            <span class="bn-hint">Tap Benny</span>
+          </div>
+          <div class="bn-take">
+            <p class="bn-take-body">${sl.take}</p>
+            <div class="bn-take-meta">
+              ${sl.chips.map(c => `<span class="bn-take-chip">${c}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
   if (sl.type === 'quiz') {
     return `
       <div class="slide slide--quiz">
@@ -339,6 +416,10 @@ function goSlide(storyI, k) {
   const track = document.querySelector(`.slide-track[data-story="${storyI}"]`);
   track.style.transform = `translateX(-${k * 100}%)`;
   updateSegs();
+}
+
+function openBenny(i, k) {
+  document.getElementById(`bn-${i}-${k}`)?.classList.add('opened');
 }
 
 function answerQuiz(i, k, oi) {
