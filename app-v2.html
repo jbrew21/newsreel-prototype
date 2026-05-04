@@ -200,6 +200,50 @@
     0% { transform:scale(0.85); opacity:0.9; }
     100% { transform:scale(2.4); opacity:0; }
   }
+
+  /* Particle burst on tap — small dots fly outward */
+  .bn-particles { position:absolute; inset:0; pointer-events:none; }
+  .bn-particle { position:absolute; left:50%; top:50%; width:6px; height:6px; border-radius:50%;
+    background:radial-gradient(circle, #FFB088 0%, #FF6343 60%, transparent 100%);
+    box-shadow:0 0 8px rgba(255,99,67,0.8);
+    transform:translate(-50%,-50%); opacity:0; }
+  .bn-particle.go { animation:bnParticle 1.4s cubic-bezier(0.2,0.8,0.2,1) forwards; }
+  @keyframes bnParticle {
+    0% { transform:translate(-50%,-50%) scale(0.6); opacity:0; }
+    15% { opacity:1; }
+    100% { transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.4); opacity:0; }
+  }
+
+  /* "Benny is writing" state — shows briefly between tap and take */
+  .bn-writing { display:none; align-items:center; gap:10px; margin-top:12px; }
+  .slide--benny.opened.thinking .bn-writing { display:flex; animation:bnFadeIn 0.3s ease forwards; }
+  .slide--benny.opened.streaming .bn-writing,
+  .slide--benny.opened.done .bn-writing { display:none; }
+  .bn-writing-mark { width:24px; height:24px; border-radius:50%; background:radial-gradient(circle, #FF8966 0%, #FF6343 70%); position:relative;
+    box-shadow:0 0 0 0 rgba(255,99,67,0.5); animation:bnPulse 1.2s ease-in-out infinite; }
+  @keyframes bnPulse { 0%,100% { box-shadow:0 0 0 0 rgba(255,99,67,0.6); } 50% { box-shadow:0 0 0 8px rgba(255,99,67,0); } }
+  .bn-writing-label { font-family:var(--font-m); font-size:11px; letter-spacing:0.16em; color:var(--nr-silver); text-transform:uppercase; }
+  .bn-writing-dots::after { content:""; display:inline-block; width:1.2em; text-align:left; animation:bnDots 1.2s steps(4) infinite; }
+  @keyframes bnDots { 0% { content:""; } 25% { content:"."; } 50% { content:".."; } 75% { content:"..."; } }
+  @keyframes bnFadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+
+  /* Streaming take body — word-by-word reveal */
+  .bn-take-body .w { opacity:0; filter:blur(4px); transition:opacity 0.35s ease, filter 0.35s ease; }
+  .bn-take-body .w.in { opacity:1; filter:blur(0); }
+  .bn-take-body .w em { color:#fff; font-style:normal; transition:color 0.4s ease, text-shadow 0.4s ease; }
+  .bn-take-body .w.in em.lit { color:var(--nr-red); text-shadow:0 0 14px rgba(255,99,67,0.55); }
+
+  /* Aurora glow behind the orb (subtle, moving) */
+  .bn-aurora { position:absolute; left:50%; top:50%; width:420px; height:420px; transform:translate(-50%,-50%); pointer-events:none; opacity:0.55; z-index:-1;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,99,67,0.35), transparent 50%),
+      radial-gradient(circle at 70% 60%, rgba(237,189,31,0.20), transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(255,99,67,0.20), transparent 50%);
+    filter:blur(40px); animation:bnAurora 18s ease-in-out infinite; }
+  @keyframes bnAurora {
+    0%,100% { transform:translate(-50%,-50%) rotate(0); }
+    50%     { transform:translate(-50%,-50%) rotate(180deg); }
+  }
   @keyframes bnIdle { 0%,100% { transform:rotate(-2deg) translateY(0); } 50% { transform:rotate(2deg) translateY(-3px); } }
   .bn-hint { font-family:var(--font-m); font-size:11px; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; animation:bnHintPulse 2.4s ease-in-out infinite; }
   @keyframes bnHintPulse { 0%,100% { opacity:0.55; } 50% { opacity:1; } }
@@ -470,6 +514,7 @@ function renderSlide(sl, i, k) {
   if (sl.type === 'benny') {
     return `
       <div class="slide slide--benny" id="bn-${i}-${k}">
+        <div class="bn-aurora"></div>
         <div class="bn-stage">
           <div class="bn-context">${sl.context}</div>
           <h2 class="bn-headline">${sl.headline}</h2>
@@ -483,7 +528,12 @@ function renderSlide(sl, i, k) {
               <div class="bn-ripple"></div>
               <div class="bn-ripple r2"></div>
               <div class="bn-ripple r3"></div>
+              <div class="bn-particles" id="bnParticles-${i}-${k}"></div>
             </button>
+            <div class="bn-writing">
+              <div class="bn-writing-mark"></div>
+              <span class="bn-writing-label">Benny is writing for you<span class="bn-writing-dots"></span></span>
+            </div>
             <div class="bn-byline">
               <span class="bn-byline-label">Benny · Story Impact</span>
               <span class="bn-byline-name">For you</span>
@@ -492,7 +542,7 @@ function renderSlide(sl, i, k) {
             <span class="bn-hint">Tap Benny</span>
           </div>
           <div class="bn-take">
-            <p class="bn-take-body">${sl.take}</p>
+            <p class="bn-take-body" id="bnBody-${i}-${k}">${sl.take}</p>
             <div class="bn-take-meta-head">
               <span class="bn-take-meta-label">Based on you</span>
               <button class="bn-take-edit" onclick="toggleBennyEdit(${i}, ${k})" id="bnEdit-${i}-${k}">Edit</button>
