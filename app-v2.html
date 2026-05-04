@@ -179,12 +179,14 @@
   .bn-hint { font-family:var(--font-m); font-size:11px; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; animation:bnHintPulse 2.4s ease-in-out infinite; }
   @keyframes bnHintPulse { 0%,100% { opacity:0.55; } 50% { opacity:1; } }
 
-  .slide--benny.opened .bn-orb-wrap { flex:0 0 auto; flex-direction:row; align-items:center; justify-content:flex-start; gap:14px; padding-top:0; }
-  .slide--benny.opened .bn-orb-btn { width:64px; height:64px; pointer-events:none; }
-  .slide--benny.opened .bn-aura { inset:-12px; filter:blur(4px); }
-  .slide--benny.opened .bn-aura.two { inset:-6px; }
-  .slide--benny.opened .bn-headline { font-size:16px; opacity:0.7; }
-  .slide--benny.opened .bn-hint { display:none; }
+  .slide--benny.opened .bn-orb-wrap { flex:0 0 auto; flex-direction:row; align-items:center; justify-content:flex-start; gap:12px; padding-top:0; }
+  .slide--benny.opened .bn-orb-btn { width:52px; height:52px; min-width:52px; pointer-events:none; }
+  .slide--benny.opened .bn-aura { inset:-6px; filter:blur(3px); animation:none; opacity:0.7; }
+  .slide--benny.opened .bn-aura.two { inset:-3px; animation:none; opacity:0.5; }
+  .slide--benny.opened .bn-headline { font-size:15px; opacity:0.6; }
+  .slide--benny.opened .bn-hint,
+  .slide--benny.opened .bn-impact-label,
+  .slide--benny.opened .bn-foryou { display:none; }
   .slide--benny.opened .bn-byline { display:flex; flex-direction:column; align-items:flex-start; gap:2px; }
   .bn-byline { display:none; }
   .bn-byline-label { font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; }
@@ -205,8 +207,13 @@
     80% { opacity:1; }
     100% { background-position:200% 0; opacity:0; }
   }
+  .bn-take-meta-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .bn-take-meta-label { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; }
+  .bn-take-edit { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; background:none; border:none; cursor:pointer; padding:4px 0; }
   .bn-take-meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
-  .bn-take-chip { font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; color:var(--nr-silver); text-transform:uppercase; padding:5px 9px; border:1px solid var(--nr-iron); border-radius:999px; }
+  .bn-take-chip { font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; color:var(--nr-silver); text-transform:uppercase; padding:5px 9px; border:1px solid var(--nr-iron); border-radius:999px; cursor:pointer; transition:border-color 0.15s, color 0.15s; }
+  .bn-take-chip.editable { border-color:var(--nr-red); color:#fff; border-style:dashed; }
+  .bn-take-chip[contenteditable="true"] { outline:none; }
 
   /* ─────────── XP SLIDE ─────────── */
   .slide--xp { background:#000; }
@@ -444,7 +451,11 @@ function renderSlide(sl, i, k) {
           </div>
           <div class="bn-take">
             <p class="bn-take-body">${sl.take}</p>
-            <div class="bn-take-meta">
+            <div class="bn-take-meta-head">
+              <span class="bn-take-meta-label">Based on you</span>
+              <button class="bn-take-edit" onclick="toggleBennyEdit(${i}, ${k})" id="bnEdit-${i}-${k}">Edit</button>
+            </div>
+            <div class="bn-take-meta" id="bnChips-${i}-${k}">
               ${sl.chips.map(c => `<span class="bn-take-chip">${c}</span>`).join('')}
             </div>
           </div>
@@ -557,11 +568,27 @@ function goSlide(storyI, k) {
     const hideTypes = ['benny','xp'];
     overlay.classList.toggle('hidden-overlay', hideTypes.includes(s.slides[k].type));
   }
+  // Reset any opened Benny slides we navigated away from
+  document.querySelectorAll('.slide--benny.opened').forEach(el => {
+    if (el.id !== `bn-${storyI}-${k}`) el.classList.remove('opened');
+  });
   updateSegs();
 }
 
 function openBenny(i, k) {
   document.getElementById(`bn-${i}-${k}`)?.classList.add('opened');
+}
+
+function toggleBennyEdit(i, k) {
+  const wrap = document.getElementById(`bnChips-${i}-${k}`);
+  const btn = document.getElementById(`bnEdit-${i}-${k}`);
+  const editing = wrap.classList.toggle('editing');
+  btn.textContent = editing ? 'Done' : 'Edit';
+  wrap.querySelectorAll('.bn-take-chip').forEach(c => {
+    c.classList.toggle('editable', editing);
+    c.contentEditable = editing;
+    if (editing) c.focus();
+  });
 }
 
 function answerQuiz(i, k, oi) {
