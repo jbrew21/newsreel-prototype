@@ -160,7 +160,10 @@
   .slide--benny::before, .slide--benny::after { display:none; }
   .bn-stage { position:absolute; inset:0; padding:120px 68px 110px 24px; display:flex; flex-direction:column; }
   .bn-context { font-family:var(--font-m); font-size:10px; letter-spacing:0.24em; color:var(--nr-ash); text-transform:uppercase; margin-bottom:10px; transition:opacity 0.3s ease; }
-  .bn-headline { font-family:var(--font-h); font-size:20px; line-height:1.22; color:#fff; margin-bottom:0; transition:font-size 0.5s ease, opacity 0.4s ease, margin 0.4s ease; }
+  .bn-headline { font-family:var(--font-h); font-size:26px; line-height:1.18; color:#fff; margin-bottom:0; transition:font-size 0.5s ease, opacity 0.4s ease, margin 0.4s ease; }
+  .bn-headline em { color:var(--nr-red); font-style:normal; }
+  .bn-subline { font-family:var(--font-m); font-size:11px; letter-spacing:0.12em; color:var(--nr-silver); text-transform:uppercase; margin-top:10px; }
+  .slide--benny.opened .bn-subline { display:none; }
   .bn-orb-wrap { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; transition:flex 0.6s cubic-bezier(0.2,0.8,0.2,1), margin 0.4s ease; margin-top:0; }
   /* Opened state — give every chunk breathing room */
   .slide--benny.opened .bn-context { display:none; }
@@ -862,10 +865,10 @@ function renderSlide(sl, i, k) {
       <div class="slide slide--benny" id="bn-${i}-${k}">
         <div class="bn-aurora"></div>
         <div class="bn-stage">
-          <div class="bn-context">${sl.context}</div>
-          <h2 class="bn-headline">${sl.headline}</h2>
+          <div class="bn-context">Story impact · for Jack</div>
+          <h2 class="bn-headline">How this story affects <em>you</em>.</h2>
+          <p class="bn-subline">Brooklyn renter · tech worker, 27 · paying down student loans</p>
           <div class="bn-orb-wrap">
-            <span class="bn-impact-label"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt="">Story Impact</span>
             <button class="bn-orb-btn" onclick="openBenny(${i}, ${k})">
               <div class="bn-aura"></div>
               <div class="bn-aura two"></div>
@@ -884,8 +887,7 @@ function renderSlide(sl, i, k) {
               <span class="bn-byline-label">Benny · Story Impact</span>
               <span class="bn-byline-name">For you</span>
             </div>
-            <span class="bn-foryou"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" alt="">For you</span>
-            <span class="bn-hint">Tap Benny</span>
+            <span class="bn-hint">Tap Benny to see how →</span>
           </div>
           <div class="bn-take">
             <p class="bn-take-body" id="bnBody-${i}-${k}">${sl.take}</p>
