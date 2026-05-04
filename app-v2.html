@@ -392,6 +392,73 @@
   .ex-jl-verif { position:absolute; right:-2px; bottom:-2px; width:18px; height:18px; }
   .ex-jl-name { font-family:var(--font-b); font-size:11px; font-weight:500; color:#fff; text-align:center; line-height:1.2; }
 
+  /* ─────────── THE WIRE SCENE ─────────── */
+  .wire { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:25; overflow-y:auto; padding-bottom:120px; }
+  .wire.on { transform:translateY(0); }
+  .wr-top { padding:60px 18px 8px; position:sticky; top:0; background:linear-gradient(to bottom, #000 80%, rgba(0,0,0,0)); z-index:5; }
+  .wr-eyebrow { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.24em; color:var(--nr-red); text-transform:uppercase; margin-bottom:4px; }
+  .wr-title { font-family:var(--font-h); font-size:34px; line-height:1.05; color:#fff; margin-bottom:6px; }
+  .wr-sub { font-family:var(--font-b); font-size:13px; color:var(--nr-silver); margin-bottom:14px; }
+  .wr-chips { display:flex; gap:8px; padding-bottom:12px; overflow-x:auto; scrollbar-width:none; }
+  .wr-chips::-webkit-scrollbar { display:none; }
+  .wr-chip { flex-shrink:0; padding:7px 14px; border-radius:999px; border:1px solid var(--nr-iron); background:transparent; color:var(--nr-smoke); font-family:var(--font-b); font-size:13px; font-weight:500; cursor:pointer; }
+  .wr-chip.active { background:#fff; color:#000; border-color:#fff; }
+
+  /* Friends' stories row (top of Wire) */
+  .wr-circle { padding:6px 0 16px; border-bottom:1px solid rgba(255,255,255,0.06); margin-bottom:6px; }
+  .wr-circle-label { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.2em; color:var(--nr-ash); text-transform:uppercase; padding:0 18px 10px; }
+  .wr-circle-row { display:flex; gap:14px; padding:0 18px 4px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .wr-circle-row::-webkit-scrollbar { display:none; }
+  .wr-friend { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; background:none; border:none; padding:0; }
+  .wr-friend-ring { width:64px; height:64px; border-radius:50%; padding:2px;
+    background:linear-gradient(135deg, var(--nr-red), var(--nr-yellow));
+  }
+  .wr-friend-ring--viewed { background:var(--nr-iron); }
+  .wr-friend-ring--me { background:var(--nr-iron); position:relative; }
+  .wr-friend-ring--me::after {
+    content:""; position:absolute; right:-2px; bottom:-2px; width:20px; height:20px; border-radius:50%;
+    background:var(--nr-red); border:2px solid #000;
+    background-image:linear-gradient(45deg, transparent 46%, #000 46%, #000 54%, transparent 54%), linear-gradient(135deg, transparent 46%, #000 46%, #000 54%, transparent 54%);
+    background-size:60% 60%; background-repeat:no-repeat; background-position:center;
+  }
+  .wr-friend-av { width:100%; height:100%; border-radius:50%; object-fit:cover; border:2px solid #000; background:var(--nr-iron); }
+  .wr-friend-name { font-family:var(--font-b); font-size:11px; font-weight:500; color:#fff; text-align:center; max-width:74px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* Card base */
+  .wr-card { padding:14px 18px 16px; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .wr-author { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .wr-author-av { width:38px; height:38px; border-radius:50%; object-fit:cover; }
+  .wr-author-info { display:flex; flex-direction:column; gap:1px; flex:1; min-width:0; }
+  .wr-author-name { font-family:var(--font-b); font-size:14px; font-weight:600; color:#fff; display:flex; align-items:center; gap:5px; }
+  .wr-author-verif { width:13px; height:13px; }
+  .wr-author-meta { font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; color:var(--nr-ash); text-transform:uppercase; }
+  .wr-time { font-family:var(--font-m); font-size:10px; letter-spacing:0.1em; color:var(--nr-ash); text-transform:uppercase; }
+
+  /* Post body */
+  .wr-post-body { font-family:var(--font-b); font-size:15px; line-height:1.45; color:#fff; }
+  .wr-tag { display:inline-flex; align-items:center; gap:5px; margin-top:10px; font-family:var(--font-m); font-size:9px; letter-spacing:0.18em; color:var(--nr-yellow); text-transform:uppercase; font-weight:600; }
+
+  /* Story-drop card */
+  .wr-drop-note { font-family:var(--font-b); font-size:14px; line-height:1.4; color:var(--nr-smoke); margin-bottom:12px; }
+  .wr-drop-story { display:flex; gap:12px; padding:12px; border-radius:14px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); cursor:pointer; text-align:left; width:100%; }
+  .wr-drop-thumb { width:64px; height:64px; border-radius:10px; flex-shrink:0; overflow:hidden; background:var(--nr-lead); }
+  .wr-drop-thumb img { width:100%; height:100%; object-fit:cover; }
+  .wr-drop-meta { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; justify-content:center; }
+  .wr-drop-eyebrow { font-family:var(--font-m); font-size:9px; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; font-weight:600; }
+  .wr-drop-headline { font-family:var(--font-h); font-size:15px; line-height:1.25; color:#fff; }
+
+  /* Poll split */
+  .wr-poll-q { font-family:var(--font-h); font-size:18px; line-height:1.25; color:#fff; margin-bottom:16px; }
+  .wr-poll-row { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  .wr-poll-label { display:flex; align-items:center; justify-content:space-between; font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; }
+  .wr-poll-label-left { color:var(--nr-silver); }
+  .wr-poll-pct { color:#fff; font-family:var(--font-b); font-size:13px; }
+  .wr-poll-bar { height:8px; border-radius:4px; background:var(--nr-lead); overflow:hidden; }
+  .wr-poll-bar-fill { height:100%; border-radius:4px; transition:width 0.6s cubic-bezier(0.2,0.8,0.2,1); }
+  .wr-poll-bar-fill--friends { background:linear-gradient(90deg, #5DD4F0, #2196CC); }
+  .wr-poll-bar-fill--journalists { background:var(--nr-red); }
+  .wr-poll-foot { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
+
   /* ─────────── BENNY TAB SCENE ─────────── */
   .bennytab { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:25; display:flex; flex-direction:column; }
   .bennytab.on { transform:translateY(0); }
@@ -545,13 +612,13 @@
 
   <!-- Tabs are sibling of scenes so they stay above Explore/Creator -->
   <div class="tabs">
-    <button class="tab active" onclick="closeExplore(); closeBennyTab()">
+    <button class="tab active" onclick="closeExplore(); closeBennyTab(); closeWire()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="8" y1="3" x2="8" y2="8"/></svg>
       <span class="tab-label">Today</span>
     </button>
-    <button class="tab">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span class="tab-label">Activity</span>
+    <button class="tab" onclick="openWire()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="14" y2="18"/></svg>
+      <span class="tab-label">The Wire</span>
     </button>
     <button class="tab" onclick="openExplore()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
@@ -587,6 +654,9 @@
 
   <!-- Explore scene -->
   <div class="explore" id="explore"></div>
+
+  <!-- The Wire scene -->
+  <div class="wire" id="wire"></div>
 
   <!-- Benny tab scene -->
   <div class="bennytab" id="bennytab">
@@ -1249,6 +1319,130 @@ function closeExplore() {
   document.querySelectorAll('.tab')[0]?.classList.add('active');
 }
 function jumpToStory(i) { closeExplore(); goStory(i); goSlide(i, 0); }
+
+// ─── The Wire ───
+const wireEl = document.getElementById('wire');
+
+const WIRE = [
+  { type:'post',  cId:1, time:'12 min', body:"Just got off the phone with a senior State Department official. Confirms 'Project Freedom' Navy escorts begin Monday — three U.S. destroyers already repositioning to the Strait. More tonight.", tag:'From the desk' },
+  { type:'poll',  cId:0, time:'34 min', q:"Should the Fed have cut rates today?", friends:67, journalists:42, friendsN:24, jrnN:31 },
+  { type:'drop',  cId:0, time:'1h', note:"Took me three days to get the Treasury sources to talk on record. Worth the wait — full piece up now.", storyId:0, headline:"The US economy is fine probably", thumb:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=200&h=200&fit=crop", tag:'Business' },
+  { type:'post',  cId:2, time:'2h', body:"The methane rule has been in EPA's drawer for 18 months. The reason it dropped today, not last quarter, has everything to do with the Senate calendar. We'll be tracking the floor vote.", tag:'Analysis' },
+  { type:'poll',  cId:1, time:'3h', q:"Is the U.S. right to demand half-ownership of the Gordie Howe Bridge?", friends:18, journalists:9, friendsN:31, jrnN:17 },
+  { type:'drop',  cId:1, time:'4h', note:"Working on this one for two weeks. The story isn't the threat — it's what Canada's quietly preparing in response.", storyId:1, headline:"Trump threatens to block new bridge to Canada", thumb:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=200&h=200&fit=crop", tag:'Politics' },
+  { type:'post',  cId:0, time:'5h', body:"Hot take from inside the Fed presser: Powell looked tired. Three reporters tried to get him on the dot-plot question. He swatted all three. Make of that what you will.", tag:'Hot take' },
+];
+
+const VERIF_TINY = `<svg class="wr-author-verif" viewBox="0 0 24 24" fill="#EDBD1F"><path d="M12 1.5l2.6 2.3 3.4-.5.7 3.4 3.1 1.6-1.4 3.2 1.4 3.2-3.1 1.6-.7 3.4-3.4-.5L12 22.5l-2.6-2.3-3.4.5-.7-3.4-3.1-1.6 1.4-3.2-1.4-3.2 3.1-1.6.7-3.4 3.4.5L12 1.5z"/><polyline points="8 12 11 15 16 9.5" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+function authorRow(c, time) {
+  return `
+    <div class="wr-author">
+      <img class="wr-author-av" src="${c.avatar}" alt="">
+      <div class="wr-author-info">
+        <span class="wr-author-name">${c.name}${c.verified ? VERIF_TINY : ''}</span>
+        <span class="wr-author-meta">Newsreel staff</span>
+      </div>
+      <span class="wr-time">${time} ago</span>
+    </div>`;
+}
+
+function renderWireCard(item) {
+  const c = CREATORS[item.cId];
+  if (item.type === 'post') {
+    return `<div class="wr-card">
+      ${authorRow(c, item.time)}
+      <div class="wr-post-body">${item.body}</div>
+      <div class="wr-tag">★ ${item.tag}</div>
+    </div>`;
+  }
+  if (item.type === 'drop') {
+    return `<div class="wr-card">
+      ${authorRow(c, item.time)}
+      <div class="wr-drop-note">${item.note}</div>
+      <button class="wr-drop-story" onclick="closeWire(); goStory(${item.storyId}); goSlide(${item.storyId},0);">
+        <div class="wr-drop-thumb"><img src="${item.thumb}"></div>
+        <div class="wr-drop-meta">
+          <span class="wr-drop-eyebrow">New from ${c.name.split(' ')[0]} · ${item.tag}</span>
+          <span class="wr-drop-headline">${item.headline}</span>
+        </div>
+      </button>
+    </div>`;
+  }
+  if (item.type === 'poll') {
+    return `<div class="wr-card">
+      ${authorRow(c, item.time)}
+      <div class="wr-poll-q">${item.q}</div>
+      <div class="wr-poll-row">
+        <div class="wr-poll-label"><span class="wr-poll-label-left">Your friends agree</span><span class="wr-poll-pct">${item.friends}%</span></div>
+        <div class="wr-poll-bar"><div class="wr-poll-bar-fill wr-poll-bar-fill--friends" style="width:${item.friends}%"></div></div>
+      </div>
+      <div class="wr-poll-row">
+        <div class="wr-poll-label"><span class="wr-poll-label-left">Verified journalists agree</span><span class="wr-poll-pct">${item.journalists}%</span></div>
+        <div class="wr-poll-bar"><div class="wr-poll-bar-fill wr-poll-bar-fill--journalists" style="width:${item.journalists}%"></div></div>
+      </div>
+      <div class="wr-poll-foot">${item.friendsN} friends · ${item.jrnN} journalists voted</div>
+    </div>`;
+  }
+  return '';
+}
+
+const FRIENDS = [
+  { name:"You",      av:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop", state:'me' },
+  { name:"Maya",     av:"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop", state:'unviewed' },
+  { name:"Brijesh",  av:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=120&h=120&fit=crop", state:'unviewed' },
+  { name:"Annika",   av:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop", state:'unviewed' },
+  { name:"Roy",      av:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop", state:'viewed' },
+  { name:"Lauren",   av:"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&h=120&fit=crop", state:'viewed' },
+  { name:"Kyle",     av:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop", state:'viewed' },
+  { name:"Ava",      av:"https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=120&h=120&fit=crop", state:'viewed' },
+];
+
+function renderWire(filter) {
+  filter = filter || 'all';
+  const filtered = filter === 'all' ? WIRE : WIRE.filter(w =>
+    (filter === 'posts' && w.type === 'post') ||
+    (filter === 'polls' && w.type === 'poll') ||
+    (filter === 'stories' && w.type === 'drop')
+  );
+  const friendsHtml = FRIENDS.map(f => {
+    const ringClass = f.state === 'me' ? 'wr-friend-ring--me' : (f.state === 'viewed' ? 'wr-friend-ring--viewed' : '');
+    return `<button class="wr-friend">
+      <div class="wr-friend-ring ${ringClass}"><img class="wr-friend-av" src="${f.av}"></div>
+      <span class="wr-friend-name">${f.name}</span>
+    </button>`;
+  }).join('');
+  wireEl.innerHTML = `
+    <div class="wr-top">
+      <div class="wr-eyebrow">From your circle + the newsroom</div>
+      <h1 class="wr-title">The Wire</h1>
+      <div class="wr-sub">Two layers: friends' takes on top, verified reporters below.</div>
+    </div>
+    <div class="wr-circle">
+      <div class="wr-circle-label">Your circle's takes</div>
+      <div class="wr-circle-row">${friendsHtml}</div>
+    </div>
+    <div style="padding:14px 18px 6px;">
+      <div class="wr-chips">
+        <button class="wr-chip ${filter==='all'?'active':''}" onclick="renderWire('all')">All</button>
+        <button class="wr-chip ${filter==='posts'?'active':''}" onclick="renderWire('posts')">Posts</button>
+        <button class="wr-chip ${filter==='polls'?'active':''}" onclick="renderWire('polls')">Polls</button>
+        <button class="wr-chip ${filter==='stories'?'active':''}" onclick="renderWire('stories')">New stories</button>
+      </div>
+    </div>
+    ${filtered.map(renderWireCard).join('')}
+  `;
+}
+
+function openWire() {
+  renderWire('all');
+  wireEl.classList.add('on');
+  exploreEl.classList.remove('on');
+  bennytabEl.classList.remove('on');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab')[1]?.classList.add('active');
+}
+function closeWire() { wireEl.classList.remove('on'); }
 
 // ─── Benny tab ───
 const bennytabEl = document.getElementById('bennytab');
