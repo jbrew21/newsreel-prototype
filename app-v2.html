@@ -495,8 +495,25 @@
   .wp-bar-pct { font-family:var(--font-m); font-size:9px; font-weight:600; color:var(--nr-silver); }
   .wp-labels { display:flex; justify-content:space-between; font-family:var(--font-m); font-size:9px; letter-spacing:0.1em; color:var(--nr-ash); text-transform:uppercase; padding:0 2px; margin-bottom:10px; }
   .wp-foot { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); margin-bottom:10px; }
-  .wp-vote { width:100%; padding:9px; background:transparent; border:1px dashed var(--nr-iron); border-radius:10px; color:var(--nr-silver); font-family:var(--font-b); font-size:13px; cursor:pointer; }
-  .wp-vote:hover { border-color:var(--nr-yellow); color:#fff; }
+  /* Interactive Likert row inside Wire poll cards */
+  .wp-likert { background:var(--nr-lead); border-radius:12px; padding:18px 16px 14px; margin-bottom:12px; }
+  .wp-likert-track { position:relative; height:24px; margin-bottom:10px; }
+  .wp-likert-line { position:absolute; left:6px; right:6px; top:50%; height:2px; background:var(--nr-yellow); transform:translateY(-50%); border-radius:1px; }
+  .wp-likert-tick { position:absolute; top:50%; transform:translate(-50%,-50%); width:24px; height:24px; padding:0; border:none; background:transparent; cursor:pointer; border-radius:50%; }
+  .wp-likert-tick::before { content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:2px; height:14px; background:rgba(237,189,31,0.55); border-radius:1px; transition:background 0.15s ease, height 0.15s ease, width 0.15s ease; }
+  .wp-likert-tick:hover::before { background:var(--nr-yellow); height:18px; width:3px; }
+  .wp-likert-tick.on::before { background:var(--nr-yellow); height:24px; width:4px; }
+  .wp-likert-tick:nth-child(2) { left:0%; } .wp-likert-tick:nth-child(3) { left:25%; }
+  .wp-likert-tick:nth-child(4) { left:50%; } .wp-likert-tick:nth-child(5) { left:75%; }
+  .wp-likert-tick:nth-child(6) { left:100%; }
+  .wp-likert-knob { position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:24px; background:var(--nr-yellow); border-radius:3px; pointer-events:none; box-shadow:0 0 12px rgba(237,189,31,0.55); }
+  .wp-likert-labels { display:flex; justify-content:space-between; font-family:var(--font-m); font-size:9px; letter-spacing:0.1em; color:var(--nr-ash); text-transform:uppercase; }
+
+  .wp-voted-banner { display:flex; align-items:center; gap:8px; padding:8px 12px; margin-bottom:10px; border-radius:8px;
+    background:rgba(26,173,23,0.1); border:1px solid rgba(26,173,23,0.35);
+    font-family:var(--font-b); font-size:12px; color:#fff; }
+  .wp-voted-banner svg { width:14px; height:14px; color:var(--nr-green); flex-shrink:0; }
+  .wp-voted-banner strong { color:var(--nr-green); font-weight:600; }
 
   /* Floating composer (+) and bottom sheet */
   .wr-fab { position:absolute; right:20px; bottom:108px; z-index:55; width:54px; height:54px; border-radius:50%;
@@ -882,7 +899,7 @@ const STORIES = [
       { type:"quiz",
         q:"The economy grew by 2% last quarter, but Wall Street analysts were hoping to hit what number?",
         opts:["3%","2.5%","2.2%","4%"], answer:0 },
-      { type:"poll",
+      { type:"poll", pollId:'fed-rates',
         q:"The Fed should have cut rates today rather than holding steady." },
       { type:"benny",
         context:"You just read",
@@ -919,6 +936,10 @@ let storyIdx = 0;
 const slideIdx = STORIES.map(()=>0);
 
 const POLL_LABELS = ["Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"];
+// Shared poll vote store keyed by pollId — same source of truth for story slide + wire card
+const userPollVotes = {};
+function getUserVote(pollId) { return pollId in userPollVotes ? userPollVotes[pollId] : null; }
+function castVote(pollId, idx) { userPollVotes[pollId] = idx; }
 
 function renderSlide(sl, i, k) {
   if (sl.type === 'poll') {
@@ -1234,6 +1255,9 @@ function setPoll(i, k, idx) {
   const key = `${i}-${k}`;
   pollChoice[key] = idx;
   pollGroup[key] = pollGroup[key] || 'friends';
+  // Sync to shared vote store so wire cards reflect this vote
+  const slide = STORIES[i]?.slides[k];
+  if (slide?.pollId) castVote(slide.pollId, idx);
   // knob
   const knob = document.getElementById(`plKnob-${i}-${k}`);
   if (knob) knob.style.left = `${idx * 25}%`;
@@ -1520,16 +1544,17 @@ function jumpToStory(i) { closeExplore(); goStory(i); goSlide(i, 0); }
 const wireEl = document.getElementById('wire');
 
 // Friend-authored items use group:'circle', journalist items use group:'newsroom'
+// pollId on poll items lets us share vote state across surfaces (story slide ↔ wire)
 const WIRE = [
   { group:'newsroom', type:'post',  cId:1, time:'12 min', body:"Just got off the phone with a senior State Department official. Confirms 'Project Freedom' Navy escorts begin Monday — three U.S. destroyers already repositioning to the Strait. More tonight.", tag:'From the desk' },
   { group:'circle',   type:'post',  fId:2, time:'18 min', body:"reading the bridge story now — feels like Trump's just trolling Trudeau. wild that this is how trade gets done now.", tag:'' },
-  { group:'newsroom', type:'poll',  cId:0, time:'34 min', q:"Should the Fed have cut rates today?", friends:67, journalists:42, friendsN:24, jrnN:31 },
-  { group:'circle',   type:'poll',  fId:1, time:'48 min', q:"Did you actually finish today's stack?", friends:78, journalists:null, friendsN:42 },
+  { group:'newsroom', type:'poll',  cId:0, time:'34 min', pollId:'fed-rates', q:"The Fed should have cut rates today rather than holding steady.", friends:67, journalists:42, friendsN:24, jrnN:31 },
+  { group:'circle',   type:'poll',  fId:1, time:'48 min', pollId:'finish-stack', q:"Did you actually finish today's stack?", friends:78, journalists:null, friendsN:42 },
   { group:'newsroom', type:'drop',  cId:0, time:'1h', note:"Took me three days to get the Treasury sources to talk on record. Worth the wait — full piece up now.", storyId:0, headline:"The US economy is fine probably", thumb:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=200&h=200&fit=crop", tag:'Business' },
   { group:'circle',   type:'post',  fId:3, time:'1h', body:"if the Fed isn't cutting it's because they think there's recession risk later. the 'one cut' is a hedge. nobody saying that part out loud.", tag:'' },
   { group:'newsroom', type:'post',  cId:2, time:'2h', body:"The methane rule has been in EPA's drawer for 18 months. The reason it dropped today, not last quarter, has everything to do with the Senate calendar. We'll be tracking the floor vote.", tag:'Analysis' },
-  { group:'circle',   type:'poll',  fId:4, time:'2h', q:"Are you tracking the Iran/Hormuz situation?", friends:54, journalists:null, friendsN:39 },
-  { group:'newsroom', type:'poll',  cId:1, time:'3h', q:"Is the U.S. right to demand half-ownership of the Gordie Howe Bridge?", friends:18, journalists:9, friendsN:31, jrnN:17 },
+  { group:'circle',   type:'poll',  fId:4, time:'2h', pollId:'iran-track', q:"Are you tracking the Iran/Hormuz situation?", friends:54, journalists:null, friendsN:39 },
+  { group:'newsroom', type:'poll',  cId:1, time:'3h', pollId:'bridge-half', q:"The U.S. is right to demand half-ownership of the Gordie Howe Bridge.", friends:18, journalists:9, friendsN:31, jrnN:17 },
   { group:'newsroom', type:'drop',  cId:1, time:'4h', note:"Working on this one for two weeks. The story isn't the threat — it's what Canada's quietly preparing in response.", storyId:1, headline:"Trump threatens to block new bridge to Canada", thumb:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=200&h=200&fit=crop", tag:'Politics' },
   { group:'circle',   type:'post',  fId:5, time:'5h', body:"finally read the methane rule explainer. wild that this is the first real climate policy progress in 18 months and nobody's talking about it.", tag:'' },
   { group:'newsroom', type:'post',  cId:0, time:'6h', body:"Hot take from inside the Fed presser: Powell looked tired. Three reporters tried to get him on the dot-plot question. He swatted all three. Make of that what you will.", tag:'Hot take' },
@@ -1574,21 +1599,30 @@ function renderWireCard(item, idx) {
   }
   if (item.type === 'poll') {
     const wid = `wp-${idx}`;
-    const totalVoters = (item.friendsN || 0) + (item.jrnN || 0);
-    return `<div class="wr-card">
+    const pollId = item.pollId || `wire-${idx}`;
+    const userVote = getUserVote(pollId);
+    const voted = userVote != null;
+    return `<div class="wr-card" id="${wid}-card" data-poll-id="${pollId}">
       ${authorRow(person, item.time, item.group)}
       <div class="wr-poll-q">${item.q}</div>
-      <div class="wp-toggle" id="${wid}-toggle">
+      ${voted ? `<div class="wp-voted-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>You voted <strong>${POLL_LABELS[userVote]}</strong></div>` : ''}
+      <div class="wp-likert" id="${wid}-likert">
+        <div class="wp-likert-track">
+          <div class="wp-likert-line"></div>
+          ${[0,1,2,3,4].map(j => `<button class="wp-likert-tick ${j===userVote?'on':''}" data-idx="${j}" onclick="castWireVote('${pollId}','${wid}',${j})" aria-label="${POLL_LABELS[j]}"></button>`).join('')}
+          ${voted ? `<div class="wp-likert-knob" style="left:${userVote*25}%"></div>` : ''}
+        </div>
+        <div class="wp-likert-labels">
+          <span>Strongly disagree</span><span>Neutral</span><span>Strongly agree</span>
+        </div>
+      </div>
+      <div class="wp-toggle" id="${wid}-toggle" style="${voted ? '' : 'opacity:0.5; pointer-events:none;'}">
         <button class="wp-tab active" data-g="friends" onclick="setWirePollGroup('${wid}','friends')">Friends</button>
         <button class="wp-tab" data-g="contributors" onclick="setWirePollGroup('${wid}','contributors')">Contributors</button>
         <button class="wp-tab" data-g="all" onclick="setWirePollGroup('${wid}','all')">Whole app</button>
       </div>
       <div class="wp-bars" id="${wid}-bars"></div>
-      <div class="wp-labels">
-        <span>Strongly disagree</span><span>Neutral</span><span>Strongly agree</span>
-      </div>
-      <div class="wp-foot" id="${wid}-foot">${item.friendsN || 0} friends voted</div>
-      <button class="wp-vote" onclick="alert('Cast your vote: tap a label on the slider')">+ Cast your vote</button>
+      <div class="wp-foot" id="${wid}-foot">${voted ? '' : 'Vote first to see results'}</div>
     </div>`;
   }
   return '';
@@ -1659,10 +1693,18 @@ function renderWire(group) {
     </div>
     ${filtered.map((item, idx) => renderWireCard(item, idx)).join('')}
   `;
-  // Initialize each Wire poll's bars in the default 'friends' state
+  // Initialize each Wire poll's bars only if user has already voted
   filtered.forEach((item, idx) => {
-    if (item.type === 'poll') renderWirePollBars(`wp-${idx}`, 'friends');
+    if (item.type === 'poll' && getUserVote(item.pollId || `wire-${idx}`) != null) {
+      renderWirePollBars(`wp-${idx}`, 'friends');
+    }
   });
+}
+
+function castWireVote(pollId, wid, idx) {
+  castVote(pollId, idx);
+  // Re-render the wire feed so the just-voted card flips to the voted state
+  renderWire();
 }
 
 function openWire() {
