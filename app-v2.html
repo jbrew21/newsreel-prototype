@@ -475,6 +475,16 @@
   .wr-post-body { font-family:var(--font-b); font-size:15px; line-height:1.45; color:#fff; }
   .wr-tag { display:inline-flex; align-items:center; gap:5px; margin-top:10px; font-family:var(--font-m); font-size:9px; letter-spacing:0.18em; color:var(--nr-yellow); text-transform:uppercase; font-weight:600; }
 
+  /* External link card (rich preview, OG-tag style) */
+  .wr-link-note { font-family:var(--font-b); font-size:14px; line-height:1.4; color:var(--nr-smoke); margin-bottom:12px; }
+  .wr-link-card { display:flex; flex-direction:column; border-radius:14px; overflow:hidden; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); cursor:pointer; text-align:left; width:100%; padding:0; border-left:none; border-right:none; border-top:none; }
+  .wr-link-img { width:100%; aspect-ratio:1.91/1; object-fit:cover; background:var(--nr-lead); }
+  .wr-link-body { padding:12px 14px 14px; }
+  .wr-link-domain { display:flex; align-items:center; gap:6px; font-family:var(--font-m); font-size:9px; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; margin-bottom:6px; }
+  .wr-link-domain svg { width:12px; height:12px; }
+  .wr-link-title { font-family:var(--font-h); font-size:15px; line-height:1.25; color:#fff; margin-bottom:5px; }
+  .wr-link-desc { font-family:var(--font-b); font-size:12px; line-height:1.4; color:var(--nr-silver); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
   /* Story-drop card */
   .wr-drop-note { font-family:var(--font-b); font-size:14px; line-height:1.4; color:var(--nr-smoke); margin-bottom:12px; }
   .wr-drop-story { display:flex; gap:12px; padding:12px; border-radius:14px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); cursor:pointer; text-align:left; width:100%; }
@@ -767,6 +777,10 @@
       <button class="wr-compose-mode" data-mode="story" onclick="pickWireMode('story')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
         Share story
+      </button>
+      <button class="wr-compose-mode" data-mode="link" onclick="pickWireMode('link')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Share link
       </button>
     </div>
     <div class="wr-compose-body" id="wrComposeBody"></div>
@@ -1565,6 +1579,20 @@ const WIRE = [
   { group:'newsroom', type:'drop',  cId:1, time:'4h', visibility:'subscribers', note:"Working on this one for two weeks. The story isn't the threat — it's what Canada's quietly preparing in response.", storyId:1, headline:"Trump threatens to block new bridge to Canada", thumb:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=200&h=200&fit=crop", tag:'Politics' },
   { group:'circle',   type:'post',  fId:5, time:'5h', visibility:'circle', body:"finally read the methane rule explainer. wild that this is the first real climate policy progress in 18 months and nobody's talking about it." },
   { group:'newsroom', type:'post',  cId:0, time:'6h', visibility:'subscribers', body:"Hot take from inside the Fed presser: Powell looked tired. Three reporters tried to get him on the dot-plot question. He swatted all three. Make of that what you will." },
+  { group:'newsroom', type:'link',  cId:1, time:'7h', visibility:'public',
+    note:"Reuters has the most comprehensive timeline on this. Worth a careful read.",
+    url:"reuters.com/world/middle-east/strait-hormuz-tensions-timeline",
+    domain:"reuters.com",
+    linkTitle:"Hormuz tensions: a 90-day timeline of how we got here",
+    linkDesc:"Reuters chronicles the diplomatic and military escalations leading up to today's Project Freedom announcement.",
+    linkImg:"https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&h=315&fit=crop" },
+  { group:'circle',   type:'link',  fId:2, time:'8h', visibility:'circle',
+    note:"this is the explainer i was telling you about. blew my mind.",
+    url:"theatlantic.com/economy/methane-rule-2026",
+    domain:"theatlantic.com",
+    linkTitle:"What the methane rule actually changes about your gas bill",
+    linkDesc:"Behind the EPA's announcement: how 18 months of regulatory drafts will hit residential pricing within 6 months.",
+    linkImg:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=600&h=315&fit=crop" },
 
   // Examples that SHOULD be hidden from current viewer (Jack) — proving the filter works:
   { group:'circle',   type:'post',  fId:6, time:'7h', visibility:'circle', body:"this should NOT show — Kyle's not in Jack's circle." },
@@ -1593,6 +1621,23 @@ function renderWireCard(item, idx) {
     return `<div class="wr-card">
       ${authorRow(person, item.time, item.group)}
       <div class="wr-post-body">${item.body}</div>
+    </div>`;
+  }
+  if (item.type === 'link') {
+    return `<div class="wr-card">
+      ${authorRow(person, item.time, item.group)}
+      <div class="wr-link-note">${item.note}</div>
+      <button class="wr-link-card" onclick="event.preventDefault();" type="button">
+        <img class="wr-link-img" src="${item.linkImg}" alt="">
+        <div class="wr-link-body">
+          <div class="wr-link-domain">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            ${item.domain}
+          </div>
+          <div class="wr-link-title">${item.linkTitle}</div>
+          <div class="wr-link-desc">${item.linkDesc}</div>
+        </div>
+      </button>
     </div>`;
   }
   if (item.type === 'drop') {
@@ -1785,6 +1830,12 @@ function renderWireComposeBody() {
       <input class="wr-compose-pollq" placeholder="Ask your circle: do you agree or disagree?" />
       <span class="wr-compose-pollnote">5-point Likert · Strongly disagree → Strongly agree</span>
     `;
+  } else if (wireMode === 'link') {
+    body.innerHTML = `
+      <input class="wr-compose-pollq" id="wrLinkUrl" placeholder="Paste a URL — Reuters, NYT, anywhere" oninput="renderLinkPreview()" />
+      <textarea class="wr-compose-text" placeholder="Add your take on this link…" style="min-height:60px;"></textarea>
+      <div id="wrLinkPreview" class="wr-compose-pollnote">Paste a URL to fetch a preview.</div>
+    `;
   } else if (wireMode === 'story') {
     body.innerHTML = `
       <textarea class="wr-compose-text" placeholder="Add a note about this story…" style="min-height:60px;"></textarea>
@@ -1802,6 +1853,30 @@ function renderWireComposeBody() {
 function sendWire() {
   closeWireCompose();
   // Simulated success — re-render the wire feed (actual data persistence would call backend)
+}
+
+// Mock OG-tag preview fetch (real impl: server-side scrape Open Graph tags)
+function renderLinkPreview() {
+  const inputEl = document.getElementById('wrLinkUrl');
+  const previewEl = document.getElementById('wrLinkPreview');
+  if (!inputEl || !previewEl) return;
+  const url = inputEl.value.trim();
+  if (!url || !/\w+\.\w+/.test(url)) {
+    previewEl.innerHTML = '<span style="font-family:var(--font-m); font-size:10px; letter-spacing:0.16em; color:var(--nr-ash); text-transform:uppercase;">Paste a URL to fetch a preview.</span>';
+    return;
+  }
+  const domain = url.replace(/^https?:\/\//, '').split('/')[0];
+  // Mock: any URL gets a fake OG payload. Real impl: POST /api/link-preview { url } → { title, description, image, domain }
+  previewEl.innerHTML = `
+    <div style="background:var(--nr-lead); border-radius:12px; overflow:hidden; margin-top:8px;">
+      <div style="height:140px; background:linear-gradient(135deg, var(--nr-iron), var(--nr-charcoal)); display:flex; align-items:center; justify-content:center; color:var(--nr-ash); font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; text-transform:uppercase;">Preview image</div>
+      <div style="padding:12px 14px;">
+        <div style="font-family:var(--font-m); font-size:9px; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; margin-bottom:5px;">${domain}</div>
+        <div style="font-family:var(--font-h); font-size:15px; line-height:1.25; color:#fff; margin-bottom:4px;">Article title fetched from Open Graph tags</div>
+        <div style="font-family:var(--font-b); font-size:12px; line-height:1.4; color:var(--nr-silver);">Description from <code>og:description</code> or first paragraph.</div>
+      </div>
+    </div>
+  `;
 }
 
 // ─── Benny tab ───
