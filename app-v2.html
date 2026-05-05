@@ -1550,20 +1550,25 @@ function jumpToStory(i) { closeExplore(); goStory(i); goSlide(i, 0); }
 const wireEl = document.getElementById('wire');
 
 // Friend-authored items use group:'circle', journalist items use group:'newsroom'
+// visibility: public | subscribers | circle  — feed filters by viewer's relationship to author
 // pollId on poll items lets us share vote state across surfaces (story slide ↔ wire)
 const WIRE = [
-  { group:'newsroom', type:'post',  cId:1, time:'12 min', body:"Just got off the phone with a senior State Department official. Confirms 'Project Freedom' Navy escorts begin Monday — three U.S. destroyers already repositioning to the Strait. More tonight.", tag:'From the desk' },
-  { group:'circle',   type:'post',  fId:2, time:'18 min', body:"reading the bridge story now — feels like Trump's just trolling Trudeau. wild that this is how trade gets done now.", tag:'' },
-  { group:'newsroom', type:'poll',  cId:0, time:'34 min', pollId:'fed-rates', q:"The Fed should have cut rates today rather than holding steady.", friends:67, journalists:42, friendsN:24, jrnN:31 },
-  { group:'circle',   type:'poll',  fId:1, time:'48 min', pollId:'finish-stack', q:"Did you actually finish today's stack?", friends:78, journalists:null, friendsN:42 },
-  { group:'newsroom', type:'drop',  cId:0, time:'1h', note:"Took me three days to get the Treasury sources to talk on record. Worth the wait — full piece up now.", storyId:0, headline:"The US economy is fine probably", thumb:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=200&h=200&fit=crop", tag:'Business' },
-  { group:'circle',   type:'post',  fId:3, time:'1h', body:"if the Fed isn't cutting it's because they think there's recession risk later. the 'one cut' is a hedge. nobody saying that part out loud.", tag:'' },
-  { group:'newsroom', type:'post',  cId:2, time:'2h', body:"The methane rule has been in EPA's drawer for 18 months. The reason it dropped today, not last quarter, has everything to do with the Senate calendar. We'll be tracking the floor vote.", tag:'Analysis' },
-  { group:'circle',   type:'poll',  fId:4, time:'2h', pollId:'iran-track', q:"Are you tracking the Iran/Hormuz situation?", friends:54, journalists:null, friendsN:39 },
-  { group:'newsroom', type:'poll',  cId:1, time:'3h', pollId:'bridge-half', q:"The U.S. is right to demand half-ownership of the Gordie Howe Bridge.", friends:18, journalists:9, friendsN:31, jrnN:17 },
-  { group:'newsroom', type:'drop',  cId:1, time:'4h', note:"Working on this one for two weeks. The story isn't the threat — it's what Canada's quietly preparing in response.", storyId:1, headline:"Trump threatens to block new bridge to Canada", thumb:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=200&h=200&fit=crop", tag:'Politics' },
-  { group:'circle',   type:'post',  fId:5, time:'5h', body:"finally read the methane rule explainer. wild that this is the first real climate policy progress in 18 months and nobody's talking about it.", tag:'' },
-  { group:'newsroom', type:'post',  cId:0, time:'6h', body:"Hot take from inside the Fed presser: Powell looked tired. Three reporters tried to get him on the dot-plot question. He swatted all three. Make of that what you will.", tag:'Hot take' },
+  { group:'newsroom', type:'post',  cId:1, time:'12 min', visibility:'subscribers', body:"Just got off the phone with a senior State Department official. Confirms 'Project Freedom' Navy escorts begin Monday — three U.S. destroyers already repositioning to the Strait. More tonight." },
+  { group:'circle',   type:'post',  fId:2, time:'18 min', visibility:'circle', body:"reading the bridge story now — feels like Trump's just trolling Trudeau. wild that this is how trade gets done now." },
+  { group:'newsroom', type:'poll',  cId:0, time:'34 min', visibility:'public', pollId:'fed-rates', q:"The Fed should have cut rates today rather than holding steady.", friends:67, journalists:42, friendsN:24, jrnN:31 },
+  { group:'circle',   type:'poll',  fId:1, time:'48 min', visibility:'circle', pollId:'finish-stack', q:"Did you actually finish today's stack?", friends:78, journalists:null, friendsN:42 },
+  { group:'newsroom', type:'drop',  cId:0, time:'1h', visibility:'public', note:"Took me three days to get the Treasury sources to talk on record. Worth the wait — full piece up now.", storyId:0, headline:"The US economy is fine probably", thumb:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=200&h=200&fit=crop", tag:'Business' },
+  { group:'circle',   type:'post',  fId:3, time:'1h', visibility:'circle', body:"if the Fed isn't cutting it's because they think there's recession risk later. the 'one cut' is a hedge. nobody saying that part out loud." },
+  { group:'newsroom', type:'post',  cId:2, time:'2h', visibility:'public', body:"The methane rule has been in EPA's drawer for 18 months. The reason it dropped today, not last quarter, has everything to do with the Senate calendar. We'll be tracking the floor vote." },
+  { group:'circle',   type:'poll',  fId:4, time:'2h', visibility:'circle', pollId:'iran-track', q:"Are you tracking the Iran/Hormuz situation?", friends:54, journalists:null, friendsN:39 },
+  { group:'newsroom', type:'poll',  cId:1, time:'3h', visibility:'public', pollId:'bridge-half', q:"The U.S. is right to demand half-ownership of the Gordie Howe Bridge.", friends:18, journalists:9, friendsN:31, jrnN:17 },
+  { group:'newsroom', type:'drop',  cId:1, time:'4h', visibility:'subscribers', note:"Working on this one for two weeks. The story isn't the threat — it's what Canada's quietly preparing in response.", storyId:1, headline:"Trump threatens to block new bridge to Canada", thumb:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=200&h=200&fit=crop", tag:'Politics' },
+  { group:'circle',   type:'post',  fId:5, time:'5h', visibility:'circle', body:"finally read the methane rule explainer. wild that this is the first real climate policy progress in 18 months and nobody's talking about it." },
+  { group:'newsroom', type:'post',  cId:0, time:'6h', visibility:'subscribers', body:"Hot take from inside the Fed presser: Powell looked tired. Three reporters tried to get him on the dot-plot question. He swatted all three. Make of that what you will." },
+
+  // Examples that SHOULD be hidden from current viewer (Jack) — proving the filter works:
+  { group:'circle',   type:'post',  fId:6, time:'7h', visibility:'circle', body:"this should NOT show — Kyle's not in Jack's circle." },
+  { group:'newsroom', type:'post',  cId:0, time:'8h', visibility:'subscribers', body:"this should NOT show if Jack doesn't subscribe to Dave (he does, so it does)." },
 ];
 
 const VERIF_TINY = `<svg class="wr-author-verif" viewBox="0 0 24 24" fill="#EDBD1F"><path d="M12 1.5l2.6 2.3 3.4-.5.7 3.4 3.1 1.6-1.4 3.2 1.4 3.2-3.1 1.6-.7 3.4-3.4-.5L12 22.5l-2.6-2.3-3.4.5-.7-3.4-3.1-1.6 1.4-3.2-1.4-3.2 3.1-1.6.7-3.4 3.4.5L12 1.5z"/><polyline points="8 12 11 15 16 9.5" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -1684,9 +1689,27 @@ const FRIENDS = [
 
 let wireGroup = 'all'; // 'all' | 'circle' | 'newsroom'
 
+// Mock viewer relationships — server-side in real app
+const VIEWER = {
+  subscribesToCreators: new Set([0, 1, 2]),       // Jack subs to all 3 journalists
+  inCirclesOf: new Set([1, 2, 3, 4, 5]),          // Jack is in Maya/Brijesh/Annika/Roy/Lauren circles
+};
+function viewerCanSee(w) {
+  if (w.visibility === 'public') return true;
+  if (w.visibility === 'subscribers') {
+    return w.group === 'newsroom' && VIEWER.subscribesToCreators.has(w.cId);
+  }
+  if (w.visibility === 'circle') {
+    return w.group === 'circle' && VIEWER.inCirclesOf.has(w.fId);
+  }
+  return false;
+}
+
 function renderWire(group) {
   if (group) wireGroup = group;
-  const filtered = wireGroup === 'all' ? WIRE : WIRE.filter(w => w.group === wireGroup);
+  // Visibility filter applied first (what server would do), then group filter (UI toggle)
+  const visible = WIRE.filter(viewerCanSee);
+  const filtered = wireGroup === 'all' ? visible : visible.filter(w => w.group === wireGroup);
   const friendsHtml = FRIENDS.map(f => {
     const ringClass = f.state === 'me' ? 'wr-friend-ring--me' : (f.state === 'viewed' ? 'wr-friend-ring--viewed' : '');
     return `<button class="wr-friend">
