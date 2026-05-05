@@ -490,10 +490,13 @@
   .wp-tab { flex:1; padding:8px; border-radius:999px; border:none; background:transparent; color:var(--nr-silver); font-family:var(--font-b); font-size:11px; font-weight:600; cursor:pointer; }
   .wp-tab.active { background:var(--nr-yellow); color:#000; }
   .wp-bars { display:flex; align-items:flex-end; gap:6px; height:90px; padding:0 2px; }
-  .wp-bars:not(:empty) { margin-bottom:14px; }
-  .wp-bar { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end; }
-  .wp-bar-fill { width:100%; background:var(--nr-yellow); border-radius:4px 4px 2px 2px; transition:height 0.5s cubic-bezier(0.2,0.8,0.2,1); min-height:3px; }
+  .wp-bars:not(:empty) { margin-bottom:24px; }
+  .wp-bar { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end; position:relative; }
+  .wp-bar-fill { width:100%; background:var(--nr-iron); border-radius:4px 4px 2px 2px; transition:height 0.5s cubic-bezier(0.2,0.8,0.2,1), background 0.2s ease; min-height:3px; }
+  .wp-bar.you .wp-bar-fill { background:var(--nr-yellow); box-shadow:0 0 14px rgba(237,189,31,0.45); }
   .wp-bar-pct { font-family:var(--font-m); font-size:10px; font-weight:600; color:var(--nr-silver); }
+  .wp-bar.you .wp-bar-pct { color:var(--nr-yellow); }
+  .wp-bar-you-tag { position:absolute; bottom:-18px; font-family:var(--font-m); font-size:8px; letter-spacing:0.16em; color:var(--nr-yellow); text-transform:uppercase; font-weight:600; white-space:nowrap; }
   .wp-foot { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
   .wp-foot:not(:empty) { padding-top:2px; }
   /* Interactive Likert row inside Wire poll cards */
@@ -510,11 +513,12 @@
   .wp-likert-knob { position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:24px; background:var(--nr-yellow); border-radius:3px; pointer-events:none; box-shadow:0 0 12px rgba(237,189,31,0.55); }
   .wp-likert-labels { display:flex; justify-content:space-between; font-family:var(--font-m); font-size:9px; letter-spacing:0.1em; color:var(--nr-ash); text-transform:uppercase; }
 
-  .wp-voted-banner { display:flex; align-items:center; gap:8px; padding:8px 12px; margin-bottom:10px; border-radius:8px;
+  .wp-voted-banner { display:flex; align-items:center; gap:8px; padding:8px 12px; margin-bottom:12px; border-radius:8px;
     background:rgba(26,173,23,0.1); border:1px solid rgba(26,173,23,0.35);
     font-family:var(--font-b); font-size:12px; color:#fff; }
   .wp-voted-banner svg { width:14px; height:14px; color:var(--nr-green); flex-shrink:0; }
-  .wp-voted-banner strong { color:var(--nr-green); font-weight:600; }
+  .wp-voted-banner strong { color:var(--nr-green); font-weight:600; margin-right:auto; }
+  .wp-voted-change { font-family:var(--font-m); font-size:9px; letter-spacing:0.14em; color:var(--nr-silver); text-transform:uppercase; font-weight:500; }
 
   /* Floating composer (+) and bottom sheet */
   .wr-fab { position:absolute; right:20px; bottom:108px; z-index:55; width:54px; height:54px; border-radius:50%;
@@ -1607,7 +1611,7 @@ function renderWireCard(item, idx) {
     return `<div class="wr-card" id="${wid}-card" data-poll-id="${pollId}">
       ${authorRow(person, item.time, item.group)}
       <div class="wr-poll-q">${item.q}</div>
-      ${voted ? `<div class="wp-voted-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>You voted <strong>${POLL_LABELS[userVote]}</strong></div>` : ''}
+      ${voted ? `<div class="wp-voted-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>You voted <strong>${POLL_LABELS[userVote]}</strong><span class="wp-voted-change">Tap any point to change</span></div>` : ''}
       <div class="wp-likert" id="${wid}-likert">
         <div class="wp-likert-track">
           <div class="wp-likert-line"></div>
@@ -1648,9 +1652,18 @@ function renderWirePollBars(wid, group) {
   const max = Math.max(...data.dist);
   const bars = document.getElementById(`${wid}-bars`);
   if (!bars) return;
-  bars.innerHTML = data.dist.map(pct => `
-    <div class="wp-bar"><span class="wp-bar-pct">${pct}%</span><div class="wp-bar-fill" style="height:${(pct/max)*100}%"></div></div>
-  `).join('');
+  // Find pollId from card to determine if/which bar is the user's
+  const card = document.getElementById(`${wid}-card`);
+  const pollId = card?.dataset.pollId;
+  const userVote = pollId ? getUserVote(pollId) : null;
+  bars.innerHTML = data.dist.map((pct, j) => {
+    const isYou = j === userVote;
+    return `<div class="wp-bar ${isYou?'you':''}">
+      <span class="wp-bar-pct">${pct}%</span>
+      <div class="wp-bar-fill" style="height:${(pct/max)*100}%"></div>
+      ${isYou ? '<span class="wp-bar-you-tag">You</span>' : ''}
+    </div>`;
+  }).join('');
   const foot = document.getElementById(`${wid}-foot`);
   if (foot) {
     const labels = { friends:`${data.n} friends voted`, contributors:`${data.n} contributors voted`, all:`${data.n.toLocaleString()} readers voted` };
