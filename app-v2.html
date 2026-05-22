@@ -667,26 +667,106 @@
   .ex-tile-author { position:absolute; bottom:8px; left:8px; display:flex; align-items:center; gap:5px; }
   .ex-tile-author img { width:18px; height:18px; border-radius:50%; border:1.5px solid #000; }
   .ex-tile-author span { font-family:var(--font-b); font-size:11px; font-weight:500; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.6); }
-  .cr-top { display:flex; align-items:center; justify-content:space-between; padding:60px 16px 8px; }
-  .cr-icon-btn { width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.06); border:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  /* Cover banner + avatar */
+  .cr-cover-img { position:relative; width:100%; height:200px; overflow:hidden; }
+  .cr-cover-img img { width:100%; height:100%; object-fit:cover; }
+  .cr-cover-grad { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.6) 100%); }
+  .cr-top { position:absolute; top:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; padding:54px 16px 8px; z-index:2; }
+  .cr-icon-btn { width:36px; height:36px; border-radius:50%; background:rgba(0,0,0,0.45); backdrop-filter:blur(6px); border:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
   .cr-icon-btn svg { width:18px; height:18px; }
-  .cr-cover { position:relative; height:140px; background:linear-gradient(135deg, var(--nr-charcoal), var(--nr-lead)); display:flex; align-items:center; justify-content:center; }
-  .cr-cover-icon { width:36px; height:36px; color:var(--nr-iron); }
-  .cr-avatar-wrap { position:absolute; right:24px; bottom:-50px; }
-  .cr-avatar { width:108px; height:108px; border-radius:50%; object-fit:cover; border:3px solid var(--nr-black); background:var(--nr-iron); }
-  .cr-meta { padding:64px 24px 0; }
-  .cr-name-row { display:flex; align-items:center; gap:8px; margin-bottom:18px; }
-  .cr-name { font-family:var(--font-b); font-size:30px; font-weight:700; letter-spacing:-0.5px; color:#fff; }
-  .cr-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:24px; }
-  .cr-stat-num { font-family:var(--font-b); font-size:30px; font-weight:700; color:#fff; line-height:1.1; }
-  .cr-stat-num--pct { color:var(--nr-red); }
-  .cr-stat-label { font-family:var(--font-b); font-size:13px; color:var(--nr-silver); margin-top:2px; }
-  .cr-divider { height:1px; background:rgba(255,255,255,0.08); margin:0 0 18px; }
-  .cr-bio { font-family:var(--font-b); font-size:16px; line-height:1.45; color:var(--nr-smoke); margin-bottom:32px; }
-  .cr-section-label { font-family:var(--font-b); font-weight:700; font-size:13px; letter-spacing:0.12em; color:var(--nr-silver); text-transform:uppercase; padding:0 24px 10px; border-bottom:1px solid rgba(255,255,255,0.08); margin:0 -24px 4px; }
-  .cr-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:2px; padding:8px 0 40px; }
-  .cr-thumb { position:relative; aspect-ratio:9/16; background:var(--nr-lead); overflow:hidden; }
-  .cr-thumb img { width:100%; height:100%; object-fit:cover; }
+  .cr-id { position:relative; padding:0 20px; margin-top:-54px; z-index:2; }
+  .cr-id-avatar { width:108px; height:108px; border-radius:50%; object-fit:cover; border:4px solid #000; background:var(--nr-iron); display:block; }
+  .cr-id-name-row { display:flex; align-items:center; gap:8px; margin-top:14px; }
+  .cr-id-name { font-family:var(--font-h); font-size:34px; line-height:1.05; color:#fff; letter-spacing:-0.5px; margin:0; }
+  .cr-chip-row { display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .cr-verified-chip, .cr-discl-chip { display:inline-flex; align-items:center; gap:6px; font-family:var(--font-b); font-size:13px; font-weight:600; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:999px; cursor:pointer; padding:6px 12px; }
+  .cr-verified-chip { color:var(--nr-yellow); }
+  .cr-discl-chip { color:var(--nr-silver); }
+  .cr-discl-chip svg:first-child { width:14px; height:14px; }
+  .cr-verified-chip svg.cr-verif-seal { width:16px; height:16px; }
+  .cr-verif-chev { width:12px; height:12px; transition:transform 0.2s ease; }
+  .cr-verified-chip.open .cr-verif-chev, .cr-discl-chip.open .cr-verif-chev { transform:rotate(180deg); }
+  /* Sub-hero strip */
+  .cr-substrip { display:flex; align-items:center; justify-content:space-between; padding:14px 20px 6px; gap:12px; }
+  .cr-readers { font-family:var(--font-b); font-size:13px; color:var(--nr-silver); }
+  .cr-substrip-r { display:flex; align-items:center; gap:14px; }
+  .cr-follow { font-family:var(--font-b); font-size:13px; font-weight:600; color:#fff; background:transparent; border:1.5px solid rgba(255,255,255,0.4); border-radius:999px; padding:7px 18px; cursor:pointer; }
+  .cr-follow.on { background:#fff; color:#000; border-color:#fff; }
+  .cr-iconlink { background:none; border:none; color:var(--nr-silver); cursor:pointer; padding:4px; display:flex; }
+  .cr-iconlink svg { width:20px; height:20px; }
+  /* Bio + Verified blurb */
+  .cr-bio-wrap { padding:14px 20px 6px; }
+  .cr-bio { font-family:var(--font-b); font-size:15px; line-height:1.5; color:#fff; margin:0; }
+  /* Collage — perfectly imperfect, Newsreel style */
+  .cr-collage-wrap { margin:18px 16px 4px; }
+  .cr-collage-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; padding:0 4px; }
+  .cr-collage-label { font-family:var(--font-m); font-size:10px; font-weight:700; letter-spacing:0.22em; color:var(--nr-silver); text-transform:uppercase; }
+  .cr-collage-shuffle { display:inline-flex; align-items:center; gap:5px; background:transparent; border:1px solid var(--nr-iron); border-radius:999px; padding:5px 10px; font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.14em; color:#fff; text-transform:uppercase; cursor:pointer; }
+  .cr-collage-shuffle svg { width:12px; height:12px; }
+  .cr-collage { position:relative; height:0; background:var(--nr-red); border-radius:14px; overflow:hidden; transition:height 0.35s cubic-bezier(0.2,0.8,0.2,1); }
+  .cr-collage.open { height:380px; }
+  .cr-collage-bg { position:absolute; inset:0; opacity:0.12; background-image:repeating-linear-gradient(45deg, transparent 0 18px, rgba(0,0,0,0.6) 18px 19px); pointer-events:none; }
+  .cr-collage-top { position:absolute; top:14px; left:0; right:0; text-align:center; font-family:var(--font-h); font-size:34px; line-height:0.95; color:var(--nr-yellow); letter-spacing:-0.5px; text-shadow:3px 3px 0 #000; padding:0 8px; z-index:1; pointer-events:none; }
+  .cr-collage-bot { position:absolute; bottom:16px; left:0; right:0; text-align:center; font-family:var(--font-h); font-size:42px; line-height:0.95; color:#fff; letter-spacing:-0.5px; text-shadow:3px 3px 0 #000; padding:0 8px; z-index:2; pointer-events:none; }
+  .cr-collage-mid { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-family:var(--font-h); font-size:18px; color:#000; background:var(--nr-yellow); padding:6px 14px; border-radius:999px; z-index:3; pointer-events:none; box-shadow:3px 3px 0 #000; white-space:nowrap; }
+  .cr-collage-pic { position:absolute; border:3px solid #fff; box-shadow:4px 4px 0 rgba(0,0,0,0.55); object-fit:cover; transition:transform 0.35s cubic-bezier(0.2,0.8,0.2,1), top 0.35s ease, left 0.35s ease; z-index:2; }
+  .cr-collage-star { position:absolute; width:30px; height:30px; color:var(--nr-yellow); filter:drop-shadow(2px 2px 0 #000); z-index:4; pointer-events:none; }
+  .cr-collage-wm { position:absolute; right:10px; bottom:8px; font-family:var(--font-m); font-size:9px; font-weight:700; letter-spacing:0.24em; color:rgba(255,255,255,0.55); text-transform:uppercase; z-index:5; pointer-events:none; }
+  .cr-id .cr-blurb-wrap { max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease, margin 0.3s ease; padding:0; margin:0; border-top:1px solid rgba(255,255,255,0); }
+  .cr-id .cr-blurb-wrap.open { max-height:600px; padding:12px 0 0; margin:10px 0 0; }
+  .cr-blurb-label { display:inline-flex; align-items:center; gap:5px; font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.18em; color:var(--nr-yellow); text-transform:uppercase; margin-bottom:8px; }
+  .cr-blurb-label svg { width:12px; height:12px; }
+  .cr-blurb { font-family:var(--font-b); font-size:14px; line-height:1.5; color:var(--nr-smoke); margin:0; }
+  .cr-discl-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
+  .cr-discl-list li { display:flex; gap:10px; align-items:flex-start; font-family:var(--font-b); font-size:13px; line-height:1.45; }
+  .cr-discl-k { flex:0 0 88px; color:var(--nr-ash); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; padding-top:1px; }
+  .cr-discl-v { flex:1; color:#fff; }
+  /* Tabs */
+  .cr-tabs { display:flex; gap:22px; padding:6px 20px 0; border-bottom:1px solid rgba(255,255,255,0.06); position:sticky; top:0; background:#000; z-index:5; }
+  .cr-tab { background:none; border:none; color:var(--nr-silver); font-family:var(--font-b); font-size:15px; font-weight:600; padding:12px 0; cursor:pointer; position:relative; }
+  .cr-tab.active { color:#fff; }
+  .cr-tab.active::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--nr-red); }
+  .cr-panel { display:none; padding:14px 16px 60px; }
+  .cr-panel.active { display:block; }
+  /* Stories tiles */
+  .cr-tile-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; }
+  .cr-tile { position:relative; aspect-ratio:3/4; background:var(--nr-lead); overflow:hidden; border-radius:10px; cursor:pointer; border:none; padding:0; }
+  .cr-tile img { width:100%; height:100%; object-fit:cover; }
+  .cr-tile-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.75), transparent 50%); }
+  .cr-tile-tag { position:absolute; top:8px; left:8px; font-family:var(--font-m); font-size:9px; font-weight:600; letter-spacing:0.16em; color:#fff; text-transform:uppercase; background:rgba(0,0,0,0.5); backdrop-filter:blur(6px); padding:3px 7px; border-radius:4px; }
+  .cr-tile-head { position:absolute; left:10px; right:10px; bottom:10px; font-family:var(--font-h); font-size:14px; line-height:1.2; color:#fff; text-align:left; text-shadow:0 1px 4px rgba(0,0,0,0.5); }
+  /* Past Work rows */
+  .cr-pw { display:flex; flex-direction:column; gap:2px; }
+  .cr-pw-row { display:flex; align-items:center; gap:12px; padding:14px 4px; border-bottom:1px solid rgba(255,255,255,0.05); text-decoration:none; color:inherit; }
+  .cr-pw-fav { width:38px; height:38px; border-radius:6px; object-fit:cover; background:var(--nr-lead); flex-shrink:0; }
+  .cr-pw-info { flex:1; min-width:0; }
+  .cr-pw-title { font-family:var(--font-b); font-size:14px; font-weight:600; color:#fff; line-height:1.3; margin-bottom:3px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .cr-pw-meta { font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; color:var(--nr-ash); text-transform:uppercase; }
+  .cr-pw-ext { color:var(--nr-silver); flex-shrink:0; }
+  .cr-pw-ext svg { width:14px; height:14px; }
+  /* Shop */
+  .cr-shop-subtabs { display:flex; gap:8px; margin-bottom:14px; }
+  .cr-shop-subtab { background:transparent; border:1px solid var(--nr-iron); border-radius:999px; padding:7px 14px; color:var(--nr-silver); font-family:var(--font-b); font-size:13px; font-weight:600; cursor:pointer; }
+  .cr-shop-subtab.active { background:#fff; color:#000; border-color:#fff; }
+  .cr-shop-panel { display:none; }
+  .cr-shop-panel.active { display:block; }
+  .cr-shop-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
+  .cr-shop-card { display:flex; flex-direction:column; background:var(--nr-charcoal); border-radius:12px; overflow:hidden; text-decoration:none; color:inherit; }
+  .cr-shop-img { width:100%; aspect-ratio:1; object-fit:cover; background:var(--nr-lead); }
+  .cr-shop-body { padding:10px 12px 12px; display:flex; flex-direction:column; gap:4px; }
+  .cr-shop-title { font-family:var(--font-b); font-size:13px; font-weight:600; color:#fff; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .cr-shop-sub { font-family:var(--font-m); font-size:10px; letter-spacing:0.1em; color:var(--nr-ash); text-transform:uppercase; }
+  .cr-shop-price { font-family:var(--font-b); font-size:13px; font-weight:700; color:var(--nr-red); margin-top:2px; }
+  /* Events */
+  .cr-events { display:flex; flex-direction:column; gap:2px; }
+  .cr-event-row { display:flex; align-items:center; gap:14px; padding:14px 4px; border-bottom:1px solid rgba(255,255,255,0.05); text-decoration:none; color:inherit; }
+  .cr-event-date { width:56px; flex-shrink:0; background:var(--nr-lead); border-radius:8px; padding:8px 4px; text-align:center; }
+  .cr-event-month { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.14em; color:var(--nr-red); text-transform:uppercase; }
+  .cr-event-day { font-family:var(--font-h); font-size:22px; color:#fff; line-height:1.1; margin-top:2px; }
+  .cr-event-info { flex:1; min-width:0; }
+  .cr-event-title { font-family:var(--font-b); font-size:14px; font-weight:600; color:#fff; line-height:1.3; margin-bottom:3px; }
+  .cr-event-venue { font-family:var(--font-b); font-size:12px; color:var(--nr-silver); }
+  .cr-event-rsvp { font-family:var(--font-b); font-size:12px; font-weight:600; color:#fff; background:transparent; border:1.5px solid rgba(255,255,255,0.3); border-radius:999px; padding:6px 14px; cursor:pointer; flex-shrink:0; }
   .cr-thumb-play { position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; }
   .cr-thumb-play svg { width:12px; height:12px; color:#fff; }
 
@@ -879,31 +959,157 @@ const VERIF_LG = `<svg style="width:22px;height:22px" viewBox="0 0 24 24" fill="
 const CREATORS = [
   {
     id:0, name:"Dave Jorgenson", verified:true,
-    avatar:"https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop",
-    bio:"I make funny news videos that are also sometimes serious.",
+    avatar:"https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300&h=300&fit=crop",
+    cover:"https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1200&h=500&fit=crop",
+    bio:"Senior video journalist. Formerly The Washington Post. I make funny news videos that are also sometimes serious. Based in Brooklyn.",
+    collageTag:"news but funny",
+    quirks:[
+      { q:"Currently obsessed with —", a:"the economics of the Costco hot dog" },
+      { q:"Will die on this hill —", a:"the Oxford comma is non-negotiable" },
+      { q:"Worst pitch I ever sent —", a:"\"Is bread fascist?\" (Editor: \"No.\")" },
+      { q:"Coffee order —", a:"cortado, no foam, judge me" },
+    ],
     stats:{ readers:87, stories:10, accuracy:"38%" },
+    verifiedBlurb:"Dave built The Washington Post's TikTok into the most-followed legacy newsroom account on the platform — 2M followers, 1B+ views. We verified him because he proved a generation will pay attention to real reporting if you meet them where they already are. He writes and films his own stuff. No staff, no spin, no AI ghost.",
+    disclosures:[
+      { k:"Employer", v:"Independent (formerly The Washington Post, 2018–2024)" },
+      { k:"AI use", v:"Opted out. Dave's stories are not licensed for AI training." },
+      { k:"Funding", v:"Reader subscriptions + Newsreel revenue share. No sponsored stories on Newsreel." },
+      { k:"Affiliations", v:"On-staff at The Daily Show (correspondent, 2025–)." },
+    ],
     posts:[
-      "https://images.unsplash.com/photo-1554224155-1696413565d3?w=400&h=700&fit=crop",
-      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=700&fit=crop",
-      "https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=400&h=700&fit=crop",
-      "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=400&h=700&fit=crop",
-      "https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400&h=700&fit=crop",
-      "https://images.unsplash.com/photo-1620266757065-5814239881fd?w=400&h=700&fit=crop",
+      { sId:0, img:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=600&h=800&fit=crop", tag:"Business", head:"The US economy is fine probably" },
+      { sId:0, img:"https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&h=800&fit=crop", tag:"Markets", head:"What one Fed cut actually buys you" },
+      { sId:0, img:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=600&h=800&fit=crop", tag:"Politics", head:"Inside the room when the bridge call happened" },
+      { sId:0, img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=600&h=800&fit=crop", tag:"Climate", head:"Methane rule, in plain English" },
+      { sId:0, img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=600&h=800&fit=crop", tag:"World", head:"Hormuz, day 4" },
+      { sId:0, img:"https://images.unsplash.com/photo-1620266757065-5814239881fd?w=600&h=800&fit=crop", tag:"Energy", head:"The grid is doing fine, actually" },
+    ],
+    pastWork:[
+      { title:"How a TikTok account became the most-read paper in America", outlet:"The Washington Post", year:2024, url:"https://www.washingtonpost.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=washingtonpost.com" },
+      { title:"Why Gen Z keeps watching the news (just not on TV)", outlet:"Nieman Lab", year:2023, url:"https://www.niemanlab.org/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=niemanlab.org" },
+      { title:"The TikTok Newsroom — a yearlong experiment", outlet:"Columbia Journalism Review", year:2023, url:"https://www.cjr.org/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=cjr.org" },
+      { title:"Live from the campaign trail (in 60 seconds)", outlet:"The Atlantic", year:2022, url:"https://www.theatlantic.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=theatlantic.com" },
+    ],
+    shop:{
+      merch:[
+        { title:"Paperboy Tee", price:"$32", img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop", url:"#" },
+        { title:"Dave's Press Hat", price:"$28", img:"https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&h=400&fit=crop", url:"#" },
+        { title:"Newsroom Tote", price:"$24", img:"https://images.unsplash.com/photo-1591561954557-26941169b49e?w=400&h=400&fit=crop", url:"#" },
+        { title:"\"Fine Probably\" Mug", price:"$18", img:"https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop", url:"#" },
+      ],
+      books:[
+        { title:"News for Humans", sub:"Dave Jorgenson · 2024", price:"$24", img:"https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=400&fit=crop", url:"#" },
+        { title:"How to Watch the News", sub:"Dave Jorgenson · 2022", price:"$19", img:"https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&h=400&fit=crop", url:"#" },
+      ],
+      picks:[
+        { title:"The Powers That Be", sub:"David Halberstam", img:"https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop", url:"#" },
+        { title:"Trust Me, I'm Lying", sub:"Ryan Holiday", img:"https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=400&fit=crop", url:"#" },
+        { title:"Amusing Ourselves to Death", sub:"Neil Postman", img:"https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400&h=400&fit=crop", url:"#" },
+      ],
+    },
+    events:[
+      { date:"JUN 12", title:"Future of News panel", venue:"Brooklyn Brewery, NY", url:"#" },
+      { date:"JUL 09", title:"Newsroom on TikTok — live taping", venue:"The Bell House, Brooklyn", url:"#" },
+      { date:"SEP 22", title:"ONA 2026 keynote", venue:"Atlanta, GA", url:"#" },
     ],
   },
   {
-    id:1, name:"Eliza Haverstock", verified:false,
-    avatar:"https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop",
-    bio:"Politics + power. Newsreel staff reporter.",
+    id:1, name:"Eliza Haverstock", verified:true,
+    avatar:"https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop",
+    cover:"https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=1200&h=500&fit=crop",
+    bio:"Politics + power reporter at Newsreel. Previously covered private capital at Forbes. DC-based. I name sources and show receipts.",
+    collageTag:"on the record",
+    quirks:[
+      { q:"Sources reached today —", a:"7 (lobbyist count: 2)" },
+      { q:"Story I'm proud of —", a:"the one a senator's office tried to spike" },
+      { q:"My beat in one word —", a:"receipts" },
+      { q:"Notebook count —", a:"42 (and counting)" },
+    ],
     stats:{ readers:42, stories:6, accuracy:"54%" },
-    posts:["https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=400&h=700&fit=crop"],
+    verifiedBlurb:"Eliza covered private capital at Forbes before joining Newsreel as our politics + power reporter. She's been in the rooms where deals get made — and the ones where they fall apart. We verified her because she names sources, shows receipts, and doesn't write the obvious story.",
+    disclosures:[
+      { k:"Employer", v:"Newsreel staff reporter (Jan 2026–)" },
+      { k:"AI use", v:"Opt-in, per story. Currently 2 of 6 stories licensed." },
+      { k:"Funding", v:"Salaried by Newsreel Media Corp." },
+      { k:"Conflicts", v:"Spouse works at the State Department. Recuses from State-related coverage." },
+    ],
+    posts:[
+      { sId:1, img:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=600&h=800&fit=crop", tag:"Politics", head:"Trump threatens to block new bridge to Canada" },
+      { sId:1, img:"https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&h=800&fit=crop", tag:"Defense", head:"Inside the Pentagon's quiet pivot" },
+      { sId:1, img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=600&h=800&fit=crop", tag:"World", head:"Hormuz: who blinks first" },
+      { sId:1, img:"https://images.unsplash.com/photo-1535320903710-d993d3d77d29?w=600&h=800&fit=crop", tag:"Economy", head:"The tariff math, with sources" },
+    ],
+    pastWork:[
+      { title:"Inside the family office boom", outlet:"Forbes", year:2024, url:"https://www.forbes.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=forbes.com" },
+      { title:"The new generation of VC scolds", outlet:"Forbes", year:2023, url:"https://www.forbes.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=forbes.com" },
+      { title:"Why nobody is buying the next Silicon Valley", outlet:"The Information", year:2023, url:"https://www.theinformation.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=theinformation.com" },
+    ],
+    shop:{
+      merch:[
+        { title:"Beat Reporter Crewneck", price:"$48", img:"https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop", url:"#" },
+        { title:"Notebook + Pen Set", price:"$22", img:"https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=400&h=400&fit=crop", url:"#" },
+      ],
+      books:[],
+      picks:[
+        { title:"Power Broker", sub:"Robert Caro", img:"https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop", url:"#" },
+        { title:"Empire of Pain", sub:"Patrick Radden Keefe", img:"https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&h=400&fit=crop", url:"#" },
+        { title:"Bad Blood", sub:"John Carreyrou", img:"https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=400&fit=crop", url:"#" },
+      ],
+    },
+    events:[
+      { date:"JUN 03", title:"On the record: campaign finance 2026", venue:"Politics & Prose, DC", url:"#" },
+      { date:"AUG 18", title:"Newsreel Live at the DNC", venue:"Chicago, IL", url:"#" },
+    ],
   },
   {
     id:2, name:"The Atlantic", verified:true,
-    avatar:"https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop",
-    bio:"Big ideas. Read by the people thinking about tomorrow.",
+    avatar:"https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&h=300&fit=crop",
+    cover:"https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=1200&h=500&fit=crop",
+    bio:"Founded 1857. Big ideas, original reporting, long reads. Staff writers contribute directly to Newsreel; under-25 readers get full access here without a paywall.",
+    collageTag:"big ideas since 1857",
+    quirks:[
+      { q:"Oldest piece still in print —", a:"\"Self-Reliance\" by Emerson, 1841" },
+      { q:"Average story length —", a:"4,200 words (sorry not sorry)" },
+      { q:"Most-cited writer on the masthead —", a:"Anne Applebaum" },
+      { q:"Office mascot —", a:"a taxidermy puffin named Walter" },
+    ],
     stats:{ readers:212, stories:34, accuracy:"61%" },
-    posts:["https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=400&h=700&fit=crop"],
+    verifiedBlurb:"The Atlantic is one of three legacy outlets we verified at launch. They bring 167 years of editorial standards to a feed otherwise built around individual reporters. We verified them because their staff writers — not their op-eds — show up here, and because they let us run their stories without a paywall for under-25 readers.",
+    disclosures:[
+      { k:"Owner", v:"Emerson Collective (majority owner since 2017)" },
+      { k:"AI use", v:"Opted out. The Atlantic does not license stories for AI training on Newsreel." },
+      { k:"Funding", v:"Subscription + advertising. No sponsored stories appear on Newsreel." },
+      { k:"Editorial", v:"Stories pass The Atlantic's standard fact-check before publication." },
+    ],
+    posts:[
+      { sId:2, img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=600&h=800&fit=crop", tag:"Climate", head:"The methane rule that quietly reshapes your gas bill" },
+      { sId:2, img:"https://images.unsplash.com/photo-1620266757065-5814239881fd?w=600&h=800&fit=crop", tag:"Energy", head:"What grid operators actually fear" },
+      { sId:2, img:"https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=600&h=800&fit=crop", tag:"Culture", head:"The slow death of the listicle" },
+      { sId:2, img:"https://images.unsplash.com/photo-1535320903710-d993d3d77d29?w=600&h=800&fit=crop", tag:"Economy", head:"A defense of boring policy" },
+    ],
+    pastWork:[
+      { title:"The new climate consensus", outlet:"The Atlantic", year:2024, url:"https://www.theatlantic.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=theatlantic.com" },
+      { title:"How journalism survives the AI era", outlet:"The Atlantic", year:2024, url:"https://www.theatlantic.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=theatlantic.com" },
+      { title:"Why nobody believes anything anymore", outlet:"The Atlantic", year:2023, url:"https://www.theatlantic.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=theatlantic.com" },
+    ],
+    shop:{
+      merch:[
+        { title:"Atlantic Tote", price:"$28", img:"https://images.unsplash.com/photo-1591561954557-26941169b49e?w=400&h=400&fit=crop", url:"#" },
+        { title:"Atlantic Subscription", sub:"1 year, print + digital", price:"$80", img:"https://images.unsplash.com/photo-1495020689067-958852a7765e?w=400&h=400&fit=crop", url:"#" },
+      ],
+      books:[
+        { title:"The Atlantic 2025 Reader", sub:"Anthology", price:"$22", img:"https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=400&fit=crop", url:"#" },
+      ],
+      picks:[
+        { title:"On Tyranny", sub:"Timothy Snyder", img:"https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400&h=400&fit=crop", url:"#" },
+        { title:"The Death of Expertise", sub:"Tom Nichols", img:"https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop", url:"#" },
+      ],
+    },
+    events:[
+      { date:"JUL 15", title:"The Atlantic Festival", venue:"Washington, DC", url:"#" },
+      { date:"OCT 02", title:"Ideas Issue launch", venue:"Online", url:"#" },
+    ],
   },
 ];
 
@@ -1368,42 +1574,241 @@ document.addEventListener('keydown', e => {
 
 // ─── Creator profile ───
 function renderCreator(c) {
-  return `
-    <div class="cr-top">
-      <button class="cr-icon-btn" onclick="closeCreator()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button class="cr-icon-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-      </button>
-    </div>
-    <div class="cr-cover">
-      <svg class="cr-cover-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      <div class="cr-avatar-wrap"><img class="cr-avatar" src="${c.avatar}" alt=""></div>
-    </div>
-    <div class="cr-meta">
-      <div class="cr-name-row">
-        <h1 class="cr-name">${c.name}</h1>
-        ${c.verified ? VERIF_LG : ''}
+  const storiesHtml = (c.posts || []).map(p => `
+    <button class="cr-tile" onclick="closeCreator(); jumpToStory(${p.sId})">
+      <img src="${p.img}" alt="">
+      <div class="cr-tile-overlay"></div>
+      <div class="cr-tile-tag">${p.tag}</div>
+      <div class="cr-tile-head">${p.head}</div>
+    </button>
+  `).join('');
+
+  const pastWorkHtml = (c.pastWork || []).map(w => `
+    <a class="cr-pw-row" href="${w.url}" target="_blank" rel="noopener">
+      <img class="cr-pw-fav" src="${w.favicon}" alt="">
+      <div class="cr-pw-info">
+        <div class="cr-pw-title">${w.title}</div>
+        <div class="cr-pw-meta">${w.outlet} · ${w.year}</div>
       </div>
-      <div class="cr-stats">
-        <div><div class="cr-stat-num">${c.stats.readers}</div><div class="cr-stat-label">Readers this month</div></div>
-        <div><div class="cr-stat-num">${c.stats.stories}</div><div class="cr-stat-label">Stories</div></div>
-        <div><div class="cr-stat-num cr-stat-num--pct">${c.stats.accuracy}</div><div class="cr-stat-label">Quiz Accuracy</div></div>
+      <span class="cr-pw-ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+    </a>
+  `).join('');
+
+  const shopCard = (item) => `
+    <a class="cr-shop-card" href="${item.url}" target="_blank" rel="noopener">
+      <img class="cr-shop-img" src="${item.img}" alt="">
+      <div class="cr-shop-body">
+        <div class="cr-shop-title">${item.title}</div>
+        ${item.sub ? `<div class="cr-shop-sub">${item.sub}</div>` : ''}
+        ${item.price ? `<div class="cr-shop-price">${item.price}</div>` : ''}
       </div>
-      <div class="cr-divider"></div>
-      <p class="cr-bio">${c.bio}</p>
-      <div class="cr-section-label">Latest from ${c.name}</div>
-    </div>
-    <div class="cr-grid">
-      ${c.posts.map(p => `
-        <div class="cr-thumb">
-          <img src="${p}" alt="">
-          <div class="cr-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg></div>
+    </a>
+  `;
+  const shopSub = (key) => {
+    const items = (c.shop && c.shop[key]) || [];
+    if (!items.length) return `<div style="font-family:var(--font-b); font-size:13px; color:var(--nr-ash); padding:20px 4px;">Nothing here yet.</div>`;
+    return `<div class="cr-shop-grid">${items.map(shopCard).join('')}</div>`;
+  };
+
+  const eventsHtml = (c.events || []).map(ev => {
+    const [m, d] = ev.date.split(' ');
+    return `
+      <a class="cr-event-row" href="${ev.url}" target="_blank" rel="noopener">
+        <div class="cr-event-date">
+          <div class="cr-event-month">${m}</div>
+          <div class="cr-event-day">${d}</div>
         </div>
-      `).join('')}
+        <div class="cr-event-info">
+          <div class="cr-event-title">${ev.title}</div>
+          <div class="cr-event-venue">${ev.venue}</div>
+        </div>
+        <button class="cr-event-rsvp" onclick="event.preventDefault();">RSVP</button>
+      </a>
+    `;
+  }).join('') || `<div style="font-family:var(--font-b); font-size:13px; color:var(--nr-ash); padding:20px 4px;">No upcoming events.</div>`;
+
+  return `
+    <div class="cr-cover-img">
+      <img src="${c.cover || c.hero || c.avatar}" alt="">
+      <div class="cr-cover-grad"></div>
+      <div class="cr-top">
+        <button class="cr-icon-btn" onclick="closeCreator()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="cr-icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="cr-id">
+      <img class="cr-id-avatar" src="${c.avatar}" alt="">
+      <div class="cr-id-name-row">
+        <h1 class="cr-id-name">${c.name}</h1>
+      </div>
+      <div class="cr-chip-row">
+        ${c.verified ? `
+          <button class="cr-verified-chip" onclick="toggleDrawer(this,'verif')">
+            ${VERIF_LG.replace('class=\"author-verif\"','class=\"cr-verif-seal\"')}
+            <span>Newsreel Verified</span>
+            <svg class="cr-verif-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>` : ''}
+        ${(c.disclosures && c.disclosures.length) ? `
+          <button class="cr-discl-chip" onclick="toggleDrawer(this,'discl')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>Disclosures</span>
+            <svg class="cr-verif-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>` : ''}
+      </div>
+
+      <div class="cr-blurb-wrap" data-drawer="verif">
+        <div class="cr-blurb-label">${VERIF_LG.replace('width:22px;height:22px','width:14px;height:14px')}<span>Why Newsreel Verified</span></div>
+        <p class="cr-blurb">${c.verifiedBlurb || ''}</p>
+      </div>
+
+      ${(c.disclosures && c.disclosures.length) ? `
+        <div class="cr-blurb-wrap" data-drawer="discl">
+          <div class="cr-blurb-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span>Disclosures</span></div>
+          <ul class="cr-discl-list">
+            ${c.disclosures.map(d => `<li><span class="cr-discl-k">${d.k}</span><span class="cr-discl-v">${d.v}</span></li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+    </div>
+
+    <div class="cr-substrip">
+      <div class="cr-readers">${(c.stats.readers * 1000).toLocaleString()} readers this month</div>
+      <div class="cr-substrip-r">
+        <button class="cr-follow" onclick="this.classList.toggle('on'); this.textContent = this.classList.contains('on') ? 'Following' : 'Follow';">Follow</button>
+        <button class="cr-iconlink" aria-label="More">
+          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="cr-bio-wrap">
+      <p class="cr-bio">${c.bio}</p>
+    </div>
+
+    <div class="cr-collage-wrap">
+      <div class="cr-collage-head">
+        <button class="cr-collage-shuffle" onclick="toggleCollage(this)" style="border-color:var(--nr-red); color:var(--nr-red);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+          <span data-label>Generate collage</span>
+        </button>
+        <button class="cr-collage-shuffle" onclick="shuffleCollage(this)" data-shuffle style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+          Shuffle
+        </button>
+      </div>
+      <div class="cr-collage" data-creator="${c.id}">
+        <div class="cr-collage-bg"></div>
+        <div class="cr-collage-top">PERFECTLY<br>IMPERFECT</div>
+        ${(c.posts || []).slice(0,6).map((p,i) => `<img class="cr-collage-pic" src="${p.img}" alt="" data-i="${i}">`).join('')}
+        <div class="cr-collage-mid">${c.collageTag || 'A reporter worth reading'}</div>
+        <div class="cr-collage-bot">${c.name.toUpperCase()}</div>
+        <svg class="cr-collage-star" data-star="0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+        <svg class="cr-collage-star" data-star="1" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+        <div class="cr-collage-wm">★ Newsreel ★</div>
+      </div>
+    </div>
+
+    <div class="cr-tabs">
+      <button class="cr-tab active" data-tab="stories" onclick="setCreatorTab(this,'stories')">Stories</button>
+      <button class="cr-tab" data-tab="past" onclick="setCreatorTab(this,'past')">Past Work</button>
+      <button class="cr-tab" data-tab="shop" onclick="setCreatorTab(this,'shop')">Shop</button>
+      <button class="cr-tab" data-tab="events" onclick="setCreatorTab(this,'events')">Events</button>
+    </div>
+
+    <div class="cr-panel active" data-panel="stories">
+      <div class="cr-tile-grid">${storiesHtml}</div>
+    </div>
+    <div class="cr-panel" data-panel="past">
+      <div class="cr-pw">${pastWorkHtml}</div>
+    </div>
+    <div class="cr-panel" data-panel="shop">
+      <div class="cr-shop-subtabs">
+        <button class="cr-shop-subtab active" data-sub="merch" onclick="setShopSubtab(this,'merch')">Merch</button>
+        <button class="cr-shop-subtab" data-sub="books" onclick="setShopSubtab(this,'books')">Books</button>
+        <button class="cr-shop-subtab" data-sub="picks" onclick="setShopSubtab(this,'picks')">Picks</button>
+      </div>
+      <div class="cr-shop-panel active" data-shop="merch">${shopSub('merch')}</div>
+      <div class="cr-shop-panel" data-shop="books">${shopSub('books')}</div>
+      <div class="cr-shop-panel" data-shop="picks">${shopSub('picks')}</div>
+    </div>
+    <div class="cr-panel" data-panel="events">
+      <div class="cr-events">${eventsHtml}</div>
     </div>
   `;
+}
+
+function setCreatorTab(btn, name) {
+  const root = btn.closest('.creator');
+  root.querySelectorAll('.cr-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  root.querySelectorAll('.cr-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === name));
+}
+function setShopSubtab(btn, name) {
+  const root = btn.closest('.cr-panel');
+  root.querySelectorAll('.cr-shop-subtab').forEach(t => t.classList.toggle('active', t.dataset.sub === name));
+  root.querySelectorAll('.cr-shop-panel').forEach(p => p.classList.toggle('active', p.dataset.shop === name));
+}
+function layoutCollage(collage) {
+  const rand = (a,b) => a + Math.random() * (b - a);
+  const pics = collage.querySelectorAll('.cr-collage-pic');
+  const W = collage.clientWidth || 360;
+  const H = 380;
+  // Spread images around the center text in a loose ring + scatter
+  const slots = [
+    { x: 0.06, y: 0.18, w: 110, h: 110 },
+    { x: 0.62, y: 0.10, w: 130, h: 90  },
+    { x: 0.04, y: 0.55, w: 120, h: 100 },
+    { x: 0.66, y: 0.50, w: 110, h: 130 },
+    { x: 0.30, y: 0.70, w: 100, h: 100 },
+    { x: 0.42, y: 0.06, w: 90,  h: 90  },
+  ];
+  pics.forEach((img, i) => {
+    const s = slots[i % slots.length];
+    const jitterX = rand(-12, 12);
+    const jitterY = rand(-10, 10);
+    const rot = rand(-12, 12);
+    img.style.width  = s.w + 'px';
+    img.style.height = s.h + 'px';
+    img.style.left   = (s.x * W + jitterX) + 'px';
+    img.style.top    = (s.y * H + jitterY) + 'px';
+    img.style.transform = `rotate(${rot}deg)`;
+  });
+  const stars = collage.querySelectorAll('.cr-collage-star');
+  stars.forEach((st, i) => {
+    st.style.left = (i === 0 ? rand(8, 40) : rand(W-46, W-14)) + 'px';
+    st.style.top  = (i === 0 ? rand(H-100, H-60) : rand(H-200, H-160)) + 'px';
+    st.style.transform = `rotate(${rand(-20,20)}deg)`;
+  });
+}
+function shuffleCollage(btn) {
+  const collage = btn.closest('.cr-collage-wrap').querySelector('.cr-collage');
+  layoutCollage(collage);
+}
+function toggleCollage(btn) {
+  const wrap = btn.closest('.cr-collage-wrap');
+  const collage = wrap.querySelector('.cr-collage');
+  const shuffleBtn = wrap.querySelector('[data-shuffle]');
+  const open = !collage.classList.contains('open');
+  collage.classList.toggle('open', open);
+  btn.style.display = open ? 'none' : 'inline-flex';
+  shuffleBtn.style.display = open ? 'inline-flex' : 'none';
+  if (open) requestAnimationFrame(() => layoutCollage(collage));
+}
+
+function toggleDrawer(chip, key) {
+  const open = !chip.classList.contains('open');
+  const root = chip.closest('.creator');
+  root.querySelectorAll('.cr-verified-chip, .cr-discl-chip').forEach(c => c.classList.remove('open'));
+  root.querySelectorAll('.cr-blurb-wrap').forEach(d => d.classList.remove('open'));
+  if (open) {
+    chip.classList.add('open');
+    const drawer = root.querySelector(`.cr-blurb-wrap[data-drawer="${key}"]`);
+    if (drawer) drawer.classList.add('open');
+  }
 }
 
 // ─── Explore scene ───
