@@ -1,0 +1,2754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Newsreel</title>
+<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --nr-red:#FF6343; --nr-yellow:#EDBD1F; --nr-green:#1AAD17;
+    --nr-black:#000; --nr-charcoal:#0F0F0F; --nr-lead:#1F1F1F; --nr-iron:#3A3A3A;
+    --nr-ash:#898989; --nr-silver:#ADADAD; --nr-smoke:#C8C8C8; --nr-white:#FFF;
+    --font-h:'Bree Serif',serif; --font-b:'DM Sans',sans-serif; --font-m:'IBM Plex Mono',monospace;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; background:#000; color:var(--nr-white); font-family:var(--font-b); overflow:hidden; }
+
+  .phone { width:100%; max-width:430px; height:100vh; margin:0 auto; background:#000; position:relative; overflow:hidden; }
+
+  /* ─────────── FEED ─────────── */
+  .feed { position:absolute; inset:0; transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1), opacity 0.3s ease; }
+  .feed.hidden { transform:translateX(-12%); opacity:0; pointer-events:none; }
+
+  .stories { position:absolute; inset:0; }
+  .story { position:absolute; inset:0; transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); }
+  .story.next { transform:translateY(100%); }
+  .story.prev { transform:translateY(-100%); }
+
+  .slide-track { display:flex; height:100%; width:100%; transition:transform 0.35s cubic-bezier(0.2,0.8,0.2,1); will-change:transform; }
+  .slide { flex:0 0 100%; height:100%; position:relative; background:#000; }
+  .slide-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; user-select:none; -webkit-user-drag:none; }
+  .slide::before { content:""; position:absolute; left:0; right:0; top:0; height:200px; background:linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); pointer-events:none; z-index:1; }
+  .slide::after  { content:""; position:absolute; left:0; right:0; bottom:0; height:340px; background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.55) 50%, transparent 100%); pointer-events:none; z-index:1; }
+
+  /* Top chrome: status row + segmented progress */
+  .top-chrome { position:absolute; top:60px; left:0; right:0; z-index:5; padding:0 18px; }
+  .top-row { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; min-height:34px; margin-bottom:14px; }
+  .top-row > :first-child { justify-self:start; }
+  .top-row > :last-child  { justify-self:end; }
+  .stack-counter { font-family:var(--font-m); font-size:11px; font-weight:500; letter-spacing:0.16em; color:rgba(255,255,255,0.85); text-shadow:0 1px 4px rgba(0,0,0,0.5); }
+  .nr-mark { display:flex; align-items:center; gap:6px; cursor:pointer; filter:drop-shadow(0 1px 6px rgba(0,0,0,0.5)); }
+  .nr-mark img { height:22px; width:auto; display:block; }
+  .nr-mark svg { width:11px; height:11px; color:rgba(255,255,255,0.85); }
+  .me-avatar { width:32px; height:32px; border-radius:50%; border:1.5px solid rgba(255,255,255,0.85); cursor:pointer; padding:0; overflow:hidden; background:var(--nr-iron); }
+  .me-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+  /* Story-progress dots — design system pattern (app.html .car-dot) */
+  .segs { display:flex; gap:5px; justify-content:center; align-items:center; height:8px; }
+  .segs.single { display:none; }
+  .seg { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.22); transition:background 0.25s ease, transform 0.25s ease, width 0.25s ease; }
+  .seg-fill { display:none; }
+  .seg.done { background:rgba(255,255,255,0.55); }
+  .seg.on { background:var(--nr-red); width:18px; border-radius:3px; }
+
+  /* Video controls (only pause + volume — no fullscreen) */
+  .vc { position:absolute; top:130px; left:14px; z-index:4; display:flex; gap:8px; }
+  .vc-btn {
+    width:38px; height:38px; border-radius:50%;
+    background:rgba(0,0,0,0.45); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    display:flex; align-items:center; justify-content:center;
+    border:none; cursor:pointer; color:#fff;
+  }
+  .vc-btn svg { width:15px; height:15px; }
+
+  /* Right-side action stack — speaker / CC / share / streak / Benny */
+  .side-actions { position:absolute; right:10px; top:50%; transform:translateY(-50%); z-index:4;
+    display:flex; flex-direction:column; gap:14px; align-items:center; }
+  .sa-btn { width:40px; height:40px; border-radius:50%; border:none; cursor:pointer; color:#fff;
+    background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    display:flex; align-items:center; justify-content:center; padding:0; }
+  .sa-btn svg { width:18px; height:18px; }
+  .sa-btn--streak {
+    position:relative; background:transparent;
+    background-image:conic-gradient(var(--nr-red) 65%, rgba(255,255,255,0.15) 0);
+    -webkit-mask:radial-gradient(circle, transparent 14px, #000 14px);
+            mask:radial-gradient(circle, transparent 14px, #000 14px);
+  }
+  .sa-btn--benny { background:#fff; border:1px solid rgba(237,189,31,0.6); padding:0; overflow:hidden; }
+  .sa-btn--benny img { width:100%; height:100%; object-fit:cover; display:block; }
+
+  /* ─────────── BENNY ASSISTANT SHEET ─────────── */
+  .ba-scrim { position:absolute; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(2px); z-index:50; opacity:0; pointer-events:none; transition:opacity 0.25s ease; }
+  .ba-scrim.on { opacity:1; pointer-events:auto; }
+  .ba-sheet { position:absolute; left:16px; right:64px; bottom:120px; z-index:51; display:flex; flex-direction:column; gap:10px;
+    transform:translateY(20px); opacity:0; pointer-events:none; transition:transform 0.3s cubic-bezier(0.2,0.8,0.2,1), opacity 0.25s ease; }
+  .ba-scrim.on ~ .ba-sheet, .ba-sheet.on { transform:translateY(0); opacity:1; pointer-events:auto; }
+  .ba-card { background:rgba(15,15,15,0.85); backdrop-filter:blur(10px);
+    border:1px solid rgba(237,189,31,0.55); border-radius:18px; padding:16px 18px; cursor:pointer; text-align:left;
+    color:#fff; transition:border-color 0.15s, transform 0.1s ease; }
+  .ba-card:hover { border-color:rgba(237,189,31,0.85); }
+  .ba-card:active { transform:scale(0.98); }
+  .ba-card-title { font-family:var(--font-h); font-size:18px; line-height:1.2; margin-bottom:4px; }
+  .ba-card-sub { font-family:var(--font-b); font-size:13px; line-height:1.4; color:var(--nr-silver); }
+  .ba-answer { background:rgba(15,15,15,0.92); backdrop-filter:blur(10px); border:1px solid var(--nr-iron); border-radius:18px; padding:18px; color:#fff; }
+  .ba-answer-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .ba-answer-head img { width:22px; height:22px; }
+  .ba-answer-label { font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; color:var(--nr-yellow); text-transform:uppercase; font-weight:600; }
+  .ba-answer-body { font-family:var(--font-b); font-size:15px; line-height:1.5; color:var(--nr-smoke); }
+  .ba-close { position:absolute; top:12px; right:12px; width:30px; height:30px; border-radius:50%; background:rgba(0,0,0,0.5); border:none; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .ba-close svg { width:14px; height:14px; }
+
+  /* Subtitle */
+  .subtitle { position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); z-index:2;
+    background:rgba(0,0,0,0.55); color:#fff; font-size:15px; font-weight:500;
+    padding:6px 12px; border-radius:6px; backdrop-filter:blur(4px); pointer-events:none;
+    max-width:80%; text-align:center; line-height:1.35; }
+
+  /* Bottom overlay: author chip → headline → read more */
+  .b-overlay { position:absolute; left:0; right:0; bottom:96px; z-index:3; padding:0 18px; transition:bottom 0.3s ease; }
+  /* Compact mode = slides 2+ : just a tiny author chip, no headline/tag */
+  .b-overlay.compact .b-eyebrow-row,
+  .b-overlay.compact .b-headline { display:none; }
+  .b-overlay.compact { bottom:72px; }
+  .b-overlay.compact .author-chip { padding:4px 12px 4px 4px; background:rgba(0,0,0,0.4); }
+  .b-overlay.compact .author-av { width:24px; height:24px; }
+  .b-overlay.compact .author-name { font-size:13px; font-weight:500; }
+  .b-overlay.compact .author-verif { width:12px; height:12px; }
+  /* Hide bottom author overlay completely on Benny slide */
+  .b-overlay.hidden-overlay { display:none; }
+  .author-chip {
+    display:inline-flex; align-items:center; gap:8px; padding:5px 14px 5px 5px; border-radius:999px;
+    background:rgba(0,0,0,0.5); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1);
+    color:#fff; cursor:pointer; margin-bottom:10px;
+  }
+  .author-av { width:28px; height:28px; border-radius:50%; object-fit:cover; background:var(--nr-iron); }
+  .author-name { font-family:var(--font-b); font-size:14px; font-weight:600; }
+  .author-verif { width:14px; height:14px; flex-shrink:0; }
+  .b-eyebrow-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .b-eyebrow { font-family:var(--font-m); font-size:11px; font-weight:500; letter-spacing:0.22em; color:rgba(255,255,255,0.6); text-transform:uppercase; }
+  .b-impact-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 8px 3px 4px; border-radius:999px;
+    background:rgba(255,99,67,0.16); border:1px solid rgba(255,99,67,0.45);
+    font-family:var(--font-m); font-size:9px; font-weight:600; letter-spacing:0.12em; color:#FFD9CC; text-transform:uppercase; }
+  .b-impact-pill img { width:16px; height:16px; border-radius:50%; background:#fff; object-fit:cover; }
+  .b-headline { font-family:var(--font-h); font-size:28px; line-height:1.15; color:#fff; margin-bottom:8px; text-shadow:0 1px 8px rgba(0,0,0,0.4); }
+  .b-read { display:inline-flex; align-items:center; gap:6px; font-family:var(--font-b); font-size:14px; font-weight:500; color:#fff; background:none; border:none; cursor:pointer; padding:6px 0; text-shadow:0 1px 6px rgba(0,0,0,0.5); }
+  .b-read-row { display:flex; justify-content:flex-end; }
+
+  /* Tabs */
+  .tabs { position:absolute; left:0; right:0; bottom:0; z-index:60;
+    display:flex; justify-content:space-around; align-items:flex-start;
+    padding:8px 8px max(36px, env(safe-area-inset-bottom));
+    background:linear-gradient(to top, rgba(0,0,0,0.97) 60%, rgba(0,0,0,0.75) 85%, rgba(0,0,0,0));
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+  .tab { background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; color:rgba(255,255,255,0.6); padding:6px 8px; }
+  .tab svg { width:22px; height:22px; }
+  .tab-label { font-family:var(--font-b); font-size:10px; font-weight:500; }
+  .tab.active { color:var(--nr-red); }
+
+  /* ─────────── QUIZ SLIDE OVERLAY ─────────── */
+  .slide--quiz { background:#000; }
+  .slide--quiz::before, .slide--quiz::after { display:none; }
+  .quiz-wrap { position:absolute; inset:0; padding:140px 68px 140px 24px; display:flex; flex-direction:column; }
+  .quiz-q { font-family:var(--font-b); font-size:18px; line-height:1.4; color:#fff; text-align:center; margin-bottom:28px; }
+  .quiz-opts { display:flex; flex-direction:column; gap:12px; }
+  .quiz-opt { background:transparent; border:1px solid var(--nr-iron); color:#fff; border-radius:14px; padding:16px 18px; font-family:var(--font-b); font-size:15px; text-align:left; cursor:pointer; transition:border-color 0.15s, background 0.15s; }
+  .quiz-opt:hover { border-color:var(--nr-silver); background:rgba(255,255,255,0.03); }
+  .quiz-opt.right { border-color:var(--nr-green); background:rgba(26,173,23,0.1); }
+  .quiz-opt.wrong { border-color:var(--nr-red); background:rgba(255,99,67,0.1); }
+
+  /* ─────────── POLL (Where do you stand?) SLIDE ─────────── */
+  .slide--poll { background:#000; }
+  .slide--poll::before, .slide--poll::after { display:none; }
+  .pl-wrap { position:absolute; inset:0; padding:120px 24px 130px; display:flex; flex-direction:column; align-items:center; }
+  .pl-title { font-family:var(--font-h); font-size:36px; line-height:1.1; color:#fff; align-self:flex-start; margin-bottom:22px; }
+  .pl-q { font-family:var(--font-b); font-size:21px; line-height:1.35; color:#fff; text-align:center; margin-bottom:auto; padding-top:8px; }
+  .pl-slider-wrap { width:100%; padding:34px 24px; border-radius:16px; background:var(--nr-lead); margin-top:24px; }
+  .pl-track { position:relative; height:24px; touch-action:none; user-select:none; }
+  .pl-track-line { position:absolute; left:0; right:0; top:50%; height:2px; background:var(--nr-yellow); transform:translateY(-50%); border-radius:1px; }
+  .pl-track-tick { position:absolute; top:50%; transform:translate(-50%,-50%); width:2px; height:14px; background:rgba(237,189,31,0.55); border-radius:1px; }
+  .pl-track-knob { position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:24px; background:var(--nr-yellow); border-radius:3px; transition:left 0.18s cubic-bezier(0.2,0.8,0.2,1); cursor:grab; box-shadow:0 0 12px rgba(237,189,31,0.55); }
+  .pl-track-knob:active { cursor:grabbing; }
+  .pl-labels { display:flex; justify-content:space-between; margin-top:18px; padding:0 4px; gap:8px; }
+  .pl-label { flex:1; font-family:var(--font-b); font-size:12px; font-weight:500; color:var(--nr-silver); text-align:center; line-height:1.2; transition:color 0.18s ease; cursor:pointer; }
+  .pl-label.active { color:var(--nr-yellow); font-weight:600; }
+  .pl-foot { margin-top:28px; font-family:var(--font-b); font-size:13px; color:var(--nr-silver); text-align:center; }
+  .pl-write { display:block; margin:18px auto 0; font-family:var(--font-b); font-size:13px; color:var(--nr-silver); text-decoration:underline; text-align:center; cursor:pointer; background:none; border:none; }
+
+  /* Results view (after voting) */
+  .pl-results { width:100%; margin-top:20px; opacity:0; max-height:0; overflow:hidden; transition:opacity 0.4s ease, max-height 0.5s cubic-bezier(0.2,0.8,0.2,1); }
+  .slide--poll.voted .pl-results { opacity:1; max-height:400px; }
+  .pl-res-toggle { display:flex; gap:6px; margin-bottom:14px; padding:4px; border-radius:999px; background:var(--nr-lead); }
+  .pl-res-tab { flex:1; padding:8px 10px; border-radius:999px; border:none; background:transparent; color:var(--nr-silver); font-family:var(--font-b); font-size:12px; font-weight:600; cursor:pointer; }
+  .pl-res-tab.active { background:var(--nr-yellow); color:#000; }
+  .pl-res-bars { display:flex; align-items:flex-end; gap:6px; height:96px; padding:0 4px; }
+  .pl-res-bar { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end; }
+  .pl-res-bar-fill { width:100%; background:var(--nr-iron); border-radius:6px 6px 2px 2px; transition:height 0.5s cubic-bezier(0.2,0.8,0.2,1), background 0.18s ease; min-height:4px; }
+  .pl-res-bar.you .pl-res-bar-fill { background:var(--nr-yellow); }
+  .pl-res-bar-pct { font-family:var(--font-m); font-size:10px; font-weight:600; color:var(--nr-silver); }
+  .pl-res-bar.you .pl-res-bar-pct { color:var(--nr-yellow); }
+  .pl-res-foot { font-family:var(--font-b); font-size:11px; color:var(--nr-ash); margin-top:10px; text-align:center; }
+
+  /* ─────────── BENNY (Story Impact) SLIDE ─────────── */
+  .slide--benny { background:radial-gradient(ellipse at 50% 55%, #1a0a07 0%, #000 65%); }
+  .slide--benny::before, .slide--benny::after { display:none; }
+  .bn-stage { position:absolute; inset:0; padding:120px 68px 110px 24px; display:flex; flex-direction:column; }
+  .bn-context { font-family:var(--font-m); font-size:10px; letter-spacing:0.24em; color:var(--nr-ash); text-transform:uppercase; margin-bottom:10px; transition:opacity 0.3s ease; }
+  .bn-headline { font-family:var(--font-h); font-size:26px; line-height:1.18; color:#fff; margin-bottom:0; transition:font-size 0.5s ease, opacity 0.4s ease, margin 0.4s ease; }
+  .bn-headline em { color:var(--nr-red); font-style:normal; }
+  .bn-subline { font-family:var(--font-m); font-size:11px; letter-spacing:0.12em; color:var(--nr-silver); text-transform:uppercase; margin-top:10px; }
+  .slide--benny.opened .bn-subline { display:none; }
+  .bn-orb-wrap { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; transition:flex 0.6s cubic-bezier(0.2,0.8,0.2,1), margin 0.4s ease; margin-top:0; }
+  /* Opened state — give every chunk breathing room */
+  .slide--benny.opened .bn-context { display:none; }
+  .slide--benny.opened .bn-headline { margin-bottom:24px; }
+  .slide--benny.opened .bn-orb-wrap { margin-bottom:28px; }
+  .bn-orb-btn { position:relative; width:200px; height:200px; border-radius:50%; border:none; padding:0; background:transparent; cursor:pointer;
+    transition:width 0.6s cubic-bezier(0.2,0.8,0.2,1), height 0.6s cubic-bezier(0.2,0.8,0.2,1); }
+  .bn-orb-btn:active { transform:scale(0.97); transition:transform 0.12s ease; }
+  .bn-aura { position:absolute; inset:-55px; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle, rgba(255,99,67,0.45) 0%, rgba(255,99,67,0.18) 32%, rgba(255,99,67,0) 62%);
+    filter:blur(8px); animation:bnAura 3.6s ease-in-out infinite; }
+  .bn-aura.two { inset:-25px; background:radial-gradient(circle, rgba(255,140,80,0.55) 0%, rgba(255,99,67,0) 60%); animation-delay:-1.2s; animation-duration:4.4s; }
+  @keyframes bnAura { 0%,100% { opacity:0.7; transform:scale(0.96); } 50% { opacity:1; transform:scale(1.06); } }
+  .bn-disc { position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at 50% 38%, #FF8966 0%, #FF6343 45%, #C84527 100%);
+    box-shadow: inset 0 -22px 40px rgba(0,0,0,0.35), inset 0 8px 24px rgba(255,255,255,0.18), 0 14px 50px rgba(255,99,67,0.45);
+  }
+  .bn-mascot { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .bn-mascot img { width:64%; height:64%; object-fit:contain; animation:bnIdle 5.2s ease-in-out infinite; transform-origin:50% 60%; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
+  /* "For you" chip below the orb (tasteful, not jammed inside) */
+  .bn-foryou { display:inline-flex; align-items:center; gap:8px; padding:5px 14px 5px 5px; border-radius:999px;
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#fff;
+    font-family:var(--font-m); font-size:10px; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; }
+  .bn-foryou img { width:24px; height:24px; border-radius:50%; object-fit:cover; }
+  /* Story Impact eyebrow — prominent header */
+  .bn-impact-label { display:inline-flex; align-items:center; gap:6px; padding:5px 12px 5px 5px; border-radius:999px;
+    background:rgba(255,99,67,0.14); border:1px solid rgba(255,99,67,0.45);
+    font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.2em; color:#FFD9CC; text-transform:uppercase;
+    margin-bottom:14px; align-self:flex-start; }
+  .bn-impact-label img { width:18px; height:18px; }
+  /* Concentric ripples (pre-tap = breathing; post-tap = bursting) */
+  .bn-ripple { position:absolute; inset:0; border-radius:50%; border:2px solid rgba(255,99,67,0.55); opacity:0; pointer-events:none; }
+  .slide--benny.opened .bn-ripple { animation:bnRipple 1.4s ease-out 0.05s 1; }
+  .slide--benny.opened .bn-ripple.r2 { animation-delay:0.3s; }
+  .slide--benny.opened .bn-ripple.r3 { animation-delay:0.55s; }
+  @keyframes bnRipple {
+    0% { transform:scale(0.85); opacity:0.9; }
+    100% { transform:scale(2.4); opacity:0; }
+  }
+
+  /* Particle burst on tap — small dots fly outward */
+  .bn-particles { position:absolute; inset:0; pointer-events:none; }
+  .bn-particle { position:absolute; left:50%; top:50%; width:6px; height:6px; border-radius:50%;
+    background:radial-gradient(circle, #FFB088 0%, #FF6343 60%, transparent 100%);
+    box-shadow:0 0 8px rgba(255,99,67,0.8);
+    transform:translate(-50%,-50%); opacity:0; }
+  .bn-particle.go { animation:bnParticle 1.4s cubic-bezier(0.2,0.8,0.2,1) forwards; }
+  @keyframes bnParticle {
+    0% { transform:translate(-50%,-50%) scale(0.6); opacity:0; }
+    15% { opacity:1; }
+    100% { transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.4); opacity:0; }
+  }
+
+  /* "Benny is writing" state — shows briefly between tap and take */
+  .bn-writing { display:none; align-items:center; gap:10px; margin-top:12px; }
+  .slide--benny.opened.thinking .bn-writing { display:flex; animation:bnFadeIn 0.3s ease forwards; }
+  .slide--benny.opened.streaming .bn-writing,
+  .slide--benny.opened.done .bn-writing { display:none; }
+  .bn-writing-mark { width:24px; height:24px; border-radius:50%; background:radial-gradient(circle, #FF8966 0%, #FF6343 70%); position:relative;
+    box-shadow:0 0 0 0 rgba(255,99,67,0.5); animation:bnPulse 1.2s ease-in-out infinite; }
+  @keyframes bnPulse { 0%,100% { box-shadow:0 0 0 0 rgba(255,99,67,0.6); } 50% { box-shadow:0 0 0 8px rgba(255,99,67,0); } }
+  .bn-writing-label { font-family:var(--font-m); font-size:11px; letter-spacing:0.16em; color:var(--nr-silver); text-transform:uppercase; }
+  .bn-writing-dots::after { content:""; display:inline-block; width:1.2em; text-align:left; animation:bnDots 1.2s steps(4) infinite; }
+  @keyframes bnDots { 0% { content:""; } 25% { content:"."; } 50% { content:".."; } 75% { content:"..."; } }
+  @keyframes bnFadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+
+  /* Streaming take body — word-by-word reveal */
+  .bn-take-body .w { opacity:0; filter:blur(4px); transition:opacity 0.35s ease, filter 0.35s ease; }
+  .bn-take-body .w.in { opacity:1; filter:blur(0); }
+  .bn-take-body .w em { color:#fff; font-style:normal; transition:color 0.4s ease, text-shadow 0.4s ease; }
+  .bn-take-body .w.in em.lit { color:var(--nr-red); text-shadow:0 0 14px rgba(255,99,67,0.55); }
+
+  /* Aurora glow behind the orb (subtle, moving) */
+  .bn-aurora { position:absolute; left:50%; top:50%; width:420px; height:420px; transform:translate(-50%,-50%); pointer-events:none; opacity:0.55; z-index:-1;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,99,67,0.35), transparent 50%),
+      radial-gradient(circle at 70% 60%, rgba(237,189,31,0.20), transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(255,99,67,0.20), transparent 50%);
+    filter:blur(40px); animation:bnAurora 18s ease-in-out infinite; }
+  @keyframes bnAurora {
+    0%,100% { transform:translate(-50%,-50%) rotate(0); }
+    50%     { transform:translate(-50%,-50%) rotate(180deg); }
+  }
+  @keyframes bnIdle { 0%,100% { transform:rotate(-2deg) translateY(0); } 50% { transform:rotate(2deg) translateY(-3px); } }
+  .bn-hint { font-family:var(--font-m); font-size:11px; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; animation:bnHintPulse 2.4s ease-in-out infinite; }
+  @keyframes bnHintPulse { 0%,100% { opacity:0.55; } 50% { opacity:1; } }
+
+  .slide--benny.opened .bn-orb-wrap { flex:0 0 auto; flex-direction:row; align-items:center; justify-content:flex-start; gap:12px; padding-top:0; }
+  .slide--benny.opened .bn-orb-btn { width:52px; height:52px; min-width:52px; pointer-events:none; }
+  .slide--benny.opened .bn-aura { inset:-6px; filter:blur(3px); animation:none; opacity:0.7; }
+  .slide--benny.opened .bn-aura.two { inset:-3px; animation:none; opacity:0.5; }
+  .slide--benny.opened .bn-headline { font-size:15px; opacity:0.6; }
+  .slide--benny.opened .bn-hint,
+  .slide--benny.opened .bn-impact-label,
+  .slide--benny.opened .bn-foryou { display:none; }
+  .slide--benny.opened .bn-byline { display:flex; flex-direction:column; align-items:flex-start; gap:2px; }
+  .bn-byline { display:none; }
+  .bn-byline-label { font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; }
+  .bn-byline-name { font-family:var(--font-h); font-size:18px; color:#fff; }
+
+  .bn-take { position:relative; max-height:0; overflow:hidden; opacity:0; transition:max-height 0.7s cubic-bezier(0.2,0.8,0.2,1), opacity 0.5s ease 0.15s; }
+  .slide--benny.opened .bn-take { max-height:60vh; opacity:1; }
+  .bn-take-body { font-family:var(--font-h); font-size:19px; line-height:1.35; color:#fff; margin-bottom:16px; }
+  .bn-take-body em { color:var(--nr-red); font-style:normal; }
+  /* Shimmer sweep across the take body when it reveals */
+  .bn-take::after { content:""; position:absolute; inset:0; pointer-events:none; border-radius:14px;
+    background:linear-gradient(110deg, transparent 30%, rgba(255,99,67,0.2) 50%, transparent 70%);
+    background-size:220% 100%; background-position:-100% 0; opacity:0; }
+  .slide--benny.opened .bn-take::after { animation:bnShimmer 1.6s cubic-bezier(0.4,0,0.2,1) 0.4s 1; }
+  @keyframes bnShimmer {
+    0% { background-position:-100% 0; opacity:0; }
+    20% { opacity:1; }
+    80% { opacity:1; }
+    100% { background-position:200% 0; opacity:0; }
+  }
+  .bn-take-meta-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .bn-take-meta-label { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; }
+  .bn-take-edit { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; background:none; border:none; cursor:pointer; padding:4px 0; }
+  .bn-take-meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+  .bn-take-chip { font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; color:var(--nr-silver); text-transform:uppercase; padding:5px 9px; border:1px solid var(--nr-iron); border-radius:999px; cursor:pointer; transition:border-color 0.15s, color 0.15s; }
+  .bn-take-chip.editable { border-color:var(--nr-red); color:#fff; border-style:dashed; }
+  .bn-take-chip[contenteditable="true"] { outline:none; }
+
+  /* ─────────── XP SLIDE ─────────── */
+  .slide--xp { background:#000; }
+  .slide--xp::before, .slide--xp::after { display:none; }
+  .xp-wrap { position:absolute; inset:0; padding:140px 68px 130px 24px; display:flex; flex-direction:column; align-items:center; }
+  .xp-streak { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .xp-streak-icon { width:34px; height:34px; }
+  .xp-streak-num { font-family:var(--font-b); font-size:38px; font-weight:700; color:#fff; line-height:1; }
+  .xp-msg { font-family:var(--font-b); font-size:18px; color:var(--nr-smoke); text-align:center; line-height:1.35; margin-bottom:34px; }
+  .xp-cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; max-width:340px; margin-bottom:30px; }
+  .xp-card { background:var(--nr-lead); border-radius:14px; padding:16px; }
+  .xp-card-label { font-family:var(--font-b); font-weight:600; font-size:11px; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; margin-bottom:10px; }
+  .xp-card-val { display:flex; align-items:center; gap:8px; font-family:var(--font-b); font-size:26px; font-weight:700; color:#fff; }
+  .xp-card-val svg { width:22px; height:22px; }
+  .xp-ring { position:relative; width:200px; height:200px; margin-bottom:18px; }
+  .xp-ring svg { width:100%; height:100%; transform:rotate(-90deg); }
+  .xp-ring-bg { stroke:var(--nr-lead); fill:none; stroke-width:14; }
+  .xp-ring-fg { stroke:var(--nr-red); fill:none; stroke-width:14; stroke-linecap:round; stroke-dasharray:565; stroke-dashoffset:565; transition:stroke-dashoffset 1s ease; }
+  .xp-ring-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .xp-ring-level { font-family:var(--font-b); font-size:22px; font-weight:700; color:#fff; }
+  .xp-ring-sub { font-family:var(--font-b); font-size:13px; color:var(--nr-silver); }
+  .xp-claim { width:100%; max-width:340px; background:var(--nr-red); color:#000; border:none; border-radius:14px; padding:16px; font-family:var(--font-m); font-weight:600; font-size:14px; letter-spacing:0.16em; cursor:pointer; }
+
+  /* ─────────── CREATOR PROFILE ─────────── */
+  .creator { position:absolute; inset:0; background:#000; transform:translateX(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:30; overflow-y:auto; }
+  .creator.on { transform:translateX(0); }
+
+  /* ─────────── EXPLORE SCENE ─────────── */
+  .explore { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:25; overflow-y:auto; padding-bottom:120px; }
+  .explore.on { transform:translateY(0); }
+  /* Search row */
+  .ex-top { display:flex; align-items:center; gap:10px; padding:60px 18px 14px; }
+  .ex-search { flex:1; height:42px; border-radius:14px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; padding:0 14px; gap:10px; }
+  .ex-search svg { width:16px; height:16px; color:var(--nr-silver); flex-shrink:0; }
+  .ex-search input { flex:1; background:none; border:none; color:#fff; font-family:var(--font-b); font-size:14px; outline:none; }
+  .ex-search input::placeholder { color:var(--nr-ash); }
+  .ex-search-benny { width:30px; height:30px; border-radius:50%; background:rgba(237,189,31,0.18); border:1px solid rgba(237,189,31,0.55); padding:3px; cursor:pointer; flex-shrink:0; }
+  .ex-search-benny img { width:100%; height:100%; object-fit:contain; }
+
+  /* Today's Briefing */
+  .ex-section { padding:8px 18px 24px; }
+  .ex-section--briefing { padding-top:18px; padding-bottom:30px; border-bottom:1px solid rgba(255,255,255,0.06); margin-bottom:8px; }
+  .ex-bf-title { font-family:var(--font-h); font-size:34px; line-height:1.1; color:#fff; margin-bottom:8px; }
+  .ex-bf-meta { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+  .ex-bf-date { font-family:var(--font-m); font-size:11px; letter-spacing:0.24em; color:var(--nr-ash); text-transform:uppercase; }
+  .ex-bf-progress { font-family:var(--font-b); font-size:13px; color:var(--nr-silver); }
+  .ex-bf-progress strong { color:var(--nr-green); font-weight:600; }
+  .ex-bf-list { display:flex; flex-direction:column; }
+  .ex-bf-row { display:flex; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer; background:none; border-top:none; border-left:none; border-right:none; text-align:left; width:100%; }
+  .ex-bf-row:last-child { border-bottom:none; }
+  .ex-bf-step { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-b); font-size:13px; font-weight:600; }
+  .ex-bf-step--done { background:var(--nr-green); color:#fff; }
+  .ex-bf-step--done svg { width:14px; height:14px; }
+  .ex-bf-step--idle { border:1.5px solid var(--nr-iron); color:var(--nr-silver); background:transparent; }
+  .ex-bf-thumb { width:54px; height:54px; border-radius:10px; background:var(--nr-lead); flex-shrink:0; overflow:hidden; }
+  .ex-bf-thumb img { width:100%; height:100%; object-fit:cover; }
+  .ex-bf-text { flex:1; min-width:0; }
+  .ex-bf-headline { font-family:var(--font-b); font-size:15px; font-weight:600; color:#fff; line-height:1.3; margin-bottom:4px; }
+  .ex-bf-row.done .ex-bf-headline { color:var(--nr-silver); }
+  .ex-bf-sub { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
+
+  /* Section header */
+  .ex-h { display:flex; align-items:flex-end; justify-content:space-between; padding:18px 18px 4px; }
+  .ex-h-stack { display:flex; flex-direction:column; gap:2px; }
+  .ex-h-title { font-family:var(--font-h); font-size:22px; color:#fff; line-height:1.1; }
+  .ex-h-sub { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
+  .ex-h-link { font-family:var(--font-b); font-size:12px; font-weight:500; color:var(--nr-red); background:none; border:none; cursor:pointer; }
+  .ex-section-pad { padding-bottom:8px; }
+  .ex-feat-second { display:flex; gap:12px; padding:12px 18px 4px; }
+  .ex-feat-second-card { flex:1; cursor:pointer; background:none; border:none; padding:0; text-align:left; }
+  .ex-feat-second-img { width:100%; aspect-ratio:1/1; border-radius:14px; overflow:hidden; background:var(--nr-lead); margin-bottom:8px; }
+  .ex-feat-second-img img { width:100%; height:100%; object-fit:cover; }
+  .ex-feat-second-tag { font-family:var(--font-m); font-size:9px; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; font-weight:600; margin-bottom:4px; }
+  .ex-feat-second-headline { font-family:var(--font-h); font-size:14px; line-height:1.2; color:#fff; }
+
+  /* Topic chips */
+  .ex-chips { display:flex; gap:8px; padding:0 18px 8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .ex-chips::-webkit-scrollbar { display:none; }
+  .ex-chip { flex-shrink:0; padding:8px 14px; border-radius:999px; border:1px solid var(--nr-iron); background:transparent; color:var(--nr-smoke); font-family:var(--font-b); font-size:13px; font-weight:500; cursor:pointer; }
+  .ex-chip.active { background:#fff; color:#000; border-color:#fff; }
+
+  /* Hero featured story */
+  .ex-hero { margin:8px 18px 0; border-radius:18px; overflow:hidden; position:relative; aspect-ratio:16/9; background:var(--nr-lead); cursor:pointer; }
+  .ex-hero img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .ex-hero-fade { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%); }
+  .ex-hero-body { position:absolute; left:16px; right:16px; bottom:14px; }
+  .ex-hero-eyebrow { font-family:var(--font-m); font-size:10px; letter-spacing:0.2em; color:var(--nr-red); text-transform:uppercase; margin-bottom:6px; font-weight:600; }
+  .ex-hero-headline { font-family:var(--font-h); font-size:22px; line-height:1.18; color:#fff; }
+
+  /* Trending list */
+  .ex-tr-row { display:flex; align-items:center; gap:14px; padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.06); background:none; border-top:none; border-left:none; border-right:none; text-align:left; width:100%; cursor:pointer; }
+  .ex-tr-num { font-family:var(--font-h); font-size:18px; color:var(--nr-iron); flex-shrink:0; width:18px; }
+  .ex-tr-text { flex:1; min-width:0; }
+  .ex-tr-headline { font-family:var(--font-b); font-size:14px; font-weight:600; color:#fff; line-height:1.3; margin-bottom:4px; }
+  .ex-tr-meta { display:flex; align-items:center; gap:6px; }
+  .ex-tr-faces { display:flex; }
+  .ex-tr-face { width:18px; height:18px; border-radius:50%; border:2px solid #000; object-fit:cover; }
+  .ex-tr-face + .ex-tr-face { margin-left:-6px; }
+  .ex-tr-meta-text { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
+
+  /* Verified journalists carousel */
+  .ex-jl-row { display:flex; gap:14px; padding:0 18px 8px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  .ex-jl-row::-webkit-scrollbar { display:none; }
+  .ex-jl { flex-shrink:0; width:74px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; background:none; border:none; padding:0; }
+  .ex-jl-av-wrap { position:relative; width:64px; height:64px; }
+  .ex-jl-av { width:64px; height:64px; border-radius:50%; object-fit:cover; border:2px solid var(--nr-red); padding:2px; background:#000; }
+  .ex-jl-verif { position:absolute; right:-2px; bottom:-2px; width:18px; height:18px; }
+  .ex-jl-name { font-family:var(--font-b); font-size:11px; font-weight:500; color:#fff; text-align:center; line-height:1.2; }
+
+  /* ─────────── THE WIRE SCENE ─────────── */
+  .wire { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:25; overflow-y:auto; padding-bottom:120px; }
+  .wire.on { transform:translateY(0); }
+  .wr-top { padding:60px 18px 8px; position:sticky; top:0; background:linear-gradient(to bottom, #000 80%, rgba(0,0,0,0)); z-index:5; }
+  .wr-eyebrow { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.24em; color:var(--nr-red); text-transform:uppercase; margin-bottom:4px; }
+  .wr-title { font-family:var(--font-h); font-size:34px; line-height:1.05; color:#fff; margin-bottom:6px; }
+  .wr-sub { font-family:var(--font-b); font-size:13px; color:var(--nr-silver); margin-bottom:14px; }
+  .wr-chips { display:flex; gap:8px; padding-bottom:12px; overflow-x:auto; scrollbar-width:none; }
+  .wr-chips::-webkit-scrollbar { display:none; }
+  .wr-chip { flex-shrink:0; padding:7px 14px; border-radius:999px; border:1px solid var(--nr-iron); background:transparent; color:var(--nr-smoke); font-family:var(--font-b); font-size:13px; font-weight:500; cursor:pointer; }
+  .wr-chip.active { background:#fff; color:#000; border-color:#fff; }
+
+  /* Friends' stories row (top of Wire) */
+  .wr-circle { padding:6px 0 16px; border-bottom:1px solid rgba(255,255,255,0.06); margin-bottom:6px; }
+  .wr-section-h { font-family:var(--font-h); font-size:18px; color:#fff; padding:0 18px 12px; display:flex; align-items:baseline; gap:10px; }
+  .wr-section-h-sub { font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; color:var(--nr-ash); text-transform:uppercase; font-weight:600; }
+  .wr-circle-label { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.2em; color:var(--nr-ash); text-transform:uppercase; padding:0 18px 10px; }
+  .wr-circle-row { display:flex; gap:14px; padding:0 18px 4px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .wr-circle-row::-webkit-scrollbar { display:none; }
+  .wr-friend { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; background:none; border:none; padding:0; }
+  .wr-friend-ring { width:64px; height:64px; border-radius:50%; padding:2px;
+    background:linear-gradient(135deg, var(--nr-red), var(--nr-yellow));
+  }
+  .wr-friend-ring--viewed { background:var(--nr-iron); }
+  .wr-friend-ring--me { background:var(--nr-iron); position:relative; }
+  .wr-friend-ring--me::after {
+    content:""; position:absolute; right:-2px; bottom:-2px; width:20px; height:20px; border-radius:50%;
+    background:var(--nr-red); border:2px solid #000;
+    background-image:linear-gradient(45deg, transparent 46%, #000 46%, #000 54%, transparent 54%), linear-gradient(135deg, transparent 46%, #000 46%, #000 54%, transparent 54%);
+    background-size:60% 60%; background-repeat:no-repeat; background-position:center;
+  }
+  .wr-friend-av { width:100%; height:100%; border-radius:50%; object-fit:cover; border:2px solid #000; background:var(--nr-iron); }
+  .wr-friend-name { font-family:var(--font-b); font-size:11px; font-weight:500; color:#fff; text-align:center; max-width:74px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* Card base */
+  .wr-card { padding:14px 18px 16px; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .wr-author { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .wr-author-av { width:38px; height:38px; border-radius:50%; object-fit:cover; }
+  .wr-author-info { display:flex; flex-direction:column; gap:1px; flex:1; min-width:0; }
+  .wr-author-name { font-family:var(--font-b); font-size:14px; font-weight:600; color:#fff; display:flex; align-items:center; gap:5px; }
+  .wr-author-verif { width:13px; height:13px; }
+  .wr-author-meta { font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; color:var(--nr-ash); text-transform:uppercase; }
+  .wr-time { font-family:var(--font-m); font-size:10px; letter-spacing:0.1em; color:var(--nr-ash); text-transform:uppercase; }
+
+  /* Post body */
+  .wr-post-body { font-family:var(--font-b); font-size:15px; line-height:1.45; color:#fff; }
+  .wr-tag { display:inline-flex; align-items:center; gap:5px; margin-top:10px; font-family:var(--font-m); font-size:9px; letter-spacing:0.18em; color:var(--nr-yellow); text-transform:uppercase; font-weight:600; }
+
+  /* External link card (rich preview, OG-tag style) */
+  .wr-link-note { font-family:var(--font-b); font-size:14px; line-height:1.4; color:var(--nr-smoke); margin-bottom:12px; }
+  .wr-link-card { display:flex; flex-direction:column; border-radius:14px; overflow:hidden; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); cursor:pointer; text-align:left; width:100%; padding:0; border-left:none; border-right:none; border-top:none; }
+  .wr-link-img { width:100%; aspect-ratio:1.91/1; object-fit:cover; background:var(--nr-lead); }
+  .wr-link-body { padding:12px 14px 14px; }
+  .wr-link-domain { display:flex; align-items:center; gap:6px; font-family:var(--font-m); font-size:9px; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; margin-bottom:6px; }
+  .wr-link-domain svg { width:12px; height:12px; }
+  .wr-link-title { font-family:var(--font-h); font-size:15px; line-height:1.25; color:#fff; margin-bottom:5px; }
+  .wr-link-desc { font-family:var(--font-b); font-size:12px; line-height:1.4; color:var(--nr-silver); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+  /* Story-drop card */
+  .wr-drop-note { font-family:var(--font-b); font-size:14px; line-height:1.4; color:var(--nr-smoke); margin-bottom:12px; }
+  .wr-drop-story { display:flex; gap:12px; padding:12px; border-radius:14px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); cursor:pointer; text-align:left; width:100%; }
+  .wr-drop-thumb { width:64px; height:64px; border-radius:10px; flex-shrink:0; overflow:hidden; background:var(--nr-lead); }
+  .wr-drop-thumb img { width:100%; height:100%; object-fit:cover; }
+  .wr-drop-meta { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; justify-content:center; }
+  .wr-drop-eyebrow { font-family:var(--font-m); font-size:9px; letter-spacing:0.18em; color:var(--nr-red); text-transform:uppercase; font-weight:600; }
+  .wr-drop-headline { font-family:var(--font-h); font-size:15px; line-height:1.25; color:#fff; }
+
+  /* Poll (Likert + histogram, matching story slide poll component) */
+  .wr-poll-q { font-family:var(--font-h); font-size:18px; line-height:1.25; color:#fff; margin-bottom:14px; }
+  .wp-toggle { display:flex; gap:4px; padding:3px; border-radius:999px; background:var(--nr-lead); margin-bottom:14px; transition:opacity 0.25s ease; }
+  .wp-tab { flex:1; padding:8px; border-radius:999px; border:none; background:transparent; color:var(--nr-silver); font-family:var(--font-b); font-size:11px; font-weight:600; cursor:pointer; }
+  .wp-tab.active { background:var(--nr-yellow); color:#000; }
+  .wp-bars { display:flex; align-items:flex-end; gap:6px; height:90px; padding:0 2px; }
+  .wp-bars:not(:empty) { margin-bottom:24px; }
+  .wp-bar { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end; position:relative; }
+  .wp-bar-fill { width:100%; background:var(--nr-iron); border-radius:4px 4px 2px 2px; transition:height 0.5s cubic-bezier(0.2,0.8,0.2,1), background 0.2s ease; min-height:3px; }
+  .wp-bar.you .wp-bar-fill { background:var(--nr-yellow); box-shadow:0 0 14px rgba(237,189,31,0.45); }
+  .wp-bar-pct { font-family:var(--font-m); font-size:10px; font-weight:600; color:var(--nr-silver); }
+  .wp-bar.you .wp-bar-pct { color:var(--nr-yellow); }
+  .wp-bar-you-tag { position:absolute; bottom:-18px; font-family:var(--font-m); font-size:8px; letter-spacing:0.16em; color:var(--nr-yellow); text-transform:uppercase; font-weight:600; white-space:nowrap; }
+  .wp-foot { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
+  .wp-foot:not(:empty) { padding-top:2px; }
+  /* Interactive Likert row inside Wire poll cards */
+  .wp-likert { background:var(--nr-lead); border-radius:12px; padding:18px 16px 14px; margin-bottom:12px; }
+  .wp-likert-track { position:relative; height:24px; margin-bottom:10px; }
+  .wp-likert-line { position:absolute; left:6px; right:6px; top:50%; height:2px; background:var(--nr-yellow); transform:translateY(-50%); border-radius:1px; }
+  .wp-likert-tick { position:absolute; top:50%; transform:translate(-50%,-50%); width:24px; height:24px; padding:0; border:none; background:transparent; cursor:pointer; border-radius:50%; }
+  .wp-likert-tick::before { content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:2px; height:14px; background:rgba(237,189,31,0.55); border-radius:1px; transition:background 0.15s ease, height 0.15s ease, width 0.15s ease; }
+  .wp-likert-tick:hover::before { background:var(--nr-yellow); height:18px; width:3px; }
+  .wp-likert-tick.on::before { background:var(--nr-yellow); height:24px; width:4px; }
+  .wp-likert-tick:nth-child(2) { left:0%; } .wp-likert-tick:nth-child(3) { left:25%; }
+  .wp-likert-tick:nth-child(4) { left:50%; } .wp-likert-tick:nth-child(5) { left:75%; }
+  .wp-likert-tick:nth-child(6) { left:100%; }
+  .wp-likert-knob { position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:24px; background:var(--nr-yellow); border-radius:3px; pointer-events:none; box-shadow:0 0 12px rgba(237,189,31,0.55); }
+  .wp-likert-labels { display:flex; justify-content:space-between; font-family:var(--font-m); font-size:9px; letter-spacing:0.1em; color:var(--nr-ash); text-transform:uppercase; }
+
+  .wp-voted-banner { display:flex; align-items:center; gap:8px; padding:8px 12px; margin-bottom:12px; border-radius:8px;
+    background:rgba(26,173,23,0.1); border:1px solid rgba(26,173,23,0.35);
+    font-family:var(--font-b); font-size:12px; color:#fff; }
+  .wp-voted-banner svg { width:14px; height:14px; color:var(--nr-green); flex-shrink:0; }
+  .wp-voted-banner strong { color:var(--nr-green); font-weight:600; margin-right:auto; }
+  .wp-voted-change { font-family:var(--font-m); font-size:9px; letter-spacing:0.14em; color:var(--nr-silver); text-transform:uppercase; font-weight:500; }
+
+  /* Floating composer (+) and bottom sheet */
+  .wr-fab { position:absolute; right:20px; bottom:108px; z-index:55; width:54px; height:54px; border-radius:50%;
+    background:var(--nr-red); color:#000; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 24px rgba(255,99,67,0.4); }
+  .wr-fab svg { width:24px; height:24px; }
+  .wr-fab.hidden { display:none; }
+  .wr-compose-scrim { position:absolute; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(2px); z-index:64; opacity:0; pointer-events:none; transition:opacity 0.25s ease; }
+  .wr-compose-scrim.on { opacity:1; pointer-events:auto; }
+  .wr-compose { position:absolute; left:0; right:0; bottom:0; z-index:65; background:var(--nr-charcoal); border-top:1px solid rgba(255,255,255,0.08); border-radius:22px 22px 0 0; padding:16px 18px max(34px, env(safe-area-inset-bottom)); transform:translateY(100%); transition:transform 0.32s cubic-bezier(0.2,0.8,0.2,1); }
+  .wr-compose.on { transform:translateY(0); }
+  .wr-compose-handle { width:36px; height:4px; background:var(--nr-iron); border-radius:2px; margin:0 auto 12px; }
+  .wr-compose-modes { display:flex; gap:6px; margin-bottom:14px; }
+  .wr-compose-mode { flex:1; padding:10px 8px; border-radius:10px; border:1px solid var(--nr-iron); background:transparent; color:var(--nr-silver); font-family:var(--font-b); font-size:12px; font-weight:600; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .wr-compose-mode svg { width:16px; height:16px; }
+  .wr-compose-mode.active { background:var(--nr-yellow); color:#000; border-color:var(--nr-yellow); }
+  .wr-compose-body { display:flex; flex-direction:column; gap:10px; margin-bottom:12px; }
+  .wr-compose-text { width:100%; min-height:120px; resize:none; background:transparent; border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px; color:#fff; font-family:var(--font-b); font-size:15px; line-height:1.4; outline:none; }
+  .wr-compose-text:focus { border-color:rgba(237,189,31,0.5); }
+  .wr-compose-pollq { width:100%; background:transparent; border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px; color:#fff; font-family:var(--font-h); font-size:18px; outline:none; }
+  .wr-compose-pollnote { font-family:var(--font-m); font-size:10px; letter-spacing:0.16em; color:var(--nr-ash); text-transform:uppercase; padding:6px 4px; }
+  .wr-compose-stories { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+  .wr-compose-story { flex-shrink:0; width:108px; cursor:pointer; background:none; border:none; padding:0; text-align:left; }
+  .wr-compose-story img { width:100%; aspect-ratio:1; border-radius:10px; object-fit:cover; margin-bottom:6px; }
+  .wr-compose-story.selected img { outline:2px solid var(--nr-yellow); outline-offset:2px; }
+  .wr-compose-story-title { font-family:var(--font-b); font-size:11px; line-height:1.3; color:var(--nr-smoke); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .wr-compose-actions { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .wr-compose-vis { display:inline-flex; align-items:center; gap:5px; padding:7px 12px; background:rgba(255,255,255,0.06); border:none; border-radius:999px; color:var(--nr-silver); font-family:var(--font-b); font-size:12px; cursor:pointer; }
+  .wr-compose-send { padding:9px 18px; background:var(--nr-red); color:#000; border:none; border-radius:999px; font-family:var(--font-b); font-weight:600; font-size:13px; cursor:pointer; }
+  .wr-compose-send:disabled { opacity:0.4; cursor:default; }
+
+  /* ─────────── BENNY TAB SCENE ─────────── */
+  .bennytab { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:25; display:flex; flex-direction:column; }
+  .bennytab.on { transform:translateY(0); }
+  .bt-top { display:flex; align-items:center; justify-content:space-between; padding:60px 18px 14px; flex-shrink:0; }
+  .bt-av { width:32px; height:32px; border-radius:50%; overflow:hidden; border:1.5px solid rgba(255,255,255,0.7); background:var(--nr-iron); padding:0; cursor:pointer; }
+  .bt-av img { width:100%; height:100%; object-fit:cover; }
+  .bt-history { width:38px; height:38px; border-radius:50%; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .bt-history svg { width:18px; height:18px; }
+  /* Center: greeting + live status + Benny's watching cards */
+  .bt-center { flex:1; display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start; padding:8px 18px 0; overflow-y:auto; pointer-events:auto; gap:18px; }
+  .bt-hero { display:flex; align-items:center; gap:14px; }
+  .bt-mascot { width:96px; height:96px; flex-shrink:0; position:relative; filter:drop-shadow(0 8px 22px rgba(255,99,67,0.32)); }
+  .bt-mascot img { width:100%; height:100%; object-fit:contain; transform-origin:50% 75%; animation:btMascotLive 4.4s ease-in-out infinite; }
+  @keyframes btMascotLive {
+    0%   { transform:translateY(0) rotate(-2deg); }
+    20%  { transform:translateY(-4px) rotate(2deg); }
+    35%  { transform:translateY(-3px) rotate(-1deg); }
+    50%  { transform:translateY(-5px) rotate(3deg); }
+    65%  { transform:translateY(-2px) rotate(-2deg); }
+    80%  { transform:translateY(-3px) rotate(1deg); }
+    100% { transform:translateY(0) rotate(-2deg); }
+  }
+  /* Subtle yellow glow ring around mascot — like a desk lamp */
+  .bt-mascot::before { content:""; position:absolute; inset:-14px; border-radius:50%;
+    background:radial-gradient(circle, rgba(237,189,31,0.18) 0%, transparent 65%);
+    filter:blur(6px); animation:btDeskLamp 4s ease-in-out infinite alternate; pointer-events:none; }
+  @keyframes btDeskLamp { from { opacity:0.6; } to { opacity:1; } }
+  .bt-greet { display:flex; flex-direction:column; gap:4px; flex:1; min-width:0; }
+  .bt-greet-hi { font-family:var(--font-h); font-size:30px; line-height:1.05; color:#fff; }
+  .bt-greet-line { font-family:var(--font-b); font-size:14px; line-height:1.4; color:var(--nr-smoke); }
+
+  /* "Ask a human reporter" row */
+  .bt-humans { display:flex; flex-direction:column; gap:10px; padding:0 18px 6px; flex-shrink:0; }
+  .bt-humans-head { display:flex; align-items:center; justify-content:space-between; }
+  .bt-humans-label { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.2em; color:var(--nr-ash); text-transform:uppercase; }
+  .bt-humans-sub { font-family:var(--font-b); font-size:11px; color:var(--nr-silver); }
+  .bt-humans-row { display:flex; gap:10px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .bt-humans-row::-webkit-scrollbar { display:none; }
+  .bt-human { flex-shrink:0; display:flex; align-items:center; gap:10px; padding:8px 14px 8px 8px; border-radius:999px;
+    background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); cursor:pointer; color:#fff; }
+  .bt-human-av { width:32px; height:32px; border-radius:50%; object-fit:cover; }
+  .bt-human-name { font-family:var(--font-b); font-size:13px; font-weight:600; }
+  .bt-human-beat { font-family:var(--font-m); font-size:9px; letter-spacing:0.14em; color:var(--nr-silver); text-transform:uppercase; display:block; margin-top:1px; }
+
+  /* What Benny's watching */
+  .bt-watch-head { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.2em; color:var(--nr-ash); text-transform:uppercase; margin-bottom:-4px; }
+  .bt-watch-card { display:flex; gap:12px; padding:14px; border-radius:14px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); cursor:pointer; text-align:left; color:#fff; }
+  .bt-watch-thumb { width:54px; height:54px; border-radius:10px; flex-shrink:0; overflow:hidden; background:var(--nr-lead); }
+  .bt-watch-thumb img { width:100%; height:100%; object-fit:cover; }
+  .bt-watch-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
+  .bt-watch-title { font-family:var(--font-h); font-size:16px; line-height:1.2; color:#fff; }
+  .bt-watch-note { font-family:var(--font-b); font-size:13px; line-height:1.4; color:var(--nr-smoke); }
+  .bt-watch-note::before { content:""; display:inline-block; width:14px; height:14px; vertical-align:-3px; margin-right:5px;
+    background:url(assets/benny/benny-paperboy-v2-transparent.png) center/contain no-repeat; }
+  .bt-watch-tag { display:inline-flex; align-items:center; gap:4px; font-family:var(--font-m); font-size:9px; letter-spacing:0.16em; color:var(--nr-yellow); text-transform:uppercase; font-weight:600; }
+  /* Action card row */
+  .bt-actions { display:flex; gap:10px; padding:0 18px 14px 18px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; flex-shrink:0; }
+  .bt-actions::after { content:""; flex:0 0 8px; }
+  .bt-actions::-webkit-scrollbar { display:none; }
+  .bt-action { flex-shrink:0; width:130px; height:108px; border-radius:16px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); padding:14px; cursor:pointer; display:flex; flex-direction:column; justify-content:flex-end; gap:8px; text-align:left; color:#fff; }
+  .bt-action-icon { width:28px; height:28px; border-radius:8px; background:rgba(255,99,67,0.18); border:1px solid rgba(255,99,67,0.5); display:flex; align-items:center; justify-content:center; }
+  .bt-action-icon svg { width:14px; height:14px; color:#FFD9CC; }
+  .bt-action-icon img { width:18px; height:18px; }
+  .bt-action-label { font-family:var(--font-b); font-size:14px; font-weight:600; line-height:1.2; color:#fff; }
+  /* Input bar */
+  .bt-input { padding:8px 14px calc(86px + env(safe-area-inset-bottom)); flex-shrink:0; background:linear-gradient(to top, #000 70%, rgba(0,0,0,0)); }
+  .bt-input-wrap { background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.08); border-radius:22px; padding:6px 6px 6px 10px; display:flex; align-items:center; gap:6px; max-width:100%; overflow:hidden; }
+  .bt-input-field { flex:1; background:none; border:none; color:#fff; font-family:var(--font-b); font-size:15px; outline:none; padding:8px 0; }
+  .bt-input-field::placeholder { color:var(--nr-ash); }
+  .bt-input-btn { width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.06); border:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+  .bt-input-btn svg { width:15px; height:15px; }
+  .bt-expert { display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.06); border:none; color:#fff; padding:7px 11px; border-radius:999px; font-family:var(--font-b); font-size:13px; font-weight:500; cursor:pointer; flex-shrink:0; }
+  .bt-expert svg { width:13px; height:13px; color:var(--nr-yellow); }
+  .bt-send { width:36px; height:36px; background:var(--nr-red); color:#000; border:none; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; padding:0; }
+  .bt-send svg { width:15px; height:15px; }
+
+  /* Chat overlay (slides up when a prompt is sent) */
+  .bt-chat { position:absolute; inset:0; background:#000; z-index:26; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.2,0.8,0.2,1); display:flex; flex-direction:column; }
+  .bt-chat.on { transform:translateY(0); }
+  .bt-chat-top { display:flex; align-items:center; justify-content:space-between; padding:60px 18px 14px; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .bt-chat-back { width:38px; height:38px; border-radius:50%; background:var(--nr-charcoal); border:none; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .bt-chat-back svg { width:16px; height:16px; }
+  .bt-chat-title { display:flex; align-items:center; gap:8px; font-family:var(--font-b); font-weight:600; font-size:15px; color:#fff; }
+  .bt-chat-title img { width:24px; height:24px; }
+  .bt-chat-spacer { width:38px; }
+  .bt-chat-body { flex:1; overflow-y:auto; padding:20px 18px 24px; display:flex; flex-direction:column; gap:14px; }
+  .bt-msg-user { align-self:flex-end; max-width:80%; background:var(--nr-lead); padding:12px 16px; border-radius:18px 18px 4px 18px; font-family:var(--font-b); font-size:15px; line-height:1.4; color:#fff; }
+  .bt-msg-benny { display:flex; gap:10px; align-items:flex-start; max-width:90%; }
+  .bt-msg-benny-av { width:32px; height:32px; border-radius:50%; background:#fff; border:1px solid rgba(237,189,31,0.5); flex-shrink:0; overflow:hidden; }
+  .bt-msg-benny-av img { width:100%; height:100%; object-fit:cover; display:block; }
+  .bt-msg-benny-card { background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.06); border-radius:18px 18px 18px 4px; padding:14px 16px; }
+  .bt-msg-benny-body { font-family:var(--font-b); font-size:15px; line-height:1.5; color:#fff; }
+  .bt-msg-benny-body em { color:var(--nr-red); font-style:normal; }
+  .bt-msg-cite { display:flex; align-items:center; gap:6px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06); }
+  .bt-msg-cite img { width:18px; height:18px; border-radius:50%; }
+  .bt-msg-cite-text { font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; color:var(--nr-silver); text-transform:uppercase; }
+
+  /* Discover grid */
+  .ex-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:2px; padding:6px 0 24px; }
+  .ex-tile { position:relative; aspect-ratio:9/14; background:var(--nr-lead); overflow:hidden; cursor:pointer; }
+  .ex-tile img { width:100%; height:100%; object-fit:cover; }
+  .ex-tile-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.7), transparent 40%); }
+  .ex-tile-tag { position:absolute; top:8px; left:8px; font-family:var(--font-m); font-size:8px; font-weight:600; letter-spacing:0.16em; color:#fff; text-transform:uppercase; background:rgba(0,0,0,0.45); backdrop-filter:blur(6px); padding:3px 6px; border-radius:4px; }
+  .ex-tile-author { position:absolute; bottom:8px; left:8px; display:flex; align-items:center; gap:5px; }
+  .ex-tile-author img { width:18px; height:18px; border-radius:50%; border:1.5px solid #000; }
+  .ex-tile-author span { font-family:var(--font-b); font-size:11px; font-weight:500; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.6); }
+  /* Cover banner + avatar */
+  .cr-cover-img { position:relative; width:100%; height:200px; overflow:hidden; }
+  .cr-cover-img img { width:100%; height:100%; object-fit:cover; }
+  .cr-cover-grad { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.6) 100%); }
+  .cr-top { position:absolute; top:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; padding:54px 16px 8px; z-index:2; }
+  .cr-icon-btn { width:36px; height:36px; border-radius:50%; background:rgba(0,0,0,0.45); backdrop-filter:blur(6px); border:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .cr-icon-btn svg { width:18px; height:18px; }
+  .cr-id { position:relative; padding:0 20px; margin-top:-54px; z-index:2; }
+  .cr-id-avatar { width:108px; height:108px; border-radius:50%; object-fit:cover; border:4px solid #000; background:var(--nr-iron); display:block; }
+  .cr-id-name-row { display:flex; align-items:center; gap:8px; margin-top:14px; }
+  .cr-id-name { font-family:var(--font-h); font-size:34px; line-height:1.05; color:#fff; letter-spacing:-0.5px; margin:0; }
+  .cr-chip-row { display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .cr-verified-chip, .cr-discl-chip { display:inline-flex; align-items:center; gap:6px; font-family:var(--font-b); font-size:13px; font-weight:600; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:999px; cursor:pointer; padding:6px 12px; }
+  .cr-verified-chip { color:var(--nr-yellow); }
+  .cr-discl-chip { color:var(--nr-silver); }
+  .cr-discl-chip svg:first-child { width:14px; height:14px; }
+  .cr-verified-chip svg.cr-verif-seal { width:16px; height:16px; }
+  .cr-verif-chev { width:12px; height:12px; transition:transform 0.2s ease; }
+  .cr-verified-chip.open .cr-verif-chev, .cr-discl-chip.open .cr-verif-chev { transform:rotate(180deg); }
+  /* Sub-hero strip */
+  .cr-substrip { display:flex; align-items:center; justify-content:space-between; padding:14px 20px 6px; gap:12px; }
+  .cr-readers { font-family:var(--font-b); font-size:13px; color:var(--nr-silver); }
+  .cr-substrip-r { display:flex; align-items:center; gap:14px; }
+  .cr-follow { font-family:var(--font-b); font-size:13px; font-weight:600; color:#fff; background:transparent; border:1.5px solid rgba(255,255,255,0.4); border-radius:999px; padding:7px 18px; cursor:pointer; }
+  .cr-follow.on { background:#fff; color:#000; border-color:#fff; }
+  .cr-iconlink { background:none; border:none; color:var(--nr-silver); cursor:pointer; padding:4px; display:flex; }
+  .cr-iconlink svg { width:20px; height:20px; }
+  /* Bio + Verified blurb */
+  .cr-bio-wrap { padding:14px 20px 6px; }
+  .cr-bio { font-family:var(--font-b); font-size:15px; line-height:1.5; color:#fff; margin:0; }
+  /* Collage — perfectly imperfect, Newsreel style */
+  .cr-collage-wrap { margin:18px 16px 4px; }
+  .cr-collage-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; padding:0 4px; }
+  .cr-collage-label { font-family:var(--font-m); font-size:10px; font-weight:700; letter-spacing:0.22em; color:var(--nr-silver); text-transform:uppercase; }
+  .cr-collage-shuffle { display:inline-flex; align-items:center; gap:5px; background:transparent; border:1px solid var(--nr-iron); border-radius:999px; padding:5px 10px; font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.14em; color:#fff; text-transform:uppercase; cursor:pointer; }
+  .cr-collage-shuffle svg { width:12px; height:12px; }
+  .cr-collage { position:relative; height:0; background:var(--nr-red); border-radius:14px; overflow:hidden; transition:height 0.35s cubic-bezier(0.2,0.8,0.2,1); }
+  .cr-collage.open { height:380px; }
+  .cr-collage-bg { position:absolute; inset:0; opacity:0.12; background-image:repeating-linear-gradient(45deg, transparent 0 18px, rgba(0,0,0,0.6) 18px 19px); pointer-events:none; }
+  .cr-collage-top { position:absolute; top:14px; left:0; right:0; text-align:center; font-family:var(--font-h); font-size:34px; line-height:0.95; color:var(--nr-yellow); letter-spacing:-0.5px; text-shadow:3px 3px 0 #000; padding:0 8px; z-index:1; pointer-events:none; }
+  .cr-collage-bot { position:absolute; bottom:16px; left:0; right:0; text-align:center; font-family:var(--font-h); font-size:42px; line-height:0.95; color:#fff; letter-spacing:-0.5px; text-shadow:3px 3px 0 #000; padding:0 8px; z-index:2; pointer-events:none; }
+  .cr-collage-mid { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-family:var(--font-h); font-size:18px; color:#000; background:var(--nr-yellow); padding:6px 14px; border-radius:999px; z-index:3; pointer-events:none; box-shadow:3px 3px 0 #000; white-space:nowrap; }
+  .cr-collage-pic { position:absolute; border:3px solid #fff; box-shadow:4px 4px 0 rgba(0,0,0,0.55); object-fit:cover; transition:transform 0.35s cubic-bezier(0.2,0.8,0.2,1), top 0.35s ease, left 0.35s ease; z-index:2; }
+  .cr-collage-star { position:absolute; width:30px; height:30px; color:var(--nr-yellow); filter:drop-shadow(2px 2px 0 #000); z-index:4; pointer-events:none; }
+  .cr-collage-wm { position:absolute; right:10px; bottom:8px; font-family:var(--font-m); font-size:9px; font-weight:700; letter-spacing:0.24em; color:rgba(255,255,255,0.55); text-transform:uppercase; z-index:5; pointer-events:none; }
+  .cr-id .cr-blurb-wrap { max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease, margin 0.3s ease; padding:0; margin:0; border-top:1px solid rgba(255,255,255,0); }
+  .cr-id .cr-blurb-wrap.open { max-height:600px; padding:12px 0 0; margin:10px 0 0; }
+  .cr-blurb-label { display:inline-flex; align-items:center; gap:5px; font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.18em; color:var(--nr-yellow); text-transform:uppercase; margin-bottom:8px; }
+  .cr-blurb-label svg { width:12px; height:12px; }
+  .cr-blurb { font-family:var(--font-b); font-size:14px; line-height:1.5; color:var(--nr-smoke); margin:0; }
+  .cr-discl-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
+  .cr-discl-list li { display:flex; gap:10px; align-items:flex-start; font-family:var(--font-b); font-size:13px; line-height:1.45; }
+  .cr-discl-k { flex:0 0 88px; color:var(--nr-ash); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; padding-top:1px; }
+  .cr-discl-v { flex:1; color:#fff; }
+  /* Tabs */
+  .cr-tabs { display:flex; gap:22px; padding:6px 20px 0; border-bottom:1px solid rgba(255,255,255,0.06); position:sticky; top:0; background:#000; z-index:5; }
+  .cr-tab { background:none; border:none; color:var(--nr-silver); font-family:var(--font-b); font-size:15px; font-weight:600; padding:12px 0; cursor:pointer; position:relative; }
+  .cr-tab.active { color:#fff; }
+  .cr-tab.active::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--nr-red); }
+  .cr-panel { display:none; padding:14px 16px 60px; }
+  .cr-panel.active { display:block; }
+  /* Stories tiles */
+  .cr-tile-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; }
+  .cr-tile { position:relative; aspect-ratio:3/4; background:var(--nr-lead); overflow:hidden; border-radius:10px; cursor:pointer; border:none; padding:0; }
+  .cr-tile img { width:100%; height:100%; object-fit:cover; }
+  .cr-tile-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.75), transparent 50%); }
+  .cr-tile-tag { position:absolute; top:8px; left:8px; font-family:var(--font-m); font-size:9px; font-weight:600; letter-spacing:0.16em; color:#fff; text-transform:uppercase; background:rgba(0,0,0,0.5); backdrop-filter:blur(6px); padding:3px 7px; border-radius:4px; }
+  .cr-tile-head { position:absolute; left:10px; right:10px; bottom:10px; font-family:var(--font-h); font-size:14px; line-height:1.2; color:#fff; text-align:left; text-shadow:0 1px 4px rgba(0,0,0,0.5); }
+  /* Past Work rows */
+  .cr-pw { display:flex; flex-direction:column; gap:2px; }
+  .cr-pw-row { display:flex; align-items:center; gap:12px; padding:14px 4px; border-bottom:1px solid rgba(255,255,255,0.05); text-decoration:none; color:inherit; }
+  .cr-pw-fav { width:38px; height:38px; border-radius:6px; object-fit:cover; background:var(--nr-lead); flex-shrink:0; }
+  .cr-pw-info { flex:1; min-width:0; }
+  .cr-pw-title { font-family:var(--font-b); font-size:14px; font-weight:600; color:#fff; line-height:1.3; margin-bottom:3px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .cr-pw-meta { font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; color:var(--nr-ash); text-transform:uppercase; }
+  .cr-pw-ext { color:var(--nr-silver); flex-shrink:0; }
+  .cr-pw-ext svg { width:14px; height:14px; }
+  /* Shop */
+  .cr-shop-subtabs { display:flex; gap:8px; margin-bottom:14px; }
+  .cr-shop-subtab { background:transparent; border:1px solid var(--nr-iron); border-radius:999px; padding:7px 14px; color:var(--nr-silver); font-family:var(--font-b); font-size:13px; font-weight:600; cursor:pointer; }
+  .cr-shop-subtab.active { background:#fff; color:#000; border-color:#fff; }
+  .cr-shop-panel { display:none; }
+  .cr-shop-panel.active { display:block; }
+  .cr-shop-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
+  .cr-shop-card { display:flex; flex-direction:column; background:var(--nr-charcoal); border-radius:12px; overflow:hidden; text-decoration:none; color:inherit; }
+  .cr-shop-img { width:100%; aspect-ratio:1; object-fit:cover; background:var(--nr-lead); }
+  .cr-shop-body { padding:10px 12px 12px; display:flex; flex-direction:column; gap:4px; }
+  .cr-shop-title { font-family:var(--font-b); font-size:13px; font-weight:600; color:#fff; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .cr-shop-sub { font-family:var(--font-m); font-size:10px; letter-spacing:0.1em; color:var(--nr-ash); text-transform:uppercase; }
+  .cr-shop-price { font-family:var(--font-b); font-size:13px; font-weight:700; color:var(--nr-red); margin-top:2px; }
+  /* Events */
+  .cr-events { display:flex; flex-direction:column; gap:2px; }
+  .cr-event-row { display:flex; align-items:center; gap:14px; padding:14px 4px; border-bottom:1px solid rgba(255,255,255,0.05); text-decoration:none; color:inherit; }
+  .cr-event-date { width:56px; flex-shrink:0; background:var(--nr-lead); border-radius:8px; padding:8px 4px; text-align:center; }
+  .cr-event-month { font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.14em; color:var(--nr-red); text-transform:uppercase; }
+  .cr-event-day { font-family:var(--font-h); font-size:22px; color:#fff; line-height:1.1; margin-top:2px; }
+  .cr-event-info { flex:1; min-width:0; }
+  .cr-event-title { font-family:var(--font-b); font-size:14px; font-weight:600; color:#fff; line-height:1.3; margin-bottom:3px; }
+  .cr-event-venue { font-family:var(--font-b); font-size:12px; color:var(--nr-silver); }
+  .cr-event-rsvp { font-family:var(--font-b); font-size:12px; font-weight:600; color:#fff; background:transparent; border:1.5px solid rgba(255,255,255,0.3); border-radius:999px; padding:6px 14px; cursor:pointer; flex-shrink:0; }
+  .cr-thumb-play { position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; }
+  .cr-thumb-play svg { width:12px; height:12px; color:#fff; }
+
+  /* ─────────── v3 HOME ─────────── */
+  .home { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:26; overflow-y:auto; padding:0 0 120px; }
+  .home.on { transform:translateY(0); }
+
+  .hm-top { display:flex; align-items:center; justify-content:space-between; padding:18px 20px 6px; }
+  .hm-wordmark { height:22px; }
+  .hm-top-right { display:flex; align-items:center; gap:12px; }
+  .hm-streak { display:flex; align-items:center; gap:5px; font-family:var(--font-m); font-size:13px; font-weight:600; color:var(--nr-yellow, #EDBD1F); }
+  .hm-streak svg { width:16px; height:16px; }
+  .hm-avatar { width:32px; height:32px; border-radius:50%; object-fit:cover; border:1.5px solid var(--nr-iron); }
+
+  .hm-greet { padding:10px 20px 2px; font-family:var(--font-h); font-size:28px; color:#fff; }
+  .hm-date { padding:0 20px 14px; font-family:var(--font-m); font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--nr-ash); }
+
+  /* Face row */
+  .hm-faces { display:flex; gap:16px; overflow-x:auto; padding:4px 20px 18px; scrollbar-width:none; }
+  .hm-faces::-webkit-scrollbar { display:none; }
+  .hm-face { display:flex; flex-direction:column; align-items:center; gap:6px; background:none; border:none; cursor:pointer; flex-shrink:0; width:64px; }
+  .hm-face-av { position:relative; width:60px; height:60px; }
+  .hm-face-av img { width:60px; height:60px; border-radius:20px; object-fit:cover; display:block; }
+  .hm-face-dot { position:absolute; top:-2px; right:-2px; width:14px; height:14px; border-radius:50%; background:var(--nr-red); border:2.5px solid #000; }
+  .hm-face-name { font-family:var(--font-b); font-size:11px; color:var(--nr-smoke); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:64px; }
+
+  /* Stack card */
+  .hm-stack { margin:0 20px 14px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:18px; }
+  .hm-stack-eyebrow { font-family:var(--font-m); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--nr-yellow, #EDBD1F); margin-bottom:8px; }
+  .hm-stack-title { font-family:var(--font-h); font-size:23px; color:#fff; line-height:1.15; margin-bottom:4px; }
+  .hm-stack-sub { font-family:var(--font-b); font-size:13px; color:var(--nr-silver); margin-bottom:14px; }
+  .hm-stack-row { display:flex; align-items:center; gap:14px; }
+  .hm-ring { width:44px; height:44px; flex-shrink:0; }
+  .hm-stack-cta { flex:1; background:var(--nr-red); color:#000; border:none; border-radius:6px; padding:13px 16px; font-family:var(--font-m); font-size:13px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; }
+  .hm-stack-done { flex:1; font-family:var(--font-b); font-size:14px; font-weight:600; color:var(--nr-green,#1AAD17); }
+
+  /* Section header */
+  .hm-h { padding:16px 20px 10px; display:flex; align-items:center; gap:8px; }
+  .hm-h img { width:24px; height:24px; border-radius:50%; background:#fff; object-fit:cover; }
+  .hm-h-title { font-family:var(--font-h); font-size:18px; color:#fff; }
+
+  /* Benny catch-up rows */
+  .hm-benny { margin:0 20px; border:1px solid rgba(255,255,255,0.07); border-radius:8px; overflow:hidden; }
+  .hm-b-row { display:flex; align-items:center; gap:12px; width:100%; background:var(--nr-charcoal); border:none; border-bottom:1px solid rgba(255,255,255,0.06); padding:15px 16px; cursor:pointer; text-align:left; }
+  .hm-b-row:last-child { border-bottom:none; }
+  .hm-b-ic { width:34px; height:34px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .hm-b-ic svg { width:17px; height:17px; }
+  .hm-b-ic--time { background:rgba(237,189,31,0.14); color:var(--nr-yellow,#EDBD1F); }
+  .hm-b-ic--left { background:rgba(96,140,255,0.16); color:#7FA3FF; }
+  .hm-b-ic--right { background:rgba(255,99,67,0.14); color:var(--nr-red); }
+  .hm-b-text { flex:1; min-width:0; }
+  .hm-b-title { font-family:var(--font-b); font-size:14.5px; font-weight:600; color:#fff; margin-bottom:2px; }
+  .hm-b-sub { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
+  .hm-b-chev { color:var(--nr-iron); flex-shrink:0; }
+  .hm-b-chev svg { width:16px; height:16px; }
+
+  /* Daily poll */
+  .hm-poll { margin:14px 20px 0; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:16px; }
+  .hm-poll-eyebrow { font-family:var(--font-m); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--nr-ash); margin-bottom:6px; }
+  .hm-poll-q { font-family:var(--font-b); font-size:15px; font-weight:600; color:#fff; line-height:1.35; margin-bottom:12px; }
+  .hm-poll-opt { position:relative; display:flex; align-items:center; justify-content:space-between; width:100%; background:var(--nr-lead); border:1px solid transparent; border-radius:6px; padding:11px 12px; margin-bottom:7px; cursor:pointer; overflow:hidden; color:#fff; font-family:var(--font-b); font-size:13.5px; }
+  .hm-poll-opt:last-child { margin-bottom:0; }
+  .hm-poll-fill { position:absolute; inset:0 auto 0 0; background:rgba(237,189,31,0.16); border-radius:6px 0 0 6px; transition:width 0.5s cubic-bezier(0.2,0.8,0.2,1); }
+  .hm-poll-opt.mine { border-color:var(--nr-yellow,#EDBD1F); }
+  .hm-poll-label, .hm-poll-pct { position:relative; }
+  .hm-poll-pct { font-family:var(--font-m); font-size:12px; color:var(--nr-smoke); }
+  .hm-poll-meta { margin-top:9px; font-family:var(--font-m); font-size:10.5px; color:var(--nr-ash); letter-spacing:0.08em; text-transform:uppercase; }
+
+  /* Story column */
+  .hm-hero { display:block; position:relative; margin:6px 20px 14px; border-radius:8px; overflow:hidden; border:none; padding:0; cursor:pointer; width:calc(100% - 40px); text-align:left; background:var(--nr-lead); }
+  .hm-hero img { width:100%; aspect-ratio:16/10; object-fit:cover; display:block; }
+  .hm-hero-label { position:absolute; top:12px; left:12px; background:var(--nr-yellow,#EDBD1F); color:#000; font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.14em; padding:5px 9px; border-radius:4px; text-transform:uppercase; }
+  .hm-hero-body { padding:13px 14px 15px; }
+  .hm-hero-headline { font-family:var(--font-h); font-size:20px; line-height:1.2; color:#fff; margin-bottom:7px; }
+  .hm-byline { display:flex; align-items:center; gap:7px; font-family:var(--font-b); font-size:12px; color:var(--nr-silver); }
+  .hm-byline img { width:20px; height:20px; border-radius:50%; object-fit:cover; }
+  .hm-story-row { display:flex; align-items:center; gap:13px; width:100%; background:none; border:none; border-bottom:1px solid rgba(255,255,255,0.06); padding:14px 20px; cursor:pointer; text-align:left; }
+  .hm-story-text { flex:1; min-width:0; }
+  .hm-story-tag { font-family:var(--font-m); font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--nr-yellow,#EDBD1F); margin-bottom:4px; }
+  .hm-story-headline { font-family:var(--font-b); font-size:15px; font-weight:600; line-height:1.3; color:#fff; margin-bottom:5px; }
+  .hm-story-thumb { width:74px; height:74px; border-radius:8px; object-fit:cover; flex-shrink:0; background:var(--nr-lead); }
+
+  /* Benny overlay sheet */
+  .bo-scrim { position:absolute; inset:0; background:rgba(0,0,0,0.6); opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:40; }
+  .bo-scrim.on { opacity:1; pointer-events:auto; }
+  .bo-sheet { position:absolute; left:0; right:0; bottom:0; max-height:78%; background:var(--nr-charcoal); border-radius:16px 16px 0 0; transform:translateY(105%); transition:transform 0.38s cubic-bezier(0.2,0.8,0.2,1); z-index:41; overflow-y:auto; padding-bottom:28px; }
+  .bo-sheet.on { transform:translateY(0); }
+  .bo-head { position:sticky; top:0; background:var(--nr-charcoal); display:flex; align-items:center; gap:10px; padding:16px 18px 12px; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .bo-head img { width:28px; height:28px; border-radius:50%; background:#fff; object-fit:cover; }
+  .bo-title { flex:1; font-family:var(--font-h); font-size:18px; color:#fff; }
+  .bo-close { background:var(--nr-lead); border:none; border-radius:50%; width:28px; height:28px; color:var(--nr-smoke); font-size:15px; cursor:pointer; }
+  .bo-note { padding:10px 18px 0; font-family:var(--font-b); font-size:12.5px; color:var(--nr-ash); }
+  .bo-tl { padding:6px 18px 0; }
+  .bo-tl-row { display:flex; gap:13px; padding:13px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer; }
+  .bo-tl-time { width:64px; flex-shrink:0; font-family:var(--font-m); font-size:10.5px; letter-spacing:0.08em; color:var(--nr-yellow,#EDBD1F); text-transform:uppercase; padding-top:2px; }
+  .bo-tl-text { flex:1; }
+  .bo-tl-head { font-family:var(--font-b); font-size:14.5px; font-weight:600; color:#fff; line-height:1.35; margin-bottom:4px; }
+  .bo-tl-src { font-family:var(--font-b); font-size:11.5px; color:var(--nr-ash); }
+  .bo-topic { padding:13px 18px; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .bo-topic-name { font-family:var(--font-b); font-size:15px; font-weight:700; color:#fff; margin-bottom:2px; }
+  .bo-topic-count { font-family:var(--font-m); font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--nr-ash); margin-bottom:8px; }
+  .bo-quote { font-family:var(--font-b); font-size:13px; line-height:1.45; color:var(--nr-smoke); border-left:2px solid var(--nr-iron); padding-left:10px; }
+  .bo-quote strong { color:#fff; }
+
+  /* v3 stubs */
+  .v3stub { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:26; display:flex; align-items:center; justify-content:center; }
+  .v3stub.on { transform:translateY(0); }
+  .v3stub-inner { text-align:center; padding:0 40px; }
+  .v3stub-title { font-family:var(--font-h); font-size:26px; color:#fff; margin-bottom:8px; }
+  .v3stub-sub { font-family:var(--font-b); font-size:14px; color:var(--nr-ash); line-height:1.5; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <div class="feed" id="feed">
+    <div class="stories" id="stories"></div>
+
+  </div>
+
+  <!-- Tabs are sibling of scenes so they stay above Home/Creator -->
+  <div class="tabs">
+    <button class="tab active" onclick="v3Home()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+      <span class="tab-label">Home</span>
+    </button>
+    <button class="tab" onclick="v3Feed()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="8" y1="3" x2="8" y2="8"/></svg>
+      <span class="tab-label">Feed</span>
+    </button>
+    <button class="tab" onclick="v3Benny()">
+      <span style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;">
+        <img src="assets/benny/benny-head.png" alt="" style="width:24px;height:24px;object-fit:cover;border-radius:50%;display:block;">
+      </span>
+      <span class="tab-label">Benny</span>
+    </button>
+    <button class="tab" onclick="v3Activity()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.2 3.4-5 6.5-5s5.7 1.8 6.5 5"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.6c2.9.2 4.9 1.9 5.6 4.4"/></svg>
+      <span class="tab-label">Activity</span>
+    </button>
+    <button class="tab" onclick="v3Profile()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3.2"/><path d="M5.5 19.2c1.2-3 3.7-4.6 6.5-4.6s5.3 1.6 6.5 4.6"/></svg>
+      <span class="tab-label">Profile</span>
+    </button>
+  </div>
+
+  <!-- Benny assistant sheet (overlays current slide) -->
+  <div class="ba-scrim" id="baScrim" onclick="closeBennyAssist()"></div>
+  <div class="ba-sheet" id="baSheet">
+    <button class="ba-card" onclick="bennyAnswer('eli5')">
+      <div class="ba-card-title">Explain like I'm five</div>
+      <div class="ba-card-sub">Summarizes this slide in clear, simple language.</div>
+    </button>
+    <button class="ba-card" onclick="bennyAnswer('deeper')">
+      <div class="ba-card-title">Dig deeper</div>
+      <div class="ba-card-sub">Adds one layer of insight by unpacking what it really means.</div>
+    </button>
+    <button class="ba-card" onclick="bennyAnswer('matter')">
+      <div class="ba-card-title">Why does this matter?</div>
+      <div class="ba-card-sub">Shows why this slide is significant in the broader story.</div>
+    </button>
+  </div>
+
+  <!-- Creator profile scene -->
+  <div class="creator" id="creator"></div>
+
+  <!-- Explore scene -->
+  <div class="explore" id="explore"></div>
+
+  <!-- v3 Home scene -->
+  <div class="home" id="home"></div>
+
+  <!-- v3 Benny catch-up overlay -->
+  <div class="bo-scrim" id="boScrim" onclick="closeBennyOverlay()"></div>
+  <div class="bo-sheet" id="boSheet"></div>
+
+  <!-- v3 Activity / Profile stubs -->
+  <div class="v3stub" id="stubActivity">
+    <div class="v3stub-inner">
+      <div class="v3stub-title">Activity</div>
+      <div class="v3stub-sub">Replies, poll results and journalist updates land here. Not part of this prototype.</div>
+    </div>
+  </div>
+  <div class="v3stub" id="stubProfile">
+    <div class="v3stub-inner">
+      <div class="v3stub-title">Profile</div>
+      <div class="v3stub-sub">Streak history, saved stories, settings. Not part of this prototype.</div>
+    </div>
+  </div>
+
+  <!-- The Wire scene -->
+  <div class="wire" id="wire"></div>
+  <button class="wr-fab hidden" id="wrFab" aria-label="Send a wire" onclick="openWireCompose()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <div class="wr-compose-scrim" id="wrComposeScrim" onclick="closeWireCompose()"></div>
+  <div class="wr-compose" id="wrCompose">
+    <div class="wr-compose-handle"></div>
+    <div class="wr-compose-modes">
+      <button class="wr-compose-mode active" data-mode="text" onclick="pickWireMode('text')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg>
+        Text
+      </button>
+      <button class="wr-compose-mode" data-mode="poll" onclick="pickWireMode('poll')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="20" x2="21" y2="20"/><rect x="6" y="10" width="3" height="10"/><rect x="11" y="6" width="3" height="14"/><rect x="16" y="13" width="3" height="7"/></svg>
+        Poll
+      </button>
+      <button class="wr-compose-mode" data-mode="story" onclick="pickWireMode('story')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+        Share story
+      </button>
+      <button class="wr-compose-mode" data-mode="link" onclick="pickWireMode('link')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Share link
+      </button>
+    </div>
+    <div class="wr-compose-body" id="wrComposeBody"></div>
+    <div class="wr-compose-actions">
+      <button class="wr-compose-vis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Your Circle ▾</button>
+      <button class="wr-compose-send" onclick="sendWire()">Send wire</button>
+    </div>
+  </div>
+
+  <!-- Benny tab scene -->
+  <div class="bennytab" id="bennytab">
+    <div class="bt-top">
+      <button class="bt-av" aria-label="Profile"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" alt=""></button>
+      <button class="bt-history" aria-label="History">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.74 9.74 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/><polyline points="12 7 12 12 15 15"/></svg>
+      </button>
+    </div>
+    <div class="bt-center">
+      <div class="bt-hero">
+        <div class="bt-mascot"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
+        <div class="bt-greet">
+          <div class="bt-greet-hi">Mornin', Jack.</div>
+          <div class="bt-greet-line">Got somethin' for ya. The Hormuz situation's movin' fast — want the scoop?</div>
+        </div>
+      </div>
+    </div>
+    <div class="bt-humans">
+      <div class="bt-humans-head">
+        <span class="bt-humans-label">Or ask a real reporter</span>
+      </div>
+      <div class="bt-humans-row">
+        <button class="bt-human" onclick="closeBennyTab(); openCreator(0)">
+          <img class="bt-human-av" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop">
+          <div><div class="bt-human-name">Dave Jorgenson</div><span class="bt-human-beat">Business</span></div>
+        </button>
+        <button class="bt-human" onclick="closeBennyTab(); openCreator(1)">
+          <img class="bt-human-av" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop">
+          <div><div class="bt-human-name">Eliza Haverstock</div><span class="bt-human-beat">Politics</span></div>
+        </button>
+        <button class="bt-human" onclick="closeBennyTab(); openCreator(2)">
+          <img class="bt-human-av" src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&h=120&fit=crop">
+          <div><div class="bt-human-name">The Atlantic</div><span class="bt-human-beat">Climate</span></div>
+        </button>
+      </div>
+    </div>
+    <div class="bt-actions">
+      <button class="bt-action" onclick="askBenny('Catch me up on today')">
+        <div class="bt-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8z"/></svg></div>
+        <div class="bt-action-label">Catch me up on today</div>
+      </button>
+      <button class="bt-action" onclick="askBenny('Explain a story I just read')">
+        <div class="bt-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="bt-action-label">Explain a story</div>
+      </button>
+      <button class="bt-action" onclick="askBenny('Talk to me — read me today\\'s news out loud')">
+        <div class="bt-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
+        <div class="bt-action-label">Talk to Benny</div>
+      </button>
+      <button class="bt-action" onclick="askBenny('Dig deeper on the Fed economy story')">
+        <div class="bt-action-icon"><img src="assets/benny/benny-head.png" alt=""></div>
+        <div class="bt-action-label">Dig deeper</div>
+      </button>
+    </div>
+    <div class="bt-input">
+      <div class="bt-input-wrap">
+        <button class="bt-input-btn" aria-label="Attach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.41 17.41a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
+        <input class="bt-input-field" id="btInput" placeholder="Hey Benny, what's the scoop on…" onkeydown="if(event.key==='Enter') sendBennyInput()" />
+        <button class="bt-input-btn" aria-label="Voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></button>
+        <button class="bt-send" onclick="sendBennyInput()" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Chat overlay -->
+    <div class="bt-chat" id="btChat">
+      <div class="bt-chat-top">
+        <button class="bt-chat-back" onclick="closeBennyChat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div class="bt-chat-title"><img src="assets/benny/benny-head.png" alt="" style="border-radius:50%;background:#fff;">Benny</div>
+        <span class="bt-chat-spacer"></span>
+      </div>
+      <div class="bt-chat-body" id="btChatBody"></div>
+      <div class="bt-input">
+        <div class="bt-input-wrap">
+          <input class="bt-input-field" id="btChatInput" placeholder="Ask a follow-up…" onkeydown="if(event.key==='Enter') sendBennyChatInput()" />
+          <button class="bt-send" onclick="sendBennyChatInput()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const VERIF_SVG = `<svg class="author-verif" viewBox="0 0 24 24" fill="#EDBD1F"><path d="M12 1.5l2.6 2.3 3.4-.5.7 3.4 3.1 1.6-1.4 3.2 1.4 3.2-3.1 1.6-.7 3.4-3.4-.5L12 22.5l-2.6-2.3-3.4.5-.7-3.4-3.1-1.6 1.4-3.2-1.4-3.2 3.1-1.6.7-3.4 3.4.5L12 1.5z"/><polyline points="8 12 11 15 16 9.5" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const VERIF_LG = `<svg style="width:22px;height:22px" viewBox="0 0 24 24" fill="#EDBD1F"><path d="M12 1.5l2.6 2.3 3.4-.5.7 3.4 3.1 1.6-1.4 3.2 1.4 3.2-3.1 1.6-.7 3.4-3.4-.5L12 22.5l-2.6-2.3-3.4.5-.7-3.4-3.1-1.6 1.4-3.2-1.4-3.2 3.1-1.6.7-3.4 3.4.5L12 1.5z"/><polyline points="8 12 11 15 16 9.5" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+const CREATORS = [
+  {
+    id:0, name:"Dave Jorgenson", verified:true,
+    avatar:"https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300&h=300&fit=crop",
+    cover:"https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1200&h=500&fit=crop",
+    bio:"Senior video journalist. Formerly The Washington Post. I make funny news videos that are also sometimes serious. Based in Brooklyn.",
+    collageTag:"news but funny",
+    quirks:[
+      { q:"Currently obsessed with —", a:"the economics of the Costco hot dog" },
+      { q:"Will die on this hill —", a:"the Oxford comma is non-negotiable" },
+      { q:"Worst pitch I ever sent —", a:"\"Is bread fascist?\" (Editor: \"No.\")" },
+      { q:"Coffee order —", a:"cortado, no foam, judge me" },
+    ],
+    stats:{ readers:87, stories:10, accuracy:"38%" },
+    verifiedBlurb:"Dave built The Washington Post's TikTok into the most-followed legacy newsroom account on the platform — 2M followers, 1B+ views. We verified him because he proved a generation will pay attention to real reporting if you meet them where they already are. He writes and films his own stuff. No staff, no spin, no AI ghost.",
+    disclosures:[
+      { k:"Employer", v:"Independent (formerly The Washington Post, 2018–2024)" },
+      { k:"AI use", v:"Opted out. Dave's stories are not licensed for AI training." },
+      { k:"Funding", v:"Reader subscriptions + Newsreel revenue share. No sponsored stories on Newsreel." },
+      { k:"Affiliations", v:"On-staff at The Daily Show (correspondent, 2025–)." },
+    ],
+    posts:[
+      { sId:0, img:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=600&h=800&fit=crop", tag:"Business", head:"The US economy is fine probably" },
+      { sId:0, img:"https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&h=800&fit=crop", tag:"Markets", head:"What one Fed cut actually buys you" },
+      { sId:0, img:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=600&h=800&fit=crop", tag:"Politics", head:"Inside the room when the bridge call happened" },
+      { sId:0, img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=600&h=800&fit=crop", tag:"Climate", head:"Methane rule, in plain English" },
+      { sId:0, img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=600&h=800&fit=crop", tag:"World", head:"Hormuz, day 4" },
+      { sId:0, img:"https://images.unsplash.com/photo-1620266757065-5814239881fd?w=600&h=800&fit=crop", tag:"Energy", head:"The grid is doing fine, actually" },
+    ],
+    pastWork:[
+      { title:"How a TikTok account became the most-read paper in America", outlet:"The Washington Post", year:2024, url:"https://www.washingtonpost.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=washingtonpost.com" },
+      { title:"Why Gen Z keeps watching the news (just not on TV)", outlet:"Nieman Lab", year:2023, url:"https://www.niemanlab.org/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=niemanlab.org" },
+      { title:"The TikTok Newsroom — a yearlong experiment", outlet:"Columbia Journalism Review", year:2023, url:"https://www.cjr.org/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=cjr.org" },
+      { title:"Live from the campaign trail (in 60 seconds)", outlet:"The Atlantic", year:2022, url:"https://www.theatlantic.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=theatlantic.com" },
+    ],
+    shop:{
+      merch:[
+        { title:"Paperboy Tee", price:"$32", img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop", url:"#" },
+        { title:"Dave's Press Hat", price:"$28", img:"https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&h=400&fit=crop", url:"#" },
+        { title:"Newsroom Tote", price:"$24", img:"https://images.unsplash.com/photo-1591561954557-26941169b49e?w=400&h=400&fit=crop", url:"#" },
+        { title:"\"Fine Probably\" Mug", price:"$18", img:"https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop", url:"#" },
+      ],
+      books:[
+        { title:"News for Humans", sub:"Dave Jorgenson · 2024", price:"$24", img:"https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=400&fit=crop", url:"#" },
+        { title:"How to Watch the News", sub:"Dave Jorgenson · 2022", price:"$19", img:"https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&h=400&fit=crop", url:"#" },
+      ],
+      picks:[
+        { title:"The Powers That Be", sub:"David Halberstam", img:"https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop", url:"#" },
+        { title:"Trust Me, I'm Lying", sub:"Ryan Holiday", img:"https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=400&fit=crop", url:"#" },
+        { title:"Amusing Ourselves to Death", sub:"Neil Postman", img:"https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400&h=400&fit=crop", url:"#" },
+      ],
+    },
+    events:[
+      { date:"JUN 12", title:"Future of News panel", venue:"Brooklyn Brewery, NY", url:"#" },
+      { date:"JUL 09", title:"Newsroom on TikTok — live taping", venue:"The Bell House, Brooklyn", url:"#" },
+      { date:"SEP 22", title:"ONA 2026 keynote", venue:"Atlanta, GA", url:"#" },
+    ],
+  },
+  {
+    id:1, name:"Eliza Haverstock", verified:true,
+    avatar:"https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop",
+    cover:"https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=1200&h=500&fit=crop",
+    bio:"Politics + power reporter at Newsreel. Previously covered private capital at Forbes. DC-based. I name sources and show receipts.",
+    collageTag:"on the record",
+    quirks:[
+      { q:"Sources reached today —", a:"7 (lobbyist count: 2)" },
+      { q:"Story I'm proud of —", a:"the one a senator's office tried to spike" },
+      { q:"My beat in one word —", a:"receipts" },
+      { q:"Notebook count —", a:"42 (and counting)" },
+    ],
+    stats:{ readers:42, stories:6, accuracy:"54%" },
+    verifiedBlurb:"Eliza covered private capital at Forbes before joining Newsreel as our politics + power reporter. She's been in the rooms where deals get made — and the ones where they fall apart. We verified her because she names sources, shows receipts, and doesn't write the obvious story.",
+    disclosures:[
+      { k:"Employer", v:"Newsreel staff reporter (Jan 2026–)" },
+      { k:"AI use", v:"Opt-in, per story. Currently 2 of 6 stories licensed." },
+      { k:"Funding", v:"Salaried by Newsreel Media Corp." },
+      { k:"Conflicts", v:"Spouse works at the State Department. Recuses from State-related coverage." },
+    ],
+    posts:[
+      { sId:1, img:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=600&h=800&fit=crop", tag:"Politics", head:"Trump threatens to block new bridge to Canada" },
+      { sId:1, img:"https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&h=800&fit=crop", tag:"Defense", head:"Inside the Pentagon's quiet pivot" },
+      { sId:1, img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=600&h=800&fit=crop", tag:"World", head:"Hormuz: who blinks first" },
+      { sId:1, img:"https://images.unsplash.com/photo-1535320903710-d993d3d77d29?w=600&h=800&fit=crop", tag:"Economy", head:"The tariff math, with sources" },
+    ],
+    pastWork:[
+      { title:"Inside the family office boom", outlet:"Forbes", year:2024, url:"https://www.forbes.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=forbes.com" },
+      { title:"The new generation of VC scolds", outlet:"Forbes", year:2023, url:"https://www.forbes.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=forbes.com" },
+      { title:"Why nobody is buying the next Silicon Valley", outlet:"The Information", year:2023, url:"https://www.theinformation.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=theinformation.com" },
+    ],
+    shop:{
+      merch:[
+        { title:"Beat Reporter Crewneck", price:"$48", img:"https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop", url:"#" },
+        { title:"Notebook + Pen Set", price:"$22", img:"https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=400&h=400&fit=crop", url:"#" },
+      ],
+      books:[],
+      picks:[
+        { title:"Power Broker", sub:"Robert Caro", img:"https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop", url:"#" },
+        { title:"Empire of Pain", sub:"Patrick Radden Keefe", img:"https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&h=400&fit=crop", url:"#" },
+        { title:"Bad Blood", sub:"John Carreyrou", img:"https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=400&fit=crop", url:"#" },
+      ],
+    },
+    events:[
+      { date:"JUN 03", title:"On the record: campaign finance 2026", venue:"Politics & Prose, DC", url:"#" },
+      { date:"AUG 18", title:"Newsreel Live at the DNC", venue:"Chicago, IL", url:"#" },
+    ],
+  },
+  {
+    id:2, name:"The Atlantic", verified:true,
+    avatar:"https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&h=300&fit=crop",
+    cover:"https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=1200&h=500&fit=crop",
+    bio:"Founded 1857. Big ideas, original reporting, long reads. Staff writers contribute directly to Newsreel; under-25 readers get full access here without a paywall.",
+    collageTag:"big ideas since 1857",
+    quirks:[
+      { q:"Oldest piece still in print —", a:"\"Self-Reliance\" by Emerson, 1841" },
+      { q:"Average story length —", a:"4,200 words (sorry not sorry)" },
+      { q:"Most-cited writer on the masthead —", a:"Anne Applebaum" },
+      { q:"Office mascot —", a:"a taxidermy puffin named Walter" },
+    ],
+    stats:{ readers:212, stories:34, accuracy:"61%" },
+    verifiedBlurb:"The Atlantic is one of three legacy outlets we verified at launch. They bring 167 years of editorial standards to a feed otherwise built around individual reporters. We verified them because their staff writers — not their op-eds — show up here, and because they let us run their stories without a paywall for under-25 readers.",
+    disclosures:[
+      { k:"Owner", v:"Emerson Collective (majority owner since 2017)" },
+      { k:"AI use", v:"Opted out. The Atlantic does not license stories for AI training on Newsreel." },
+      { k:"Funding", v:"Subscription + advertising. No sponsored stories appear on Newsreel." },
+      { k:"Editorial", v:"Stories pass The Atlantic's standard fact-check before publication." },
+    ],
+    posts:[
+      { sId:2, img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=600&h=800&fit=crop", tag:"Climate", head:"The methane rule that quietly reshapes your gas bill" },
+      { sId:2, img:"https://images.unsplash.com/photo-1620266757065-5814239881fd?w=600&h=800&fit=crop", tag:"Energy", head:"What grid operators actually fear" },
+      { sId:2, img:"https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=600&h=800&fit=crop", tag:"Culture", head:"The slow death of the listicle" },
+      { sId:2, img:"https://images.unsplash.com/photo-1535320903710-d993d3d77d29?w=600&h=800&fit=crop", tag:"Economy", head:"A defense of boring policy" },
+    ],
+    pastWork:[
+      { title:"The new climate consensus", outlet:"The Atlantic", year:2024, url:"https://www.theatlantic.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=theatlantic.com" },
+      { title:"How journalism survives the AI era", outlet:"The Atlantic", year:2024, url:"https://www.theatlantic.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=theatlantic.com" },
+      { title:"Why nobody believes anything anymore", outlet:"The Atlantic", year:2023, url:"https://www.theatlantic.com/", favicon:"https://www.google.com/s2/favicons?sz=128&domain=theatlantic.com" },
+    ],
+    shop:{
+      merch:[
+        { title:"Atlantic Tote", price:"$28", img:"https://images.unsplash.com/photo-1591561954557-26941169b49e?w=400&h=400&fit=crop", url:"#" },
+        { title:"Atlantic Subscription", sub:"1 year, print + digital", price:"$80", img:"https://images.unsplash.com/photo-1495020689067-958852a7765e?w=400&h=400&fit=crop", url:"#" },
+      ],
+      books:[
+        { title:"The Atlantic 2025 Reader", sub:"Anthology", price:"$22", img:"https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=400&fit=crop", url:"#" },
+      ],
+      picks:[
+        { title:"On Tyranny", sub:"Timothy Snyder", img:"https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400&h=400&fit=crop", url:"#" },
+        { title:"The Death of Expertise", sub:"Tom Nichols", img:"https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop", url:"#" },
+      ],
+    },
+    events:[
+      { date:"JUL 15", title:"The Atlantic Festival", venue:"Washington, DC", url:"#" },
+      { date:"OCT 02", title:"Ideas Issue launch", venue:"Online", url:"#" },
+    ],
+  },
+];
+
+const STORIES = [
+  {
+    tag:"Business",
+    headline:"The US economy is fine probably",
+    creatorId:0,
+    slides:[
+      { type:"video", img:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=900&h=1600&fit=crop" },
+      { type:"video", img:"https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&h=1600&fit=crop", subtitle:"But Wall Street wanted faster." },
+      { type:"quiz",
+        q:"The economy grew by 2% last quarter, but Wall Street analysts were hoping to hit what number?",
+        opts:["3%","2.5%","2.2%","4%"], answer:0 },
+      { type:"poll", pollId:'fed-rates',
+        q:"The Fed should have cut rates today rather than holding steady." },
+      { type:"benny",
+        context:"You just read",
+        headline:"The US economy is fine probably",
+        take:"Your <em>$2,800 Brooklyn rent</em> isn't moving down in 2026 — landlords have no pressure to cut. Refinancing your student loans gets cheaper if that one cut lands in Q4, but only by a fraction of a point. The Fed thinks the economy is <em>still too hot</em>, which usually means tech hiring stays soft another quarter.",
+        chips:["Brooklyn","Tech, 27","Student loans"] },
+      { type:"xp", streak:4, msg:"Nice job keeping your streak", storyXp:5, quizXp:10, level:1, levelMax:40, levelCurrent:15 },
+    ],
+  },
+  {
+    tag:"Politics",
+    headline:"Trump threatens to block new bridge to Canada",
+    creatorId:1,
+    slides:[
+      { type:"video", img:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=900&h=1600&fit=crop" },
+    ],
+  },
+  {
+    tag:"Climate",
+    headline:"EPA's new methane rule could reshape every gas bill",
+    creatorId:2,
+    slides:[
+      { type:"video", img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=900&h=1600&fit=crop" },
+      { type:"video", img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=900&h=1600&fit=crop" },
+      { type:"video", img:"https://images.unsplash.com/photo-1620266757065-5814239881fd?w=900&h=1600&fit=crop" },
+    ],
+  },
+];
+
+const stage = document.getElementById('stories');
+const creatorEl = document.getElementById('creator');
+const feedEl = document.getElementById('feed');
+let storyIdx = 0;
+const slideIdx = STORIES.map(()=>0);
+
+const POLL_LABELS = ["Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"];
+// Shared poll vote store keyed by pollId — same source of truth for story slide + wire card
+// Pre-seed one vote so the demo shows the "already voted" state without requiring interaction
+const userPollVotes = { 'finish-stack': 4 };
+function getUserVote(pollId) { return pollId in userPollVotes ? userPollVotes[pollId] : null; }
+function castVote(pollId, idx) { userPollVotes[pollId] = idx; }
+
+function renderSlide(sl, i, k) {
+  if (sl.type === 'poll') {
+    return `
+      <div class="slide slide--poll" id="pl-${i}-${k}">
+        <div class="pl-wrap">
+          <h2 class="pl-title">Where do you stand?</h2>
+          <p class="pl-q">${sl.q}</p>
+          <div class="pl-slider-wrap">
+            <div class="pl-track" data-poll="${i}-${k}">
+              <div class="pl-track-line"></div>
+              ${[0,1,2,3,4].map(j => `<div class="pl-track-tick" style="left:${j*25}%"></div>`).join('')}
+              <div class="pl-track-knob" id="plKnob-${i}-${k}" style="left:50%"></div>
+            </div>
+            <div class="pl-labels" id="plLabels-${i}-${k}">
+              ${POLL_LABELS.map((l, j) => `<span class="pl-label ${j===2?'active':''}" onclick="setPoll(${i},${k},${j})">${l}</span>`).join('')}
+            </div>
+          </div>
+          <div class="pl-foot">Visible only to your Close Circle.</div>
+          <div class="pl-results" id="plRes-${i}-${k}">
+            <div class="pl-res-toggle">
+              <button class="pl-res-tab active" onclick="togglePollGroup(${i},${k},'friends')">Friends</button>
+              <button class="pl-res-tab" onclick="togglePollGroup(${i},${k},'contributors')">Contributors</button>
+              <button class="pl-res-tab" onclick="togglePollGroup(${i},${k},'whole')">Whole app</button>
+            </div>
+            <div class="pl-res-bars" id="plBars-${i}-${k}"></div>
+            <div class="pl-res-foot" id="plFoot-${i}-${k}">42 friends voted</div>
+          </div>
+          <button class="pl-write">Have more you want to say? Write to us!</button>
+        </div>
+      </div>
+    `;
+  }
+  if (sl.type === 'xp') {
+    const pct = sl.levelCurrent / sl.levelMax;
+    const dash = 565 * (1 - pct);
+    return `
+      <div class="slide slide--xp">
+        <div class="xp-wrap">
+          <div class="xp-streak">
+            <svg class="xp-streak-icon" viewBox="0 0 24 24" fill="#EDBD1F"><path d="M13.5 0.7s4.4 6.6 4.4 11.6c0 6.6-5.4 9.2-5.4 9.2-2-3 .5-5.6.5-7.6 0-3.6-2-5-2-5s-1 4-3 5.5C5.6 16.6 4 14.5 4 12c0-2 2.4-5 4-7 1-1.2 2.5-2 3.5-2.7l2-1.6z"/></svg>
+            <span class="xp-streak-num">${sl.streak}</span>
+          </div>
+          <div class="xp-msg">${sl.msg}</div>
+          <div class="xp-cards">
+            <div class="xp-card">
+              <div class="xp-card-label">Story XP</div>
+              <div class="xp-card-val" style="color:#36C9B6"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>${sl.storyXp}</div>
+            </div>
+            <div class="xp-card">
+              <div class="xp-card-label">Quiz XP</div>
+              <div class="xp-card-val" style="color:#A78BFA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12 11 15 16 9"/></svg>${sl.quizXp}</div>
+            </div>
+          </div>
+          <div class="xp-ring">
+            <svg viewBox="0 0 200 200">
+              <circle class="xp-ring-bg" cx="100" cy="100" r="90"/>
+              <circle class="xp-ring-fg" cx="100" cy="100" r="90" style="stroke-dashoffset:${dash}"/>
+            </svg>
+            <div class="xp-ring-text">
+              <div class="xp-ring-level">Level ${sl.level}</div>
+              <div class="xp-ring-sub">${sl.levelCurrent}/${sl.levelMax} XP</div>
+            </div>
+          </div>
+          <button class="xp-claim">CLAIM XP</button>
+        </div>
+      </div>
+    `;
+  }
+  if (sl.type === 'benny') {
+    return `
+      <div class="slide slide--benny" id="bn-${i}-${k}">
+        <div class="bn-aurora"></div>
+        <div class="bn-stage">
+          <div class="bn-context">Story impact · for Jack</div>
+          <h2 class="bn-headline">How this story affects <em>you</em>.</h2>
+          <p class="bn-subline">Brooklyn renter · tech worker, 27 · paying down student loans</p>
+          <div class="bn-orb-wrap">
+            <button class="bn-orb-btn" onclick="openBenny(${i}, ${k})">
+              <div class="bn-aura"></div>
+              <div class="bn-aura two"></div>
+              <div class="bn-disc"></div>
+              <div class="bn-mascot"><img src="assets/benny/benny-paperboy-v2-transparent.png" alt=""></div>
+              <div class="bn-ripple"></div>
+              <div class="bn-ripple r2"></div>
+              <div class="bn-ripple r3"></div>
+              <div class="bn-particles" id="bnParticles-${i}-${k}"></div>
+            </button>
+            <div class="bn-writing">
+              <div class="bn-writing-mark"></div>
+              <span class="bn-writing-label">Benny is writing for you<span class="bn-writing-dots"></span></span>
+            </div>
+            <div class="bn-byline">
+              <span class="bn-byline-label">Benny · Story Impact</span>
+              <span class="bn-byline-name">For you</span>
+            </div>
+            <span class="bn-hint">Tap Benny to see how →</span>
+          </div>
+          <div class="bn-take">
+            <p class="bn-take-body" id="bnBody-${i}-${k}">${sl.take}</p>
+            <div class="bn-take-meta-head">
+              <span class="bn-take-meta-label">Based on you</span>
+              <button class="bn-take-edit" onclick="toggleBennyEdit(${i}, ${k})" id="bnEdit-${i}-${k}">Edit</button>
+            </div>
+            <div class="bn-take-meta" id="bnChips-${i}-${k}">
+              ${sl.chips.map(c => `<span class="bn-take-chip">${c}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  if (sl.type === 'quiz') {
+    return `
+      <div class="slide slide--quiz">
+        <div class="quiz-wrap">
+          <div class="quiz-q">${sl.q}</div>
+          <div class="quiz-opts">
+            ${sl.opts.map((o, oi) => `<button class="quiz-opt" onclick="answerQuiz(${i}, ${k}, ${oi})">${o}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  return `
+    <div class="slide">
+      <img class="slide-img" src="${sl.img}" alt="">
+      ${sl.subtitle ? `<div class="subtitle">${sl.subtitle}</div>` : ''}
+    </div>
+  `;
+}
+
+function renderStory(s, i) {
+  const c = CREATORS[s.creatorId];
+  const slidesHtml = s.slides.map((sl, k) => renderSlide(sl, i, k)).join('');
+  const segsHtml = s.slides.map((_, k) =>
+    `<div class="seg ${k===0?'on':''}"><div class="seg-fill"></div></div>`
+  ).join('');
+
+  return `
+    <div class="story ${i===storyIdx?'':'next'}" data-i="${i}">
+      <div class="slide-track" data-story="${i}" style="transform:translateX(0)">
+        ${slidesHtml}
+      </div>
+
+      <div class="top-chrome">
+        <div class="top-row">
+          <span class="stack-counter">${i+1} / ${STORIES.length}</span>
+          <span class="nr-mark"><img src="assets/newsreel-wordmark-white.png" alt="newsreel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <button class="me-avatar" aria-label="Your profile"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" alt=""></button>
+        </div>
+        <div class="segs ${s.slides.length===1?'single':''}" data-story="${i}">${segsHtml}</div>
+      </div>
+
+      <div class="side-actions">
+        <button class="sa-btn" aria-label="Audio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-7h3z"/><path d="M3 19a2 2 0 0 0 2 2h1v-7H3z"/></svg></button>
+        <button class="sa-btn" aria-label="Captions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 15a2 2 0 1 1 0-4 2 2 0 0 1 1.7 1"/><path d="M14 15a2 2 0 1 1 0-4 2 2 0 0 1 1.7 1"/></svg></button>
+        <button class="sa-btn" aria-label="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
+        <button class="sa-btn sa-btn--streak" aria-label="Streak"></button>
+        <button class="sa-btn sa-btn--benny" aria-label="Ask Benny" onclick="openBennyAssist(${i})"><img src="assets/benny/benny-head.png" alt=""></button>
+      </div>
+
+      <div class="b-overlay">
+        <button class="author-chip" onclick="openCreator(${s.creatorId})">
+          <img class="author-av" src="${c.avatar}" alt="">
+          <span class="author-name">${c.name}</span>
+          ${c.verified ? VERIF_SVG : ''}
+        </button>
+        <div class="b-eyebrow-row">
+          <span class="b-eyebrow">${s.tag}</span>
+          ${s.slides.some(sl => sl.type==='benny') ? `<span class="b-impact-pill"><img src="assets/benny/benny-head.png" alt="">Story impact</span>` : ''}
+        </div>
+        <h1 class="b-headline">${s.headline}</h1>
+      </div>
+    </div>
+  `;
+}
+
+function render() {
+  stage.innerHTML = STORIES.map(renderStory).join('');
+  updateSegs();
+}
+
+function updateSegs() {
+  const segs = document.querySelector(`.segs[data-story="${storyIdx}"]`);
+  if (!segs) return;
+  [...segs.children].forEach((s, k) => {
+    s.classList.remove('on','done');
+    if (k < slideIdx[storyIdx]) s.classList.add('done');
+    else if (k === slideIdx[storyIdx]) s.classList.add('on');
+  });
+}
+
+function goStory(i) {
+  if (i < 0 || i >= STORIES.length) return;
+  storyIdx = i;
+  document.querySelectorAll('.story').forEach((el, j) => {
+    el.classList.remove('next','prev');
+    if (j < storyIdx) el.classList.add('prev');
+    else if (j > storyIdx) el.classList.add('next');
+  });
+  document.querySelectorAll('.dev button').forEach((b,j) => { if (j<3) b.classList.toggle('on', j===storyIdx); });
+  updateSegs();
+}
+
+function goSlide(storyI, k) {
+  const s = STORIES[storyI];
+  if (k < 0 || k >= s.slides.length) return;
+  slideIdx[storyI] = k;
+  const track = document.querySelector(`.slide-track[data-story="${storyI}"]`);
+  track.style.transform = `translateX(-${k * 100}%)`;
+  const overlay = document.querySelector(`.story[data-i="${storyI}"] .b-overlay`);
+  if (overlay) {
+    overlay.classList.toggle('compact', k > 0);
+    const hideTypes = ['benny','xp'];
+    overlay.classList.toggle('hidden-overlay', hideTypes.includes(s.slides[k].type));
+  }
+  // Reset any opened Benny slides we navigated away from
+  document.querySelectorAll('.slide--benny.opened').forEach(el => {
+    if (el.id !== `bn-${storyI}-${k}`) el.classList.remove('opened');
+  });
+  updateSegs();
+}
+
+function openBenny(i, k) {
+  document.getElementById(`bn-${i}-${k}`)?.classList.add('opened');
+}
+
+const BENNY_ANSWERS = {
+  eli5:  "The Fed left interest rates the same. They might lower them once before the year ends. That's it.",
+  deeper:"Holding rates means the Fed is fighting two things at once — inflation that's still above target, and a job market that's softening. One cut by year-end is the smallest possible signal that they're paying attention.",
+  matter:"Rates touch everything you pay for on credit. Mortgages, car loans, the rate on your savings, your student-loan refi. One cut barely moves the needle — your bills aren't getting cheaper any time soon."
+};
+
+function openBennyAssist(storyI) {
+  document.getElementById('baScrim').classList.add('on');
+  document.getElementById('baSheet').classList.add('on');
+}
+function closeBennyAssist() {
+  document.getElementById('baScrim').classList.remove('on');
+  document.getElementById('baSheet').classList.remove('on');
+  // Reset cards if an answer was shown
+  const sheet = document.getElementById('baSheet');
+  if (sheet.dataset.mode === 'answer') { sheet.dataset.mode = ''; renderBennyCards(); }
+}
+function renderBennyCards() {
+  document.getElementById('baSheet').innerHTML = `
+    <button class="ba-card" onclick="bennyAnswer('eli5')">
+      <div class="ba-card-title">Explain like I'm five</div>
+      <div class="ba-card-sub">Summarizes this slide in clear, simple language.</div>
+    </button>
+    <button class="ba-card" onclick="bennyAnswer('deeper')">
+      <div class="ba-card-title">Dig deeper</div>
+      <div class="ba-card-sub">Adds one layer of insight by unpacking what it really means.</div>
+    </button>
+    <button class="ba-card" onclick="bennyAnswer('matter')">
+      <div class="ba-card-title">Why does this matter?</div>
+      <div class="ba-card-sub">Shows why this slide is significant in the broader story.</div>
+    </button>`;
+}
+function bennyAnswer(key) {
+  const sheet = document.getElementById('baSheet');
+  sheet.dataset.mode = 'answer';
+  sheet.innerHTML = `
+    <div class="ba-answer">
+      <div class="ba-answer-head">
+        <img src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
+        <span class="ba-answer-label">Benny</span>
+      </div>
+      <div class="ba-answer-body">${BENNY_ANSWERS[key]}</div>
+    </div>
+    <button class="ba-card" onclick="closeBennyAssist()" style="text-align:center; padding:10px;">
+      <div class="ba-card-sub" style="font-family:var(--font-m); letter-spacing:0.18em; text-transform:uppercase; font-size:11px;">Done</div>
+    </button>`;
+}
+
+function toggleBennyEdit(i, k) {
+  const wrap = document.getElementById(`bnChips-${i}-${k}`);
+  const btn = document.getElementById(`bnEdit-${i}-${k}`);
+  const editing = wrap.classList.toggle('editing');
+  btn.textContent = editing ? 'Done' : 'Edit';
+  wrap.querySelectorAll('.bn-take-chip').forEach(c => {
+    c.classList.toggle('editable', editing);
+    c.contentEditable = editing;
+    if (editing) c.focus();
+  });
+  // When user finishes editing, regenerate Benny's take using new chip values
+  if (!editing) regenerateBennyTake(i, k);
+}
+
+function regenerateBennyTake(i, k) {
+  const chips = [...document.querySelectorAll(`#bnChips-${i}-${k} .bn-take-chip`)].map(c => c.textContent.trim());
+  const body = document.getElementById(`bnBody-${i}-${k}`);
+  if (!body) return;
+  const [c1, c2, c3] = chips;
+  // Brief "Benny is rewriting" flash, then new take
+  body.innerHTML = `<span style="opacity:0.5; font-style:italic;">Benny is rewriting for you<span class="bn-writing-dots"></span></span>`;
+  setTimeout(() => {
+    body.innerHTML = `For a <em>${c1 || 'someone like you'}</em> ${c2 ? `(${c2})` : ''}, the Fed holding rates means borrowing costs aren't moving down in 2026. ${c3 ? `Your <em>${c3}</em> situation gets cheaper only if that one cut lands in Q4 — and only by a fraction.` : ''} The Fed thinks the economy is <em>still too hot</em>, which usually means tech hiring stays soft another quarter.`;
+  }, 700);
+}
+
+// Poll mock distributions per group [strDis, dis, neut, agr, strAgr]
+const POLL_DATA = {
+  friends:      { dist:[5, 12, 18, 38, 27], n:42, label:"42 friends voted" },
+  contributors: { dist:[18, 28, 24, 22, 8], n:31, label:"31 contributors voted" },
+  whole:        { dist:[11, 19, 26, 28, 16], n:8412, label:"8,412 readers voted" },
+};
+const pollChoice = {}; // key `${i}-${k}` → user index
+const pollGroup  = {}; // key `${i}-${k}` → group
+
+function setPoll(i, k, idx) {
+  const key = `${i}-${k}`;
+  pollChoice[key] = idx;
+  pollGroup[key] = pollGroup[key] || 'friends';
+  // Sync to shared vote store so wire cards reflect this vote
+  const slide = STORIES[i]?.slides[k];
+  if (slide?.pollId) castVote(slide.pollId, idx);
+  // knob
+  const knob = document.getElementById(`plKnob-${i}-${k}`);
+  if (knob) knob.style.left = `${idx * 25}%`;
+  // labels
+  const lbls = document.getElementById(`plLabels-${i}-${k}`);
+  if (lbls) [...lbls.children].forEach((el, j) => el.classList.toggle('active', j === idx));
+  // mark slide voted, render results
+  document.getElementById(`pl-${i}-${k}`)?.classList.add('voted');
+  renderPollBars(i, k);
+}
+
+function togglePollGroup(i, k, group) {
+  const key = `${i}-${k}`;
+  pollGroup[key] = group;
+  // toggle tabs
+  const tabs = document.querySelectorAll(`#plRes-${i}-${k} .pl-res-tab`);
+  const groups = ['friends','contributors','whole'];
+  tabs.forEach((t, j) => t.classList.toggle('active', groups[j] === group));
+  renderPollBars(i, k);
+}
+
+function renderPollBars(i, k) {
+  const key = `${i}-${k}`;
+  const group = pollGroup[key] || 'friends';
+  const data = POLL_DATA[group];
+  const max = Math.max(...data.dist);
+  const choice = pollChoice[key];
+  const bars = document.getElementById(`plBars-${i}-${k}`);
+  if (!bars) return;
+  bars.innerHTML = data.dist.map((pct, j) => `
+    <div class="pl-res-bar ${j===choice?'you':''}">
+      <span class="pl-res-bar-pct">${pct}%</span>
+      <div class="pl-res-bar-fill" style="height:${(pct/max)*100}%"></div>
+    </div>
+  `).join('');
+  document.getElementById(`plFoot-${i}-${k}`).textContent = data.label;
+}
+
+function answerQuiz(i, k, oi) {
+  const s = STORIES[i].slides[k];
+  const opts = document.querySelectorAll(`.story[data-i="${i}"] .slide-track .slide`)[k].querySelectorAll('.quiz-opt');
+  opts.forEach((b, j) => {
+    if (j === s.answer) b.classList.add('right');
+    else if (j === oi) b.classList.add('wrong');
+    b.disabled = true;
+  });
+}
+
+// ─── Touch handling: axis-lock vertical/horizontal ───
+let tx=null, ty=null, axis=null;
+document.addEventListener('touchstart', e => {
+  if (creatorEl.classList.contains('on')) return;
+  tx = e.touches[0].clientX; ty = e.touches[0].clientY; axis = null;
+}, {passive:true});
+document.addEventListener('touchmove', e => {
+  if (tx === null || axis) return;
+  const dx = e.touches[0].clientX - tx;
+  const dy = e.touches[0].clientY - ty;
+  if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
+    axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+  }
+}, {passive:true});
+document.addEventListener('touchend', e => {
+  if (tx === null) return;
+  const dx = e.changedTouches[0].clientX - tx;
+  const dy = e.changedTouches[0].clientY - ty;
+  if (axis === 'y' && Math.abs(dy) > 60) goStory(storyIdx + (dy < 0 ? 1 : -1));
+  else if (axis === 'x' && Math.abs(dx) > 50) goSlide(storyIdx, slideIdx[storyIdx] + (dx < 0 ? 1 : -1));
+  tx = ty = axis = null;
+});
+
+let wheelLock = false;
+document.addEventListener('wheel', e => {
+  if (creatorEl.classList.contains('on')) return;
+  if (wheelLock || Math.abs(e.deltaY) < 30) return;
+  wheelLock = true;
+  goStory(storyIdx + (e.deltaY > 0 ? 1 : -1));
+  setTimeout(() => wheelLock = false, 500);
+}, {passive:true});
+
+document.addEventListener('keydown', e => {
+  if (creatorEl.classList.contains('on') && e.key === 'Escape') return closeCreator();
+  if (e.key === 'ArrowDown') goStory(storyIdx + 1);
+  if (e.key === 'ArrowUp')   goStory(storyIdx - 1);
+  if (e.key === 'ArrowRight') goSlide(storyIdx, slideIdx[storyIdx] + 1);
+  if (e.key === 'ArrowLeft')  goSlide(storyIdx, slideIdx[storyIdx] - 1);
+});
+
+// ─── Creator profile ───
+function renderCreator(c) {
+  const storiesHtml = (c.posts || []).map(p => `
+    <button class="cr-tile" onclick="closeCreator(); jumpToStory(${p.sId})">
+      <img src="${p.img}" alt="">
+      <div class="cr-tile-overlay"></div>
+      <div class="cr-tile-tag">${p.tag}</div>
+      <div class="cr-tile-head">${p.head}</div>
+    </button>
+  `).join('');
+
+  const pastWorkHtml = (c.pastWork || []).map(w => `
+    <a class="cr-pw-row" href="${w.url}" target="_blank" rel="noopener">
+      <img class="cr-pw-fav" src="${w.favicon}" alt="">
+      <div class="cr-pw-info">
+        <div class="cr-pw-title">${w.title}</div>
+        <div class="cr-pw-meta">${w.outlet} · ${w.year}</div>
+      </div>
+      <span class="cr-pw-ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+    </a>
+  `).join('');
+
+  const shopCard = (item) => `
+    <a class="cr-shop-card" href="${item.url}" target="_blank" rel="noopener">
+      <img class="cr-shop-img" src="${item.img}" alt="">
+      <div class="cr-shop-body">
+        <div class="cr-shop-title">${item.title}</div>
+        ${item.sub ? `<div class="cr-shop-sub">${item.sub}</div>` : ''}
+        ${item.price ? `<div class="cr-shop-price">${item.price}</div>` : ''}
+      </div>
+    </a>
+  `;
+  const shopSub = (key) => {
+    const items = (c.shop && c.shop[key]) || [];
+    if (!items.length) return `<div style="font-family:var(--font-b); font-size:13px; color:var(--nr-ash); padding:20px 4px;">Nothing here yet.</div>`;
+    return `<div class="cr-shop-grid">${items.map(shopCard).join('')}</div>`;
+  };
+
+  const eventsHtml = (c.events || []).map(ev => {
+    const [m, d] = ev.date.split(' ');
+    return `
+      <a class="cr-event-row" href="${ev.url}" target="_blank" rel="noopener">
+        <div class="cr-event-date">
+          <div class="cr-event-month">${m}</div>
+          <div class="cr-event-day">${d}</div>
+        </div>
+        <div class="cr-event-info">
+          <div class="cr-event-title">${ev.title}</div>
+          <div class="cr-event-venue">${ev.venue}</div>
+        </div>
+        <button class="cr-event-rsvp" onclick="event.preventDefault();">RSVP</button>
+      </a>
+    `;
+  }).join('') || `<div style="font-family:var(--font-b); font-size:13px; color:var(--nr-ash); padding:20px 4px;">No upcoming events.</div>`;
+
+  return `
+    <div class="cr-cover-img">
+      <img src="${c.cover || c.hero || c.avatar}" alt="">
+      <div class="cr-cover-grad"></div>
+      <div class="cr-top">
+        <button class="cr-icon-btn" onclick="closeCreator()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="cr-icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="cr-id">
+      <img class="cr-id-avatar" src="${c.avatar}" alt="">
+      <div class="cr-id-name-row">
+        <h1 class="cr-id-name">${c.name}</h1>
+      </div>
+      <div class="cr-chip-row">
+        ${c.verified ? `
+          <button class="cr-verified-chip" onclick="toggleDrawer(this,'verif')">
+            ${VERIF_LG.replace('class=\"author-verif\"','class=\"cr-verif-seal\"')}
+            <span>Newsreel Verified</span>
+            <svg class="cr-verif-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>` : ''}
+        ${(c.disclosures && c.disclosures.length) ? `
+          <button class="cr-discl-chip" onclick="toggleDrawer(this,'discl')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>Disclosures</span>
+            <svg class="cr-verif-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>` : ''}
+      </div>
+
+      <div class="cr-blurb-wrap" data-drawer="verif">
+        <div class="cr-blurb-label">${VERIF_LG.replace('width:22px;height:22px','width:14px;height:14px')}<span>Why Newsreel Verified</span></div>
+        <p class="cr-blurb">${c.verifiedBlurb || ''}</p>
+      </div>
+
+      ${(c.disclosures && c.disclosures.length) ? `
+        <div class="cr-blurb-wrap" data-drawer="discl">
+          <div class="cr-blurb-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span>Disclosures</span></div>
+          <ul class="cr-discl-list">
+            ${c.disclosures.map(d => `<li><span class="cr-discl-k">${d.k}</span><span class="cr-discl-v">${d.v}</span></li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+    </div>
+
+    <div class="cr-substrip">
+      <div class="cr-readers">${(c.stats.readers * 1000).toLocaleString()} readers this month</div>
+      <div class="cr-substrip-r">
+        <button class="cr-follow" onclick="this.classList.toggle('on'); this.textContent = this.classList.contains('on') ? 'Following' : 'Follow';">Follow</button>
+        <button class="cr-iconlink" aria-label="More">
+          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="cr-bio-wrap">
+      <p class="cr-bio">${c.bio}</p>
+    </div>
+
+    <div class="cr-collage-wrap">
+      <div class="cr-collage-head">
+        <button class="cr-collage-shuffle" onclick="toggleCollage(this)" style="border-color:var(--nr-red); color:var(--nr-red);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+          <span data-label>Generate collage</span>
+        </button>
+        <button class="cr-collage-shuffle" onclick="shuffleCollage(this)" data-shuffle style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+          Shuffle
+        </button>
+      </div>
+      <div class="cr-collage" data-creator="${c.id}">
+        <div class="cr-collage-bg"></div>
+        <div class="cr-collage-top">PERFECTLY<br>IMPERFECT</div>
+        ${(c.posts || []).slice(0,6).map((p,i) => `<img class="cr-collage-pic" src="${p.img}" alt="" data-i="${i}">`).join('')}
+        <div class="cr-collage-mid">${c.collageTag || 'A reporter worth reading'}</div>
+        <div class="cr-collage-bot">${c.name.toUpperCase()}</div>
+        <svg class="cr-collage-star" data-star="0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+        <svg class="cr-collage-star" data-star="1" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+        <div class="cr-collage-wm">★ Newsreel ★</div>
+      </div>
+    </div>
+
+    <div class="cr-tabs">
+      <button class="cr-tab active" data-tab="stories" onclick="setCreatorTab(this,'stories')">Stories</button>
+      <button class="cr-tab" data-tab="past" onclick="setCreatorTab(this,'past')">Past Work</button>
+      <button class="cr-tab" data-tab="shop" onclick="setCreatorTab(this,'shop')">Shop</button>
+      <button class="cr-tab" data-tab="events" onclick="setCreatorTab(this,'events')">Events</button>
+    </div>
+
+    <div class="cr-panel active" data-panel="stories">
+      <div class="cr-tile-grid">${storiesHtml}</div>
+    </div>
+    <div class="cr-panel" data-panel="past">
+      <div class="cr-pw">${pastWorkHtml}</div>
+    </div>
+    <div class="cr-panel" data-panel="shop">
+      <div class="cr-shop-subtabs">
+        <button class="cr-shop-subtab active" data-sub="merch" onclick="setShopSubtab(this,'merch')">Merch</button>
+        <button class="cr-shop-subtab" data-sub="books" onclick="setShopSubtab(this,'books')">Books</button>
+        <button class="cr-shop-subtab" data-sub="picks" onclick="setShopSubtab(this,'picks')">Picks</button>
+      </div>
+      <div class="cr-shop-panel active" data-shop="merch">${shopSub('merch')}</div>
+      <div class="cr-shop-panel" data-shop="books">${shopSub('books')}</div>
+      <div class="cr-shop-panel" data-shop="picks">${shopSub('picks')}</div>
+    </div>
+    <div class="cr-panel" data-panel="events">
+      <div class="cr-events">${eventsHtml}</div>
+    </div>
+  `;
+}
+
+function setCreatorTab(btn, name) {
+  const root = btn.closest('.creator');
+  root.querySelectorAll('.cr-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  root.querySelectorAll('.cr-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === name));
+}
+function setShopSubtab(btn, name) {
+  const root = btn.closest('.cr-panel');
+  root.querySelectorAll('.cr-shop-subtab').forEach(t => t.classList.toggle('active', t.dataset.sub === name));
+  root.querySelectorAll('.cr-shop-panel').forEach(p => p.classList.toggle('active', p.dataset.shop === name));
+}
+function layoutCollage(collage) {
+  const rand = (a,b) => a + Math.random() * (b - a);
+  const pics = collage.querySelectorAll('.cr-collage-pic');
+  const W = collage.clientWidth || 360;
+  const H = 380;
+  // Spread images around the center text in a loose ring + scatter
+  const slots = [
+    { x: 0.06, y: 0.18, w: 110, h: 110 },
+    { x: 0.62, y: 0.10, w: 130, h: 90  },
+    { x: 0.04, y: 0.55, w: 120, h: 100 },
+    { x: 0.66, y: 0.50, w: 110, h: 130 },
+    { x: 0.30, y: 0.70, w: 100, h: 100 },
+    { x: 0.42, y: 0.06, w: 90,  h: 90  },
+  ];
+  pics.forEach((img, i) => {
+    const s = slots[i % slots.length];
+    const jitterX = rand(-12, 12);
+    const jitterY = rand(-10, 10);
+    const rot = rand(-12, 12);
+    img.style.width  = s.w + 'px';
+    img.style.height = s.h + 'px';
+    img.style.left   = (s.x * W + jitterX) + 'px';
+    img.style.top    = (s.y * H + jitterY) + 'px';
+    img.style.transform = `rotate(${rot}deg)`;
+  });
+  const stars = collage.querySelectorAll('.cr-collage-star');
+  stars.forEach((st, i) => {
+    st.style.left = (i === 0 ? rand(8, 40) : rand(W-46, W-14)) + 'px';
+    st.style.top  = (i === 0 ? rand(H-100, H-60) : rand(H-200, H-160)) + 'px';
+    st.style.transform = `rotate(${rand(-20,20)}deg)`;
+  });
+}
+function shuffleCollage(btn) {
+  const collage = btn.closest('.cr-collage-wrap').querySelector('.cr-collage');
+  layoutCollage(collage);
+}
+function toggleCollage(btn) {
+  const wrap = btn.closest('.cr-collage-wrap');
+  const collage = wrap.querySelector('.cr-collage');
+  const shuffleBtn = wrap.querySelector('[data-shuffle]');
+  const open = !collage.classList.contains('open');
+  collage.classList.toggle('open', open);
+  btn.style.display = open ? 'none' : 'inline-flex';
+  shuffleBtn.style.display = open ? 'inline-flex' : 'none';
+  if (open) requestAnimationFrame(() => layoutCollage(collage));
+}
+
+function toggleDrawer(chip, key) {
+  const open = !chip.classList.contains('open');
+  const root = chip.closest('.creator');
+  root.querySelectorAll('.cr-verified-chip, .cr-discl-chip').forEach(c => c.classList.remove('open'));
+  root.querySelectorAll('.cr-blurb-wrap').forEach(d => d.classList.remove('open'));
+  if (open) {
+    chip.classList.add('open');
+    const drawer = root.querySelector(`.cr-blurb-wrap[data-drawer="${key}"]`);
+    if (drawer) drawer.classList.add('open');
+  }
+}
+
+// ─── Explore scene ───
+const exploreEl = document.getElementById('explore');
+const COMPLETED = new Set([0]); // story 0 marked complete for prototype
+
+const TOPICS = ["For You","Politics","Tech","Climate","Business","World","Media","Culture"];
+
+const TRENDING = [
+  { id:0, headline:"U.S. begins guiding ships out of the Strait of Hormuz", creators:[1,0], meta:"Politics · 142 stories" },
+  { id:1, headline:"3 dead from suspected hantavirus on Atlantic cruise ship, WHO says", creators:[1], meta:"World · 88 stories" },
+  { id:0, headline:"The Fed's one-cut signal — what it means for your loans", creators:[0], meta:"Business · 67 stories" },
+  { id:2, headline:"EPA's methane rule reshapes residential gas pricing", creators:[2], meta:"Climate · 41 stories" },
+];
+
+const DISCOVER = [
+  { sId:0, tag:"Business",   img:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=400&h=620&fit=crop" },
+  { sId:1, tag:"Politics",   img:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=400&h=620&fit=crop" },
+  { sId:2, tag:"Climate",    img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=400&h=620&fit=crop" },
+  { sId:0, tag:"Markets",    img:"https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=620&fit=crop" },
+  { sId:1, tag:"World",      img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400&h=620&fit=crop" },
+  { sId:2, tag:"Energy",     img:"https://images.unsplash.com/photo-1620266757065-5814239881fd?w=400&h=620&fit=crop" },
+  { sId:0, tag:"Economy",    img:"https://images.unsplash.com/photo-1535320903710-d993d3d77d29?w=400&h=620&fit=crop" },
+  { sId:1, tag:"Defense",    img:"https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=400&h=620&fit=crop" },
+  { sId:2, tag:"Atlantic",   img:"https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=620&fit=crop" },
+];
+
+function renderExplore() {
+  const todayLabel = "MAY 4, 2026";
+  const briefingHtml = STORIES.map((s, i) => {
+    const c = CREATORS[s.creatorId];
+    const done = COMPLETED.has(i);
+    return `
+      <button class="ex-bf-row ${done?'done':''}" onclick="jumpToStory(${i})">
+        <div class="ex-bf-step ${done?'ex-bf-step--done':'ex-bf-step--idle'}">
+          ${done ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : (i+1)}
+        </div>
+        <div class="ex-bf-thumb"><img src="${s.slides[0].img || 'https://images.unsplash.com/photo-1554224155-1696413565d3?w=200&h=200&fit=crop'}" alt=""></div>
+        <div class="ex-bf-text">
+          <div class="ex-bf-headline">${s.headline}</div>
+          <div class="ex-bf-sub">${c.name} · ${s.slides.length} slides</div>
+        </div>
+      </button>
+    `;
+  }).join('');
+
+  const chipsHtml = TOPICS.map((t, i) => `<button class="ex-chip ${i===0?'active':''}" onclick="pickTopic(this)">${t}</button>`).join('');
+  const hero = STORIES[1];
+  const heroAuthor = CREATORS[hero.creatorId];
+  const trendingHtml = TRENDING.map((t, i) => {
+    const faces = t.creators.map(cid => `<img class="ex-tr-face" src="${CREATORS[cid].avatar}" alt="">`).join('');
+    return `
+      <button class="ex-tr-row" onclick="jumpToStory(${t.id})">
+        <span class="ex-tr-num">${i+1}</span>
+        <div class="ex-tr-text">
+          <div class="ex-tr-headline">${t.headline}</div>
+          <div class="ex-tr-meta"><div class="ex-tr-faces">${faces}</div><span class="ex-tr-meta-text">${t.meta}</span></div>
+        </div>
+      </button>
+    `;
+  }).join('');
+
+  const journalistsHtml = CREATORS.map((c, i) => `
+    <button class="ex-jl" onclick="closeExplore(); openCreator(${i})">
+      <div class="ex-jl-av-wrap">
+        <img class="ex-jl-av" src="${c.avatar}" alt="">
+        ${c.verified ? `<svg class="ex-jl-verif" viewBox="0 0 24 24" fill="#EDBD1F"><path d="M12 1.5l2.6 2.3 3.4-.5.7 3.4 3.1 1.6-1.4 3.2 1.4 3.2-3.1 1.6-.7 3.4-3.4-.5L12 22.5l-2.6-2.3-3.4.5-.7-3.4-3.1-1.6 1.4-3.2-1.4-3.2 3.1-1.6.7-3.4 3.4.5L12 1.5z"/><polyline points="8 12 11 15 16 9.5" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+      </div>
+      <span class="ex-jl-name">${c.name}</span>
+    </button>
+  `).join('');
+
+  const tilesHtml = DISCOVER.map(d => {
+    const c = CREATORS[STORIES[d.sId].creatorId];
+    return `
+      <button class="ex-tile" onclick="jumpToStory(${d.sId})">
+        <img src="${d.img}" alt="">
+        <div class="ex-tile-overlay"></div>
+        <div class="ex-tile-tag">${d.tag}</div>
+        <div class="ex-tile-author">
+          <img src="${c.avatar}" alt="">
+          <span>${c.name.split(' ')[0]}</span>
+        </div>
+      </button>
+    `;
+  }).join('');
+
+  exploreEl.innerHTML = `
+    <div class="ex-top">
+      <div class="ex-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="Ask Newsreel or search…" />
+      </div>
+      <button class="ex-search-benny" onclick="openBennyAssist(0)" aria-label="Ask Benny"><img src="assets/benny/benny-head.png" alt="" style="border-radius:50%;background:#fff;object-fit:cover;width:100%;height:100%;"></button>
+    </div>
+
+    <div class="ex-section ex-section--briefing">
+      <h1 class="ex-bf-title">Today's Briefing</h1>
+      <div class="ex-bf-meta">
+        <span class="ex-bf-date">${todayLabel}</span>
+        <span class="ex-bf-progress"><strong>${COMPLETED.size}</strong> / ${STORIES.length} completed</span>
+      </div>
+      <div class="ex-bf-list">${briefingHtml}</div>
+    </div>
+
+    <div class="ex-h"><div class="ex-h-stack"><span class="ex-h-title">Browse by topic</span><span class="ex-h-sub">Filter today's stories by section</span></div></div>
+    <div class="ex-chips">${chipsHtml}</div>
+
+    <div class="ex-h"><div class="ex-h-stack"><span class="ex-h-title">Editor's picks</span><span class="ex-h-sub">What our team thinks you shouldn't miss</span></div></div>
+    <button class="ex-hero" onclick="jumpToStory(1)" style="display:block; padding:0; border:none;">
+      <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=900&h=600&fit=crop" alt="">
+      <div class="ex-hero-fade"></div>
+      <div class="ex-hero-body">
+        <div class="ex-hero-eyebrow">Featured · ${heroAuthor.name}</div>
+        <div class="ex-hero-headline">${hero.headline}</div>
+      </div>
+    </button>
+    <div class="ex-feat-second">
+      <button class="ex-feat-second-card" onclick="jumpToStory(2)">
+        <div class="ex-feat-second-img"><img src="https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=400&h=400&fit=crop" alt=""></div>
+        <div class="ex-feat-second-tag">Climate</div>
+        <div class="ex-feat-second-headline">${STORIES[2].headline}</div>
+      </button>
+      <button class="ex-feat-second-card" onclick="jumpToStory(0)">
+        <div class="ex-feat-second-img"><img src="https://images.unsplash.com/photo-1554224155-1696413565d3?w=400&h=400&fit=crop" alt=""></div>
+        <div class="ex-feat-second-tag">Business</div>
+        <div class="ex-feat-second-headline">${STORIES[0].headline}</div>
+      </button>
+    </div>
+
+    <div class="ex-h"><div class="ex-h-stack"><span class="ex-h-title">Trending now</span><span class="ex-h-sub">Most-read stories across Newsreel right now</span></div></div>
+    <div>${trendingHtml}</div>
+
+    <div class="ex-h"><div class="ex-h-stack"><span class="ex-h-title">Journalists to follow</span><span class="ex-h-sub">Verified reporters covering today's beats</span></div></div>
+    <div class="ex-jl-row">${journalistsHtml}</div>
+
+    <div class="ex-h"><div class="ex-h-stack"><span class="ex-h-title">Discover</span><span class="ex-h-sub">Older stories worth your time</span></div></div>
+    <div class="ex-grid">${tilesHtml}</div>
+  `;
+}
+
+function openExplore() {
+  renderExplore();
+  exploreEl.classList.add('on');
+  bennytabEl.classList.remove('on');
+  closeWire();
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab')[2]?.classList.add('active');
+}
+function closeExplore() {
+  exploreEl.classList.remove('on');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab')[0]?.classList.add('active');
+}
+function jumpToStory(i) { closeExplore(); goStory(i); goSlide(i, 0); }
+
+// ─── The Wire ───
+const wireEl = document.getElementById('wire');
+
+// Friend-authored items use group:'circle', journalist items use group:'newsroom'
+// visibility: public | subscribers | circle  — feed filters by viewer's relationship to author
+// pollId on poll items lets us share vote state across surfaces (story slide ↔ wire)
+const WIRE = [
+  { group:'newsroom', type:'post',  cId:1, time:'12 min', visibility:'subscribers', body:"Just got off the phone with a senior State Department official. Confirms 'Project Freedom' Navy escorts begin Monday — three U.S. destroyers already repositioning to the Strait. More tonight." },
+  { group:'circle',   type:'post',  fId:2, time:'18 min', visibility:'circle', body:"reading the bridge story now — feels like Trump's just trolling Trudeau. wild that this is how trade gets done now." },
+  { group:'newsroom', type:'poll',  cId:0, time:'34 min', visibility:'public', pollId:'fed-rates', q:"The Fed should have cut rates today rather than holding steady.", friends:67, journalists:42, friendsN:24, jrnN:31 },
+  { group:'circle',   type:'poll',  fId:1, time:'48 min', visibility:'circle', pollId:'finish-stack', q:"Did you actually finish today's stack?", friends:78, journalists:null, friendsN:42 },
+  { group:'newsroom', type:'drop',  cId:0, time:'1h', visibility:'public', note:"Took me three days to get the Treasury sources to talk on record. Worth the wait — full piece up now.", storyId:0, headline:"The US economy is fine probably", thumb:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=200&h=200&fit=crop", tag:'Business' },
+  { group:'circle',   type:'post',  fId:3, time:'1h', visibility:'circle', body:"if the Fed isn't cutting it's because they think there's recession risk later. the 'one cut' is a hedge. nobody saying that part out loud." },
+  { group:'newsroom', type:'post',  cId:2, time:'2h', visibility:'public', body:"The methane rule has been in EPA's drawer for 18 months. The reason it dropped today, not last quarter, has everything to do with the Senate calendar. We'll be tracking the floor vote." },
+  { group:'circle',   type:'poll',  fId:4, time:'2h', visibility:'circle', pollId:'iran-track', q:"Are you tracking the Iran/Hormuz situation?", friends:54, journalists:null, friendsN:39 },
+  { group:'newsroom', type:'poll',  cId:1, time:'3h', visibility:'public', pollId:'bridge-half', q:"The U.S. is right to demand half-ownership of the Gordie Howe Bridge.", friends:18, journalists:9, friendsN:31, jrnN:17 },
+  { group:'newsroom', type:'drop',  cId:1, time:'4h', visibility:'subscribers', note:"Working on this one for two weeks. The story isn't the threat — it's what Canada's quietly preparing in response.", storyId:1, headline:"Trump threatens to block new bridge to Canada", thumb:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=200&h=200&fit=crop", tag:'Politics' },
+  { group:'circle',   type:'post',  fId:5, time:'5h', visibility:'circle', body:"finally read the methane rule explainer. wild that this is the first real climate policy progress in 18 months and nobody's talking about it." },
+  { group:'newsroom', type:'post',  cId:0, time:'6h', visibility:'subscribers', body:"Hot take from inside the Fed presser: Powell looked tired. Three reporters tried to get him on the dot-plot question. He swatted all three. Make of that what you will." },
+  { group:'newsroom', type:'link',  cId:1, time:'7h', visibility:'public',
+    note:"Reuters has the most comprehensive timeline on this. Worth a careful read.",
+    url:"reuters.com/world/middle-east/strait-hormuz-tensions-timeline",
+    domain:"reuters.com",
+    linkTitle:"Hormuz tensions: a 90-day timeline of how we got here",
+    linkDesc:"Reuters chronicles the diplomatic and military escalations leading up to today's Project Freedom announcement.",
+    linkImg:"https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&h=315&fit=crop" },
+  { group:'circle',   type:'link',  fId:2, time:'8h', visibility:'circle',
+    note:"this is the explainer i was telling you about. blew my mind.",
+    url:"theatlantic.com/economy/methane-rule-2026",
+    domain:"theatlantic.com",
+    linkTitle:"What the methane rule actually changes about your gas bill",
+    linkDesc:"Behind the EPA's announcement: how 18 months of regulatory drafts will hit residential pricing within 6 months.",
+    linkImg:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=600&h=315&fit=crop" },
+
+  // Examples that SHOULD be hidden from current viewer (Jack) — proving the filter works:
+  { group:'circle',   type:'post',  fId:6, time:'7h', visibility:'circle', body:"this should NOT show — Kyle's not in Jack's circle." },
+  { group:'newsroom', type:'post',  cId:0, time:'8h', visibility:'subscribers', body:"this should NOT show if Jack doesn't subscribe to Dave (he does, so it does)." },
+];
+
+const VERIF_TINY = `<svg class="wr-author-verif" viewBox="0 0 24 24" fill="#EDBD1F"><path d="M12 1.5l2.6 2.3 3.4-.5.7 3.4 3.1 1.6-1.4 3.2 1.4 3.2-3.1 1.6-.7 3.4-3.4-.5L12 22.5l-2.6-2.3-3.4.5-.7-3.4-3.1-1.6 1.4-3.2-1.4-3.2 3.1-1.6.7-3.4 3.4.5L12 1.5z"/><polyline points="8 12 11 15 16 9.5" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+function authorRow(person, time, group) {
+  const meta = group === 'circle' ? 'Your circle' : 'Newsreel staff';
+  const verif = group === 'newsroom' && person.verified ? VERIF_TINY : '';
+  return `
+    <div class="wr-author">
+      <img class="wr-author-av" src="${person.avatar || person.av}" alt="">
+      <div class="wr-author-info">
+        <span class="wr-author-name">${person.name}${verif}</span>
+        <span class="wr-author-meta">${meta}</span>
+      </div>
+      <span class="wr-time">${time} ago</span>
+    </div>`;
+}
+
+function renderWireCard(item, idx) {
+  const person = item.group === 'circle' ? FRIENDS[item.fId] : CREATORS[item.cId];
+  if (item.type === 'post') {
+    return `<div class="wr-card">
+      ${authorRow(person, item.time, item.group)}
+      <div class="wr-post-body">${item.body}</div>
+    </div>`;
+  }
+  if (item.type === 'link') {
+    return `<div class="wr-card">
+      ${authorRow(person, item.time, item.group)}
+      <div class="wr-link-note">${item.note}</div>
+      <button class="wr-link-card" onclick="event.preventDefault();" type="button">
+        <img class="wr-link-img" src="${item.linkImg}" alt="">
+        <div class="wr-link-body">
+          <div class="wr-link-domain">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            ${item.domain}
+          </div>
+          <div class="wr-link-title">${item.linkTitle}</div>
+          <div class="wr-link-desc">${item.linkDesc}</div>
+        </div>
+      </button>
+    </div>`;
+  }
+  if (item.type === 'drop') {
+    return `<div class="wr-card">
+      ${authorRow(person, item.time, item.group)}
+      <div class="wr-drop-note">${item.note}</div>
+      <button class="wr-drop-story" onclick="closeWire(); goStory(${item.storyId}); goSlide(${item.storyId},0);">
+        <div class="wr-drop-thumb"><img src="${item.thumb}"></div>
+        <div class="wr-drop-meta">
+          <span class="wr-drop-eyebrow">New from ${person.name.split(' ')[0]} · ${item.tag}</span>
+          <span class="wr-drop-headline">${item.headline}</span>
+        </div>
+      </button>
+    </div>`;
+  }
+  if (item.type === 'poll') {
+    const wid = `wp-${idx}`;
+    const pollId = item.pollId || `wire-${idx}`;
+    const userVote = getUserVote(pollId);
+    const voted = userVote != null;
+    return `<div class="wr-card" id="${wid}-card" data-poll-id="${pollId}">
+      ${authorRow(person, item.time, item.group)}
+      <div class="wr-poll-q">${item.q}</div>
+      ${voted ? `<div class="wp-voted-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>You voted <strong>${POLL_LABELS[userVote]}</strong><span class="wp-voted-change">Tap any point to change</span></div>` : ''}
+      <div class="wp-likert" id="${wid}-likert">
+        <div class="wp-likert-track">
+          <div class="wp-likert-line"></div>
+          ${[0,1,2,3,4].map(j => `<button class="wp-likert-tick ${j===userVote?'on':''}" data-idx="${j}" onclick="castWireVote('${pollId}','${wid}',${j})" aria-label="${POLL_LABELS[j]}"></button>`).join('')}
+          ${voted ? `<div class="wp-likert-knob" style="left:${userVote*25}%"></div>` : ''}
+        </div>
+        <div class="wp-likert-labels">
+          <span>Strongly disagree</span><span>Neutral</span><span>Strongly agree</span>
+        </div>
+      </div>
+      <div class="wp-toggle" id="${wid}-toggle" style="${voted ? '' : 'opacity:0.5; pointer-events:none;'}">
+        <button class="wp-tab active" data-g="friends" onclick="setWirePollGroup('${wid}','friends')">Friends</button>
+        <button class="wp-tab" data-g="contributors" onclick="setWirePollGroup('${wid}','contributors')">Contributors</button>
+        <button class="wp-tab" data-g="all" onclick="setWirePollGroup('${wid}','all')">Whole app</button>
+      </div>
+      <div class="wp-bars" id="${wid}-bars"></div>
+      <div class="wp-foot" id="${wid}-foot">${voted ? '' : 'Vote first to see results'}</div>
+    </div>`;
+  }
+  return '';
+}
+
+const WIRE_POLL_DIST = [
+  { friends:{dist:[3,8,14,42,33], n:42},  contributors:{dist:[14,22,28,24,12], n:31}, all:{dist:[8,16,26,30,20], n:8412} },
+  { friends:{dist:[2,5,15,46,32], n:42},  contributors:{dist:[12,20,30,26,12], n:27}, all:{dist:[7,14,24,32,23], n:7612} },
+];
+function getWireDist(idx) { return WIRE_POLL_DIST[idx % WIRE_POLL_DIST.length]; }
+
+function setWirePollGroup(wid, group) {
+  const tabs = document.querySelectorAll(`#${wid}-toggle .wp-tab`);
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.g === group));
+  renderWirePollBars(wid, group);
+}
+
+function renderWirePollBars(wid, group) {
+  const idx = parseInt(wid.split('-')[1], 10);
+  const data = getWireDist(idx)[group];
+  const max = Math.max(...data.dist);
+  const bars = document.getElementById(`${wid}-bars`);
+  if (!bars) return;
+  // Find pollId from card to determine if/which bar is the user's
+  const card = document.getElementById(`${wid}-card`);
+  const pollId = card?.dataset.pollId;
+  const userVote = pollId ? getUserVote(pollId) : null;
+  bars.innerHTML = data.dist.map((pct, j) => {
+    const isYou = j === userVote;
+    return `<div class="wp-bar ${isYou?'you':''}">
+      <span class="wp-bar-pct">${pct}%</span>
+      <div class="wp-bar-fill" style="height:${(pct/max)*100}%"></div>
+      ${isYou ? '<span class="wp-bar-you-tag">You</span>' : ''}
+    </div>`;
+  }).join('');
+  const foot = document.getElementById(`${wid}-foot`);
+  if (foot) {
+    const labels = { friends:`${data.n} friends voted`, contributors:`${data.n} contributors voted`, all:`${data.n.toLocaleString()} readers voted` };
+    foot.textContent = labels[group];
+  }
+}
+
+const FRIENDS = [
+  { name:"You",      av:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop", state:'me' },
+  { name:"Maya",     av:"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop", avatar:"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop", state:'unviewed' },
+  { name:"Brijesh",  av:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=120&h=120&fit=crop", avatar:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=120&h=120&fit=crop", state:'unviewed' },
+  { name:"Annika",   av:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop", avatar:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop", state:'unviewed' },
+  { name:"Roy",      av:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop", avatar:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop", state:'viewed' },
+  { name:"Lauren",   av:"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&h=120&fit=crop", avatar:"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&h=120&fit=crop", state:'viewed' },
+  { name:"Kyle",     av:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop", state:'viewed' },
+  { name:"Ava",      av:"https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=120&h=120&fit=crop", state:'viewed' },
+];
+
+let wireGroup = 'all'; // 'all' | 'circle' | 'newsroom'
+
+// Mock viewer relationships — server-side in real app
+const VIEWER = {
+  subscribesToCreators: new Set([0, 1, 2]),       // Jack subs to all 3 journalists
+  inCirclesOf: new Set([1, 2, 3, 4, 5]),          // Jack is in Maya/Brijesh/Annika/Roy/Lauren circles
+};
+function viewerCanSee(w) {
+  if (w.visibility === 'public') return true;
+  if (w.visibility === 'subscribers') {
+    return w.group === 'newsroom' && VIEWER.subscribesToCreators.has(w.cId);
+  }
+  if (w.visibility === 'circle') {
+    return w.group === 'circle' && VIEWER.inCirclesOf.has(w.fId);
+  }
+  return false;
+}
+
+function renderWire(group) {
+  if (group) wireGroup = group;
+  // Visibility filter applied first (what server would do), then group filter (UI toggle)
+  const visible = WIRE.filter(viewerCanSee);
+  const filtered = wireGroup === 'all' ? visible : visible.filter(w => w.group === wireGroup);
+  const friendsHtml = FRIENDS.map(f => {
+    const ringClass = f.state === 'me' ? 'wr-friend-ring--me' : (f.state === 'viewed' ? 'wr-friend-ring--viewed' : '');
+    return `<button class="wr-friend">
+      <div class="wr-friend-ring ${ringClass}"><img class="wr-friend-av" src="${f.av}"></div>
+      <span class="wr-friend-name">${f.name}</span>
+    </button>`;
+  }).join('');
+  wireEl.innerHTML = `
+    <div class="wr-top">
+      <h1 class="wr-title">The Wire</h1>
+      <div class="wr-chips" style="margin-top:8px;">
+        <button class="wr-chip ${wireGroup==='all'?'active':''}" onclick="renderWire('all')">All</button>
+        <button class="wr-chip ${wireGroup==='circle'?'active':''}" onclick="renderWire('circle')">Your Circle</button>
+        <button class="wr-chip ${wireGroup==='newsroom'?'active':''}" onclick="renderWire('newsroom')">Newsroom</button>
+      </div>
+    </div>
+    <div class="wr-circle">
+      <div class="wr-circle-row">${friendsHtml}</div>
+    </div>
+    ${filtered.map((item, idx) => renderWireCard(item, idx)).join('')}
+  `;
+  // Initialize each Wire poll's bars only if user has already voted
+  filtered.forEach((item, idx) => {
+    if (item.type === 'poll' && getUserVote(item.pollId || `wire-${idx}`) != null) {
+      renderWirePollBars(`wp-${idx}`, 'friends');
+    }
+  });
+}
+
+function castWireVote(pollId, wid, idx) {
+  castVote(pollId, idx);
+  // Re-render the wire feed so the just-voted card flips to the voted state
+  renderWire();
+}
+
+function openWire() {
+  renderWire('all');
+  wireEl.classList.add('on');
+  exploreEl.classList.remove('on');
+  bennytabEl.classList.remove('on');
+  document.getElementById('wrFab')?.classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab')[1]?.classList.add('active');
+}
+function closeWire() { wireEl.classList.remove('on'); document.getElementById('wrFab')?.classList.add('hidden'); closeWireCompose(); }
+
+// ─── Wire Composer ───
+let wireMode = 'text';
+let composeStorySel = null;
+
+function openWireCompose() {
+  wireMode = 'text';
+  composeStorySel = null;
+  renderWireComposeBody();
+  syncWireModeTabs();
+  document.getElementById('wrComposeScrim').classList.add('on');
+  document.getElementById('wrCompose').classList.add('on');
+}
+function closeWireCompose() {
+  document.getElementById('wrComposeScrim')?.classList.remove('on');
+  document.getElementById('wrCompose')?.classList.remove('on');
+}
+function pickWireMode(m) { wireMode = m; syncWireModeTabs(); renderWireComposeBody(); }
+function syncWireModeTabs() {
+  document.querySelectorAll('.wr-compose-mode').forEach(el => el.classList.toggle('active', el.dataset.mode === wireMode));
+}
+function renderWireComposeBody() {
+  const body = document.getElementById('wrComposeBody');
+  if (wireMode === 'text') {
+    body.innerHTML = `<textarea class="wr-compose-text" placeholder="Send a wire to your circle…"></textarea>`;
+  } else if (wireMode === 'poll') {
+    body.innerHTML = `
+      <input class="wr-compose-pollq" placeholder="Ask your circle: do you agree or disagree?" />
+      <span class="wr-compose-pollnote">5-point Likert · Strongly disagree → Strongly agree</span>
+    `;
+  } else if (wireMode === 'link') {
+    body.innerHTML = `
+      <input class="wr-compose-pollq" id="wrLinkUrl" placeholder="Paste a URL — Reuters, NYT, anywhere" oninput="renderLinkPreview()" />
+      <textarea class="wr-compose-text" placeholder="Add your take on this link…" style="min-height:60px;"></textarea>
+      <div id="wrLinkPreview" class="wr-compose-pollnote">Paste a URL to fetch a preview.</div>
+    `;
+  } else if (wireMode === 'story') {
+    body.innerHTML = `
+      <textarea class="wr-compose-text" placeholder="Add a note about this story…" style="min-height:60px;"></textarea>
+      <div class="wr-compose-stories">
+        ${STORIES.map((s, i) => `
+          <button class="wr-compose-story ${composeStorySel===i?'selected':''}" onclick="composeStorySel=${i};renderWireComposeBody();">
+            <img src="${s.slides[0].img || ''}" alt="">
+            <div class="wr-compose-story-title">${s.headline}</div>
+          </button>
+        `).join('')}
+      </div>
+    `;
+  }
+}
+function sendWire() {
+  closeWireCompose();
+  // Simulated success — re-render the wire feed (actual data persistence would call backend)
+}
+
+// Mock OG-tag preview fetch (real impl: server-side scrape Open Graph tags)
+function renderLinkPreview() {
+  const inputEl = document.getElementById('wrLinkUrl');
+  const previewEl = document.getElementById('wrLinkPreview');
+  if (!inputEl || !previewEl) return;
+  const url = inputEl.value.trim();
+  if (!url || !/\w+\.\w+/.test(url)) {
+    previewEl.innerHTML = '<span style="font-family:var(--font-m); font-size:10px; letter-spacing:0.16em; color:var(--nr-ash); text-transform:uppercase;">Paste a URL to fetch a preview.</span>';
+    return;
+  }
+  const domain = url.replace(/^https?:\/\//, '').split('/')[0];
+  // Mock: any URL gets a fake OG payload. Real impl: POST /api/link-preview { url } → { title, description, image, domain }
+  previewEl.innerHTML = `
+    <div style="background:var(--nr-lead); border-radius:12px; overflow:hidden; margin-top:8px;">
+      <div style="height:140px; background:linear-gradient(135deg, var(--nr-iron), var(--nr-charcoal)); display:flex; align-items:center; justify-content:center; color:var(--nr-ash); font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; text-transform:uppercase;">Preview image</div>
+      <div style="padding:12px 14px;">
+        <div style="font-family:var(--font-m); font-size:9px; letter-spacing:0.18em; color:var(--nr-silver); text-transform:uppercase; margin-bottom:5px;">${domain}</div>
+        <div style="font-family:var(--font-h); font-size:15px; line-height:1.25; color:#fff; margin-bottom:4px;">Article title fetched from Open Graph tags</div>
+        <div style="font-family:var(--font-b); font-size:12px; line-height:1.4; color:var(--nr-silver);">Description from <code>og:description</code> or first paragraph.</div>
+      </div>
+    </div>
+  `;
+}
+
+// ─── Benny tab ───
+const bennytabEl = document.getElementById('bennytab');
+const btChatEl = document.getElementById('btChat');
+const btChatBodyEl = document.getElementById('btChatBody');
+
+function openBennyTab() {
+  bennytabEl.classList.add('on');
+  exploreEl.classList.remove('on');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab')[3]?.classList.add('active');
+}
+function closeBennyTab() {
+  bennytabEl.classList.remove('on');
+  closeBennyChat();
+}
+function openBennyChat() { btChatEl.classList.add('on'); }
+function closeBennyChat() { btChatEl.classList.remove('on'); }
+
+// Mock Benny responses with citations from CREATORS
+const BT_REPLIES = {
+  default: { body:"Today's three biggest stories are the Fed holding rates steady (Business), Trump threatening to block the Gordie Howe Bridge to Canada (Politics), and the EPA's new methane rule that could shift gas pricing (Climate). Want me to go deeper on any one?", cite:0 },
+  catch:   { body:"Three things you should know today: 1) The <em>Fed left rates flat</em> at 4.25–4.50%, signaling one cut by year-end. 2) <em>Trump demanded half-ownership</em> of the Canada-funded Gordie Howe Bridge before it opens. 3) The <em>EPA's methane rule</em> takes effect — expect downstream changes to your gas bill within 6 months.", cite:0 },
+  explain: { body:"Sure — which story? You read \"The US economy is fine probably\" today. Short version: GDP grew 2% last quarter, which is fine but slower than the Wall Street consensus of 3%. The Fed is taking it as a signal not to cut rates aggressively. So borrowing costs stay roughly where they are.", cite:0 },
+  voice:   { body:"Voice mode coming soon — I'll read you the day's stack and you can interrupt me with questions. For now, let me know what you want to hear about.", cite:0 },
+  deeper:  { body:"On the Fed story: the <em>real signal</em> isn't the rate, it's the dot plot. Half the Fed governors now expect ZERO cuts in 2026, up from 3 expected at last quarter. Markets are mispricing this — they've baked in 2 cuts. If you have a variable-rate loan, that mispricing is your risk, not your friend.", cite:0 },
+  iran:    { body:"The U.S. just announced 'Project Freedom' — Navy escorts for foreign ships through the Strait of Hormuz, starting Monday. Trump warned Iran that any disruption will be 'met with force.' This comes amid weeks of escalating Iran tensions. Three big risks to watch: oil price spikes, shipping insurance rates, and whether Iran tests U.S. resolve in the first 72 hours.", cite:1 },
+  hormuz:  { body:"Same as the Iran question — see above. The Strait of Hormuz carries roughly 20% of global oil. Even a partial closure would push crude over $100/barrel within days.", cite:1 },
+};
+
+function inferReply(q) {
+  const t = q.toLowerCase();
+  if (t.includes('catch') || t.includes('today')) return BT_REPLIES.catch;
+  if (t.includes('explain') || t.includes('what is') || t.includes('what does')) return BT_REPLIES.explain;
+  if (t.includes('voice') || t.includes('talk') || t.includes('read')) return BT_REPLIES.voice;
+  if (t.includes('deep') || t.includes('more')) return BT_REPLIES.deeper;
+  if (t.includes('iran')) return BT_REPLIES.iran;
+  if (t.includes('hormuz') || t.includes('strait')) return BT_REPLIES.hormuz;
+  return BT_REPLIES.default;
+}
+
+function appendUserMsg(text) {
+  const el = document.createElement('div');
+  el.className = 'bt-msg-user';
+  el.textContent = text;
+  btChatBodyEl.appendChild(el);
+}
+function appendBennyMsg(reply) {
+  const c = CREATORS[reply.cite];
+  const el = document.createElement('div');
+  el.className = 'bt-msg-benny';
+  el.innerHTML = `
+    <div class="bt-msg-benny-av"><img src="assets/benny/benny-head.png" alt=""></div>
+    <div class="bt-msg-benny-card">
+      <div class="bt-msg-benny-body">${reply.body}</div>
+      <div class="bt-msg-cite">
+        <img src="${c.avatar}" alt="">
+        <span class="bt-msg-cite-text">Cited from ${c.name} · Newsreel</span>
+      </div>
+    </div>
+  `;
+  btChatBodyEl.appendChild(el);
+  btChatBodyEl.scrollTop = btChatBodyEl.scrollHeight;
+}
+
+function askBenny(q) {
+  btChatBodyEl.innerHTML = '';
+  appendUserMsg(q);
+  openBennyChat();
+  setTimeout(() => appendBennyMsg(inferReply(q)), 600);
+}
+function sendBennyInput() {
+  const input = document.getElementById('btInput');
+  const v = input.value.trim();
+  if (!v) return;
+  input.value = '';
+  askBenny(v);
+}
+function sendBennyChatInput() {
+  const input = document.getElementById('btChatInput');
+  const v = input.value.trim();
+  if (!v) return;
+  input.value = '';
+  appendUserMsg(v);
+  setTimeout(() => appendBennyMsg(inferReply(v)), 600);
+}
+
+function pickTopic(btn) {
+  btn.parentElement.querySelectorAll('.ex-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function openCreator(id) {
+  creatorEl.innerHTML = renderCreator(CREATORS[id]);
+  creatorEl.classList.add('on');
+  feedEl.classList.add('hidden');
+}
+function closeCreator() {
+  creatorEl.classList.remove('on');
+  feedEl.classList.remove('hidden');
+}
+
+render();
+
+// ═══════════ v3: Explore-first Home ═══════════
+const homeEl = document.getElementById('home');
+const boScrimEl = document.getElementById('boScrim');
+const boSheetEl = document.getElementById('boSheet');
+
+// Extra display-only faces so the journalist row reads like a network
+const HM_EXTRA_FACES = [
+  { name:"Mosheh", avatar:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop" },
+  { name:"Sophia Bell", avatar:"https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&h=300&fit=crop" },
+  { name:"Marcus Reid", avatar:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop" },
+];
+
+const HM_POLL = {
+  q:"Should tech companies cover the electricity costs of their AI data centers?",
+  opts:["They should pay", "Split the cost", "Ratepayers' problem"],
+  dist:[62, 27, 11],
+  votes:1284,
+};
+
+const BO_TIMELINE = [
+  { time:"FRI 7:04A", head:"Fed holds rates, signals a single cut by year-end", src:"Dave Jorgenson · Business", story:0 },
+  { time:"FRI 2:30P", head:"Trump demands half-ownership of the Gordie Howe Bridge before it opens", src:"Eliza Haverstock · Politics", story:1 },
+  { time:"SAT 9:15A", head:"EPA methane rule takes effect — gas bills shift within 6 months", src:"The Atlantic · Climate", story:2 },
+  { time:"SUN 8:00A", head:"U.S. Navy begins escorting ships through the Strait of Hormuz", src:"Newsreel Wire · World", story:null },
+];
+
+const BO_SIDES = {
+  left: {
+    title:"What the Left is talking about",
+    topics:[
+      { name:"AI data centers hitting power bills", count:"14 voices · past 48h", quote:"<strong>Robert Reich:</strong> “Big Tech builds the data centers. You pay the electric bill. That's the deal nobody voted for.”" },
+      { name:"Tariffs as a grocery tax", count:"11 voices · past 48h", quote:"<strong>Chris Murphy:</strong> “A tariff on everything is a sales tax on everyone. Call it what it is.”" },
+      { name:"Medicaid enrollment freeze", count:"8 voices · past 48h", quote:"<strong>Pramila Jayapal:</strong> “Freezing enrollment doesn't cut costs. It cuts people.”" },
+    ],
+  },
+  right: {
+    title:"What the Right is talking about",
+    topics:[
+      { name:"Tariffs bringing factories home", count:"13 voices · past 48h", quote:"<strong>Nikki Haley:</strong> “If the price of cheap goods is dependence on Beijing, it was never cheap.”" },
+      { name:"Saudi deal & recognizing Israel", count:"9 voices · past 48h", quote:"<strong>Ben Shapiro:</strong> “A nuclear deal that starts with recognizing Israel is the first sane precondition in a decade.”" },
+      { name:"Spending, not revenue", count:"7 voices · past 48h", quote:"<strong>Thomas Massie:</strong> “We don't have a tariff problem or a tax problem. We have a spending problem.”" },
+    ],
+  },
+};
+
+function v3Tab(i) {
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tabs .tab')[i]?.classList.add('active');
+}
+function v3CloseAll() {
+  homeEl.classList.remove('on');
+  exploreEl.classList.remove('on');
+  bennytabEl.classList.remove('on');
+  closeWire();
+  closeBennyOverlay();
+  document.getElementById('stubActivity').classList.remove('on');
+  document.getElementById('stubProfile').classList.remove('on');
+  creatorEl.classList.remove('on');
+  feedEl.classList.remove('hidden');
+}
+function v3Home()     { v3CloseAll(); renderHome(); homeEl.classList.add('on'); v3Tab(0); }
+function v3Feed()     { v3CloseAll(); v3Tab(1); }
+function v3Benny()    { v3CloseAll(); bennytabEl.classList.add('on'); v3Tab(2); }
+function v3Activity() { v3CloseAll(); document.getElementById('stubActivity').classList.add('on'); v3Tab(3); }
+function v3Profile()  { v3CloseAll(); document.getElementById('stubProfile').classList.add('on'); v3Tab(4); }
+
+function hmJump(i) { v3Feed(); goStory(i); goSlide(i, 0); }
+function hmStart() {
+  const next = STORIES.findIndex((s, i) => !COMPLETED.has(i));
+  hmJump(next === -1 ? 0 : next);
+}
+
+// Mark a story complete when its last slide is reached, so the Home ring moves
+const _v3goSlide = goSlide;
+goSlide = function(s, k) {
+  _v3goSlide(s, k);
+  if (STORIES[s] && k >= STORIES[s].slides.length - 1) COMPLETED.add(s);
+};
+
+function hmRing(done, total) {
+  const r = 19, c = 2 * Math.PI * r, frac = total ? done / total : 0;
+  return `
+    <svg class="hm-ring" viewBox="0 0 44 44">
+      <circle cx="22" cy="22" r="${r}" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="4"/>
+      <circle cx="22" cy="22" r="${r}" fill="none" stroke="#EDBD1F" stroke-width="4" stroke-linecap="round"
+        stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - frac)}" transform="rotate(-90 22 22)"/>
+      <text x="22" y="26" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#fff">${done}/${total}</text>
+    </svg>`;
+}
+
+function renderHome() {
+  const done = [...COMPLETED].filter(i => STORIES[i]).length;
+  const total = STORIES.length;
+  const allDone = done >= total;
+  const myVote = userPollVotes['home-daily'];
+
+  const faces = [
+    ...CREATORS.map((c, i) => ({ name:c.name.split(' ')[0] === 'The' ? c.name : c.name.split(' ')[0], avatar:c.avatar, dot:i !== 0, tap:`closeExplore(); homeEl.classList.remove('on'); openCreator(${i})` })),
+    ...HM_EXTRA_FACES.map(f => ({ name:f.name.split(' ')[0], avatar:f.avatar, dot:false, tap:'' })),
+  ];
+  const facesHtml = faces.map(f => `
+    <button class="hm-face" onclick="${f.tap}">
+      <span class="hm-face-av"><img src="${f.avatar}" alt="">${f.dot ? '<span class="hm-face-dot"></span>' : ''}</span>
+      <span class="hm-face-name">${f.name}</span>
+    </button>`).join('');
+
+  const pollHtml = HM_POLL.opts.map((o, i) => {
+    const voted = myVote !== undefined;
+    const pct = HM_POLL.dist[i];
+    return `
+      <button class="hm-poll-opt ${voted && myVote === i ? 'mine' : ''}" onclick="hmVote(${i})">
+        ${voted ? `<span class="hm-poll-fill" style="width:${pct}%"></span>` : ''}
+        <span class="hm-poll-label">${o}</span>
+        ${voted ? `<span class="hm-poll-pct">${pct}%</span>` : ''}
+      </button>`;
+  }).join('');
+
+  const hero = STORIES[1], heroC = CREATORS[hero.creatorId];
+  const rows = [
+    { tag:"BUSINESS", head:STORIES[0].headline, c:CREATORS[STORIES[0].creatorId], img:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=300&h=300&fit=crop", jump:0 },
+    { tag:"CLIMATE", head:STORIES[2].headline, c:CREATORS[STORIES[2].creatorId], img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=300&h=300&fit=crop", jump:2 },
+    { tag:"WORLD", head:"U.S. begins guiding ships out of the Strait of Hormuz", c:CREATORS[1], img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=300&h=300&fit=crop", jump:0 },
+    { tag:"BUSINESS", head:"The Fed's one-cut signal — what it means for your loans", c:CREATORS[0], img:"https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=300&h=300&fit=crop", jump:0 },
+  ];
+  const rowsHtml = rows.map(r => `
+    <button class="hm-story-row" onclick="hmJump(${r.jump})">
+      <span class="hm-story-text">
+        <span class="hm-story-tag" style="display:block">${r.tag}</span>
+        <span class="hm-story-headline" style="display:block">${r.head}</span>
+        <span class="hm-byline"><img src="${r.c.avatar}" alt="">${r.c.name}</span>
+      </span>
+      <img class="hm-story-thumb" src="${r.img}" alt="">
+    </button>`).join('');
+
+  homeEl.innerHTML = `
+    <div class="hm-top">
+      <img class="hm-wordmark" src="assets/newsreel-wordmark-white.png" alt="newsreel">
+      <div class="hm-top-right">
+        <span class="hm-streak"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 0.7s.8 2.6-1.1 5.4C10.6 8.8 8 9.8 8 13a4.5 4.5 0 0 0 9 0c0-1.6-.7-2.6-.7-2.6s2.7 1 3.2 4a7.6 7.6 0 1 1-15 1.6C4.5 9.6 13.5 8.7 13.5.7z"/></svg>12</span>
+        <img class="hm-avatar" src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200&h=200&fit=crop" alt="">
+      </div>
+    </div>
+    <div class="hm-greet">Mornin', Jack.</div>
+    <div class="hm-date">Sunday · July 26</div>
+
+    <div class="hm-faces">${facesHtml}</div>
+
+    <div class="hm-stack">
+      <div class="hm-stack-eyebrow">Today's Stack</div>
+      <div class="hm-stack-title">${allDone ? "You're caught up." : `${total} stories, 5 minutes.`}</div>
+      <div class="hm-stack-sub">${allDone ? "That's the whole day. Come back tomorrow." : "Read these and you're done for the day."}</div>
+      <div class="hm-stack-row">
+        ${hmRing(done, total)}
+        ${allDone
+          ? `<span class="hm-stack-done">Done for today ✓</span>`
+          : `<button class="hm-stack-cta" onclick="hmStart()">${done === 0 ? "Start today's Stack" : `Continue · ${total - done} left`}</button>`}
+      </div>
+    </div>
+
+    <div class="hm-h"><img src="assets/benny/benny-head.png" alt=""><span class="hm-h-title">Catch me up</span></div>
+    <div class="hm-benny">
+      <button class="hm-b-row" onclick="openBennyOverlay('timeline')">
+        <span class="hm-b-ic hm-b-ic--time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></span>
+        <span class="hm-b-text"><span class="hm-b-title" style="display:block">Timeline</span><span class="hm-b-sub" style="display:block">What mattered since you were here Thursday</span></span>
+        <span class="hm-b-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+      </button>
+      <button class="hm-b-row" onclick="openBennyOverlay('left')">
+        <span class="hm-b-ic hm-b-ic--left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11a8.4 8.4 0 0 1-9 8.4 9.5 9.5 0 0 1-3.2-.6L3 20l1.3-3.8A8 8 0 0 1 3 11a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 9 8.4z"/></svg></span>
+        <span class="hm-b-text"><span class="hm-b-title" style="display:block">What the Left is talking about</span><span class="hm-b-sub" style="display:block">Live from 40+ verified voices</span></span>
+        <span class="hm-b-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+      </button>
+      <button class="hm-b-row" onclick="openBennyOverlay('right')">
+        <span class="hm-b-ic hm-b-ic--right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11a8.4 8.4 0 0 1-9 8.4 9.5 9.5 0 0 1-3.2-.6L3 20l1.3-3.8A8 8 0 0 1 3 11a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 9 8.4z"/></svg></span>
+        <span class="hm-b-text"><span class="hm-b-title" style="display:block">What the Right is talking about</span><span class="hm-b-sub" style="display:block">Live from 40+ verified voices</span></span>
+        <span class="hm-b-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+      </button>
+    </div>
+
+    <div class="hm-poll">
+      <div class="hm-poll-eyebrow">Today's question</div>
+      <div class="hm-poll-q">${HM_POLL.q}</div>
+      ${pollHtml}
+      <div class="hm-poll-meta">${myVote !== undefined ? `${HM_POLL.votes.toLocaleString()} readers answered` : 'Tap to see where readers stand'}</div>
+    </div>
+
+    <div class="hm-h" style="padding-top:22px;"><span class="hm-h-title">The latest</span></div>
+    <button class="hm-hero" onclick="hmJump(1)">
+      <span class="hm-hero-label">Top story</span>
+      <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=900&h=560&fit=crop" alt="">
+      <span class="hm-hero-body" style="display:block">
+        <span class="hm-hero-headline" style="display:block">${hero.headline}</span>
+        <span class="hm-byline"><img src="${heroC.avatar}" alt="">${heroC.name} · Politics</span>
+      </span>
+    </button>
+    <div>${rowsHtml}</div>
+  `;
+}
+
+function hmVote(i) {
+  if (userPollVotes['home-daily'] !== undefined) return;
+  userPollVotes['home-daily'] = i;
+  renderHome();
+}
+
+function openBennyOverlay(kind) {
+  let body = '';
+  if (kind === 'timeline') {
+    body = `
+      <div class="bo-head"><img src="assets/benny/benny-head.png" alt=""><span class="bo-title">Since you were here</span><button class="bo-close" onclick="closeBennyOverlay()">✕</button></div>
+      <div class="bo-note">Thursday 9:12 PM → now · built from Newsreel reporting only</div>
+      <div class="bo-tl">
+        ${BO_TIMELINE.map(t => `
+          <div class="bo-tl-row" ${t.story !== null ? `onclick="closeBennyOverlay(); hmJump(${t.story})"` : ''}>
+            <span class="bo-tl-time">${t.time}</span>
+            <span class="bo-tl-text"><span class="bo-tl-head" style="display:block">${t.head}</span><span class="bo-tl-src">${t.src}</span></span>
+          </div>`).join('')}
+      </div>`;
+  } else {
+    const side = BO_SIDES[kind];
+    body = `
+      <div class="bo-head"><img src="assets/benny/benny-head.png" alt=""><span class="bo-title">${side.title}</span><button class="bo-close" onclick="closeBennyOverlay()">✕</button></div>
+      <div class="bo-note">Ranked by how much verified ${kind === 'left' ? 'left-leaning' : 'right-leaning'} voices are posting about it · past 48h</div>
+      ${side.topics.map((t, i) => `
+        <div class="bo-topic">
+          <div class="bo-topic-name">${i + 1}. ${t.name}</div>
+          <div class="bo-topic-count">${t.count}</div>
+          <div class="bo-quote">${t.quote}</div>
+        </div>`).join('')}`;
+  }
+  boSheetEl.innerHTML = body;
+  boScrimEl.classList.add('on');
+  boSheetEl.classList.add('on');
+}
+function closeBennyOverlay() {
+  boScrimEl.classList.remove('on');
+  boSheetEl.classList.remove('on');
+}
+
+// v3 boot: Home is the homescreen
+v3Home();
+</script>
+</body>
+</html>
