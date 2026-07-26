@@ -1021,7 +1021,7 @@
   .sdone-benny { width:120px; margin-bottom:22px; }
   .sdone-title { font-family:var(--font-h); font-size:34px; color:#fff; margin-bottom:10px; }
   .sdone-sub { font-family:var(--font-b); font-size:14.5px; line-height:1.5; color:var(--nr-silver); margin-bottom:20px; }
-  .sdone-stats { display:flex; gap:8px; justify-content:center; font-family:var(--font-m); font-size:10px; letter-spacing:0.08em; color:var(--nr-yellow,#EDBD1F); margin-bottom:30px; white-space:nowrap; }
+  .sdone-stats { display:flex; flex-wrap:wrap; gap:6px 8px; justify-content:center; font-family:var(--font-m); font-size:10px; letter-spacing:0.06em; color:var(--nr-yellow,#EDBD1F); margin-bottom:30px; max-width:320px; }
   .sdone-stats span { white-space:nowrap; }
   .sdone-btn { background:var(--nr-red); color:#000; border:none; border-radius:6px; padding:14px 34px; font-family:var(--font-m); font-size:13px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; }
   .sdone-btn--ghost { background:transparent; color:var(--nr-silver); border:1.5px solid rgba(255,255,255,0.25); }
@@ -1040,6 +1040,23 @@
   .share-toast { position:absolute; left:50%; bottom:150px; transform:translateX(-50%) translateY(8px); background:#fff; color:#000; font-family:var(--font-b); font-size:13px; font-weight:600; padding:10px 18px; border-radius:999px; opacity:0; pointer-events:none; transition:all 0.25s ease; z-index:90; }
   .share-toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
   .sdck { width:74px; height:74px; border-radius:50%; border:3px solid var(--nr-yellow,#EDBD1F); color:var(--nr-yellow,#EDBD1F); font-size:34px; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+  .sdck.pop { animation:sdpop 0.55s cubic-bezier(0.68,-0.55,0.27,1.55); }
+  @keyframes sdpop { 0% { transform:scale(0.3); opacity:0; } 70% { transform:scale(1.12); opacity:1; } 100% { transform:scale(1); } }
+  .sd-pips { display:flex; gap:8px; justify-content:center; margin-bottom:16px; }
+  .sd-pips span { width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,0.15); }
+  .sd-pips span.on { background:var(--nr-yellow,#EDBD1F); }
+  .story-source { position:absolute; top:110px; left:20px; z-index:4; display:flex; align-items:center; gap:6px; background:rgba(0,0,0,0.55); color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:999px; padding:7px 12px; font-family:var(--font-m); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; backdrop-filter:blur(6px); }
+  .story-source svg { width:12px; height:12px; }
+  .sdone-stamp { display:inline-block; font-family:var(--font-m); font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--nr-yellow,#EDBD1F); border:1.5px solid var(--nr-yellow,#EDBD1F); border-radius:4px; padding:6px 12px; transform:rotate(-3deg); margin-bottom:16px; }
+  .hm-streak svg { animation:flame 2.6s ease-in-out infinite; transform-origin:50% 85%; }
+  @keyframes flame { 0%,100% { transform:scale(1); } 50% { transform:scale(1.12) rotate(-2deg); } }
+  .confetti { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .confetti span { position:absolute; top:-14px; width:7px; height:11px; border-radius:2px; opacity:0; animation:cfall 1.9s ease-in forwards; }
+  .confetti span:nth-child(3n) { background:var(--nr-yellow,#EDBD1F); }
+  .confetti span:nth-child(3n+1) { background:var(--nr-red); }
+  .confetti span:nth-child(3n+2) { background:#fff; }
+  .confetti span:nth-child(1){left:6%;animation-delay:0.05s} .confetti span:nth-child(2){left:14%;animation-delay:0.3s} .confetti span:nth-child(3){left:22%;animation-delay:0.12s} .confetti span:nth-child(4){left:30%;animation-delay:0.4s} .confetti span:nth-child(5){left:38%;animation-delay:0.02s} .confetti span:nth-child(6){left:46%;animation-delay:0.28s} .confetti span:nth-child(7){left:54%;animation-delay:0.15s} .confetti span:nth-child(8){left:62%;animation-delay:0.36s} .confetti span:nth-child(9){left:70%;animation-delay:0.08s} .confetti span:nth-child(10){left:78%;animation-delay:0.32s} .confetti span:nth-child(11){left:86%;animation-delay:0.18s} .confetti span:nth-child(12){left:94%;animation-delay:0.44s} .confetti span:nth-child(13){left:26%;animation-delay:0.55s} .confetti span:nth-child(14){left:66%;animation-delay:0.6s}
+  @keyframes cfall { 0% { opacity:1; transform:translateY(0) rotate(0deg); } 100% { opacity:0.9; transform:translateY(105vh) rotate(340deg); } }
   .sdck-sub { font-family:var(--font-m); font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--nr-ash); margin-top:16px; }
   .quiz-note { font-family:var(--font-m); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--nr-ash); text-align:center; margin:-6px 0 16px; }
   .quiz-opt.soft-miss { border-color:rgba(255,255,255,0.25); color:var(--nr-silver); }
@@ -1538,10 +1555,9 @@ const STORIES = [
     takeaway:"Utilities must fix methane leaks — and can bill you $9–14/mo for it.",
     creatorId:2,
     slides:[
-      { type:"longcover",
+      { type:"video",
         img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=900&h=1600&fit=crop",
-        dek:"The EPA's methane rule is the biggest change to how gas gets to your stove in forty years. Almost nobody has read it. We did.",
-        readMin:11 },
+        subtitle:"The EPA's methane rule is the biggest change to how gas gets to your stove in forty years. Almost nobody has read it. We did." },
       { type:"longtext", n:1, total:3,
         text:"Utilities must now find and fix methane leaks across <em>2.3 million miles</em> of distribution pipe — and under most state law, they're allowed to bill the repairs straight back to you." },
       { type:"longtext", n:2, total:3,
@@ -1634,11 +1650,12 @@ function renderSlide(sl, i, k) {
     `;
   }
   if (sl.type === 'xp') {
-    // No XP, no levels, no claiming — finishing is the reward (judge consensus)
+    // No XP, no levels, no claiming — light play only: pop + pips (finishing is the reward)
     return `
       <div class="slide slide--xp">
         <div class="xp-wrap">
           <div class="sdck">✓</div>
+          <div class="sd-pips">${STORIES.map((_, si) => `<span class="${si <= i ? 'on' : ''}"></span>`).join('')}</div>
           <div class="xp-msg">${sl.msg}</div>
           <div class="sdck-sub">Swipe down when you're ready</div>
         </div>
@@ -1724,7 +1741,6 @@ function renderSlide(sl, i, k) {
         <div class="lt-wrap">
           <div class="lt-n">${sl.n} / ${sl.total}</div>
           <p class="lt-text">${sl.text}</p>
-          <button class="lt-full" onclick="openReader(${i})">Read the full piece ↗</button>
         </div>
       </div>
     `;
@@ -1770,6 +1786,12 @@ function renderStory(s, i) {
         </div>
         <div class="segs ${s.slides.length===1?'single':''}" data-story="${i}">${segsHtml}</div>
       </div>
+
+      ${s.article ? `
+      <button class="story-source" onclick="openReader(${i})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="14 3 14 9 20 9"/></svg>
+        Full story · ${s.article.readMin} min
+      </button>` : ''}
 
       <div class="side-actions">
         <button class="sa-btn" aria-label="Audio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-7h3z"/><path d="M3 19a2 2 0 0 0 2 2h1v-7H3z"/></svg></button>
@@ -3058,6 +3080,11 @@ goStory = function(i) {
 const _v3goSlide = goSlide;
 goSlide = function(s, k) {
   _v3goSlide(s, k);
+  // Replay the check-pop when the done beat comes into view
+  if (STORIES[s]?.slides[k]?.type === 'xp') {
+    const ck = document.querySelectorAll(`.story[data-i="${s}"] .slide`)[k]?.querySelector('.sdck');
+    if (ck) { ck.classList.remove('pop'); void ck.offsetWidth; ck.classList.add('pop'); }
+  }
   if (STORIES[s] && k >= STORIES[s].slides.length - 1) {
     COMPLETED.add(s);
     if (stackMode && COMPLETED.size >= STORIES.length) {
@@ -3290,11 +3317,13 @@ function hmRecapHtml() {
 function renderStackDone() {
   document.getElementById('stackDone').innerHTML = `
     <div class="se-grain"></div>
+    <div class="confetti">${Array.from({length: 14}, () => '<span></span>').join('')}</div>
     <img class="sdone-benny" src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
+    <div class="sdone-stamp">Edition No. ${NR_EDITION} · collected</div>
     <div class="sdone-title">You're caught up.</div>
     <div class="sdone-sub">The ${STORIES.length} things you now know:</div>
     <div class="sdone-recap">${hmRecapHtml()}</div>
-    <div class="sdone-stats"><span>${STORIES.length}/${STORIES.length}</span><span>·</span><span>🔥 ${NR_STREAK} DAYS</span><span>·</span><span>🛡 1 SHIELD</span><span>·</span><span>NEXT STACK <b>TOMORROW 7AM</b></span></div>
+    <div class="sdone-stats"><span>🔥 ${NR_STREAK} DAYS</span><span>·</span><span>🛡 1 SHIELD</span><span>·</span><span>NEXT STACK <b>TOMORROW 7AM</b></span></div>
     <div class="sdone-actions">
       <button class="sdone-btn" onclick="hmShare()">Share</button>
       <button class="sdone-btn sdone-btn--ghost" onclick="leaveStack()">Back home</button>
