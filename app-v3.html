@@ -109,7 +109,7 @@
   /* Compact mode = slides 2+ : just a tiny author chip, no headline/tag */
   .b-overlay.compact .b-eyebrow-row,
   .b-overlay.compact .b-headline { display:none; }
-  .b-overlay.compact { bottom:72px; }
+  .b-overlay.compact { bottom:112px; }
   .b-overlay.compact .author-chip { padding:4px 12px 4px 4px; background:rgba(0,0,0,0.4); }
   .b-overlay.compact .author-av { width:24px; height:24px; }
   .b-overlay.compact .author-name { font-size:13px; font-weight:500; }
@@ -1743,7 +1743,7 @@ function goSlide(storyI, k) {
   const overlay = document.querySelector(`.story[data-i="${storyI}"] .b-overlay`);
   if (overlay) {
     overlay.classList.toggle('compact', k > 0);
-    const hideTypes = ['benny','xp','longcover','longtext'];
+    const hideTypes = ['benny','xp','longcover','longtext','poll','quiz'];
     overlay.classList.toggle('hidden-overlay', hideTypes.includes(s.slides[k].type));
   }
   // Reset any opened Benny slides we navigated away from
