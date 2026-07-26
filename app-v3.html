@@ -1043,6 +1043,22 @@
   .se-flash.go { animation:seFlash 0.22s ease-out forwards; }
   @keyframes seFlash { 0% { opacity:0; } 40% { opacity:0.9; } 100% { opacity:0; } }
 
+  /* Social presence */
+  .hm-stack-social { display:flex; align-items:center; gap:8px; margin-top:13px; font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
+  .hm-ss-faces { display:flex; flex-shrink:0; }
+  .hm-ss-faces img { width:20px; height:20px; border-radius:50%; object-fit:cover; border:1.5px solid var(--nr-charcoal); margin-left:-6px; }
+  .hm-ss-faces img:first-child { margin-left:0; }
+  .hm-poll-friends { display:flex; align-items:center; gap:8px; margin-top:9px; font-family:var(--font-b); font-size:12px; color:var(--nr-smoke); }
+  .v3stub--top { align-items:flex-start; justify-content:flex-start; overflow-y:auto; padding:0 0 120px; }
+  .act-wrap { width:100%; padding:26px 20px 0; }
+  .act-title { font-family:var(--font-h); font-size:28px; color:#fff; margin-bottom:16px; }
+  .act-row { display:flex; gap:12px; align-items:flex-start; padding:13px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .act-row img { width:38px; height:38px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+  .act-text { font-family:var(--font-b); font-size:14px; line-height:1.45; color:var(--nr-smoke); }
+  .act-text b { color:#fff; }
+  .act-time { display:block; font-family:var(--font-m); font-size:10px; letter-spacing:0.1em; color:var(--nr-ash); margin-top:3px; text-transform:uppercase; }
+  .act-foot { padding:16px 0; font-family:var(--font-m); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--nr-ash); }
+
   /* v3 stubs */
   .v3stub { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:26; display:flex; align-items:center; justify-content:center; }
   .v3stub.on { transform:translateY(0); }
@@ -1066,9 +1082,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
       <span class="tab-label">Home</span>
     </button>
-    <button class="tab" onclick="v3Feed()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="8" y1="3" x2="8" y2="8"/></svg>
-      <span class="tab-label">Browse</span>
+    <button class="tab" onclick="v3Wire()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="14" y2="18"/></svg>
+      <span class="tab-label">The Wire</span>
     </button>
     <button class="tab" onclick="v3Benny()">
       <span style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;">
@@ -1158,11 +1174,16 @@
   <div class="bo-scrim" id="boScrim" onclick="closeBennyOverlay()"></div>
   <div class="bo-sheet" id="boSheet"></div>
 
-  <!-- v3 Activity / Profile stubs -->
-  <div class="v3stub" id="stubActivity">
-    <div class="v3stub-inner">
-      <div class="v3stub-title">Activity</div>
-      <div class="v3stub-sub">Replies, poll results and journalist updates land here. Not part of this prototype.</div>
+  <!-- v3 Activity -->
+  <div class="v3stub v3stub--top" id="stubActivity">
+    <div class="act-wrap">
+      <h1 class="act-title">Activity</h1>
+      <div class="act-row"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop" alt=""><span class="act-text"><b>Eliza Haverstock</b> sent a wire: "Bridge sources say October opening is now 'aspirational.'"<span class="act-time">12m</span></span></div>
+      <div class="act-row"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop" alt=""><span class="act-text"><b>Maya</b> finished today's Stack before you<span class="act-time">1h</span></span></div>
+      <div class="act-row"><img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=120&h=120&fit=crop" alt=""><span class="act-text"><b>Brijesh</b> agreed with your take on the Fed<span class="act-time">2h</span></span></div>
+      <div class="act-row"><img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop" alt=""><span class="act-text"><b>Dave Jorgenson</b> replied to your question in the Wire<span class="act-time">3h</span></span></div>
+      <div class="act-row"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop" alt=""><span class="act-text"><b>Annika</b> shared your "Today I learned" card<span class="act-time">5h</span></span></div>
+      <div class="act-foot">Quiet by design. No red dots, ever.</div>
     </div>
   </div>
   <div class="v3stub" id="stubProfile">
@@ -2887,6 +2908,7 @@ function v3CloseAll() {
 }
 function v3Home()     { v3CloseAll(); renderHome(); homeEl.classList.add('on'); v3Tab(0); }
 function v3Feed()     { v3CloseAll(); v3Tab(1); }
+function v3Wire()     { v3CloseAll(); openWire(); v3Tab(1); }
 function v3Benny()    { v3CloseAll(); bennytabEl.classList.add('on'); v3Tab(2); }
 function v3Activity() { v3CloseAll(); document.getElementById('stubActivity').classList.add('on'); v3Tab(3); }
 function v3Profile()  { v3CloseAll(); document.getElementById('stubProfile').classList.add('on'); v3Tab(4); }
@@ -3104,6 +3126,10 @@ function renderHome() {
         ${hmRing(done, total)}
         <button class="hm-stack-cta" onclick="hmStart()">${done === 0 ? "Start today's Stack" : `Continue · ${total - done} left`}</button>
       </div>
+      <div class="hm-stack-social">
+        <span class="hm-ss-faces">${FRIENDS.slice(1, 4).map(f => `<img src="${f.av}" alt="">`).join('')}</span>
+        Maya, Brijesh and 4 others finished today
+      </div>
     </div>`}
 
     <div class="hm-faces-label">Your journalists</div>
@@ -3134,6 +3160,11 @@ function renderHome() {
       <div class="hm-poll-q">${HM_POLL.q}</div>
       ${pollHtml}
       <div class="hm-poll-meta">${myVote !== undefined ? `${HM_POLL.votes.toLocaleString()} readers answered` : 'Tap to see where readers stand'}</div>
+      ${myVote !== undefined ? `
+      <div class="hm-poll-friends">
+        <span class="hm-ss-faces">${FRIENDS.slice(1, 3).map(f => `<img src="${f.av}" alt="">`).join('')}</span>
+        Maya and Roy said "${HM_POLL.opts[0]}"
+      </div>` : ''}
     </div>` : ''}
 
     <div class="hm-h" style="padding-top:22px;"><span class="hm-h-title">${allDone ? 'Off the clock' : 'The latest'}</span></div>
