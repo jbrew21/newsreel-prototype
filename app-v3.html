@@ -793,6 +793,13 @@
   .hm-face-av img { width:60px; height:60px; border-radius:20px; object-fit:cover; display:block; }
   .hm-face-dot { position:absolute; top:-2px; right:-2px; width:14px; height:14px; border-radius:50%; background:var(--nr-red); border:2.5px solid #000; }
   .hm-face-name { font-family:var(--font-b); font-size:11px; color:var(--nr-smoke); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:64px; }
+  /* Following cards: face + headline preview (headlines navigate, faces attribute) */
+  .hm-flw { flex-shrink:0; width:172px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:12px; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:8px; }
+  .hm-flw-top { display:flex; align-items:center; gap:8px; }
+  .hm-flw-top img { width:28px; height:28px; border-radius:50%; object-fit:cover; }
+  .hm-flw-name { font-family:var(--font-b); font-size:12px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hm-flw-head { font-family:var(--font-b); font-size:12.5px; line-height:1.35; color:var(--nr-smoke); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:34px; }
+  .hm-flw-tag { font-family:var(--font-m); font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:var(--nr-yellow,#EDBD1F); }
 
   /* Stack card */
   .hm-stack { margin:0 20px 14px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:18px; }
@@ -3060,14 +3067,17 @@ function renderHome() {
   const allDone = done >= total;
   const myVote = userPollVotes['home-daily'];
 
-  const faces = [
-    ...CREATORS.map((c, i) => ({ name:c.name.split(' ')[0] === 'The' ? c.name : c.name.split(' ')[0], avatar:c.avatar, dot:false, tap:`v3OpenCreatorFromHome(${i})` })),
-    ...HM_EXTRA_FACES.map(f => ({ name:f.name.split(' ')[0], avatar:f.avatar, dot:false, tap:'' })),
+  // Faces never blind-open content — every card previews the story first (headline consent)
+  const following = [
+    ...CREATORS.map((c, i) => ({ name:c.name, avatar:c.avatar, head:c.posts[0].head, tag:c.posts[0].tag, tap:`v3OpenCreatorFromHome(${i})` })),
+    { name:"Mosheh", avatar:HM_EXTRA_FACES[0].avatar, head:"What the Hormuz escorts mean for gas prices", tag:"World", tap:'' },
+    { name:"Sophia Bell", avatar:HM_EXTRA_FACES[1].avatar, head:"The methane rule, explained by an energy analyst", tag:"Climate", tap:'' },
   ];
-  const facesHtml = faces.map(f => `
-    <button class="hm-face" onclick="${f.tap}">
-      <span class="hm-face-av"><img src="${f.avatar}" alt="">${f.dot ? '<span class="hm-face-dot"></span>' : ''}</span>
-      <span class="hm-face-name">${f.name}</span>
+  const facesHtml = following.map(f => `
+    <button class="hm-flw" onclick="${f.tap}">
+      <span class="hm-flw-top"><img src="${f.avatar}" alt=""><span class="hm-flw-name">${f.name}</span></span>
+      <span class="hm-flw-head">${f.head}</span>
+      <span class="hm-flw-tag">${f.tag}</span>
     </button>`).join('');
 
   const pollHtml = HM_POLL.opts.map((o, i) => {
