@@ -872,6 +872,99 @@
   .bo-quote { font-family:var(--font-b); font-size:13px; line-height:1.45; color:var(--nr-smoke); border-left:2px solid var(--nr-iron); padding-left:10px; }
   .bo-quote strong { color:#fff; }
 
+  /* ─────────── v3 STORY FORMATS ─────────── */
+  /* Long-form cover */
+  .slide--longcover { background:#000; }
+  .lc-shade { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.95) 30%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.25)); }
+  .lc-body { position:absolute; left:0; right:0; bottom:0; padding:0 24px 130px; }
+  .lc-kicker { display:inline-block; background:var(--nr-yellow,#EDBD1F); color:#000; font-family:var(--font-m); font-size:10px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; padding:5px 9px; border-radius:4px; margin-bottom:14px; }
+  .lc-title { font-family:var(--font-h); font-size:33px; line-height:1.12; color:#fff; margin-bottom:12px; }
+  .lc-dek { font-family:var(--font-b); font-size:15px; line-height:1.5; color:var(--nr-smoke); margin-bottom:16px; }
+  .lc-byline { display:flex; align-items:center; gap:8px; font-family:var(--font-b); font-size:13px; font-weight:600; color:#fff; margin-bottom:18px; }
+  .lc-byline img { width:26px; height:26px; border-radius:50%; object-fit:cover; }
+  .lc-read { display:block; width:100%; background:var(--nr-red); color:#000; border:none; border-radius:6px; padding:14px; font-family:var(--font-m); font-size:13px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; margin-bottom:10px; }
+  .lc-alt { text-align:center; font-family:var(--font-b); font-size:12.5px; color:var(--nr-silver); }
+
+  /* Long-form TL;DR slides */
+  .slide--longtext { background:#0F0F0F; display:flex; align-items:center; }
+  .lt-wrap { padding:0 82px 0 30px; width:100%; }
+  .lt-n { font-family:var(--font-m); font-size:11px; letter-spacing:0.16em; color:var(--nr-yellow,#EDBD1F); margin-bottom:18px; }
+  .lt-text { font-family:var(--font-h); font-size:27px; line-height:1.35; color:#fff; margin-bottom:26px; }
+  .lt-text em { font-style:normal; color:var(--nr-yellow,#EDBD1F); }
+  .lt-full { background:none; border:none; color:var(--nr-silver); font-family:var(--font-m); font-size:12px; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; padding:0; }
+
+  /* Video slide */
+  .vp-frame { position:absolute; inset:0; overflow:hidden; }
+  .vp-img { animation:vpKenburns 16s ease-in-out infinite alternate; }
+  @keyframes vpKenburns { from { transform:scale(1) translate(0,0); } to { transform:scale(1.14) translate(-2.5%,-2%); } }
+  .vp-chip { position:absolute; top:110px; left:20px; display:flex; align-items:center; gap:6px; background:rgba(0,0,0,0.55); color:#fff; font-family:var(--font-m); font-size:11px; padding:6px 10px; border-radius:999px; backdrop-filter:blur(6px); }
+  .vp-chip svg { width:10px; height:10px; }
+  .vp-caps { position:absolute; left:20px; right:20px; bottom:305px; height:64px; }
+  .vp-cap { position:absolute; inset:auto 0 0 0; text-align:center; font-family:var(--font-b); font-size:16px; font-weight:700; color:#fff; text-shadow:0 1px 8px rgba(0,0,0,0.9); opacity:0; animation:vpCap 12s linear infinite; }
+  @keyframes vpCap { 0%,4% { opacity:0; transform:translateY(8px); } 8%,30% { opacity:1; transform:translateY(0); } 34%,100% { opacity:0; transform:translateY(-6px); } }
+  .vp-progress { position:absolute; left:0; right:0; bottom:0; height:3px; background:rgba(255,255,255,0.18); }
+  .vp-progress-fill { height:100%; width:0; background:var(--nr-red); animation:vpProg 58s linear forwards; }
+  @keyframes vpProg { to { width:100%; } }
+
+  /* Reader */
+  .reader { position:absolute; inset:0; background:#0B0B0B; z-index:55; transform:translateY(105%); transition:transform 0.42s cubic-bezier(0.2,0.8,0.2,1); overflow-y:auto; }
+  .reader.on { transform:translateY(0); }
+  .rd-top { position:sticky; top:0; display:flex; align-items:center; justify-content:space-between; background:rgba(11,11,11,0.92); backdrop-filter:blur(10px); padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.07); z-index:2; }
+  .rd-top-brand { height:16px; }
+  .rd-close { background:var(--nr-lead); border:none; border-radius:50%; width:30px; height:30px; color:var(--nr-smoke); font-size:15px; cursor:pointer; }
+  .rd-body { padding:28px 24px 60px; max-width:430px; margin:0 auto; }
+  .rd-kicker { font-family:var(--font-m); font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--nr-yellow,#EDBD1F); margin-bottom:12px; }
+  .rd-title { font-family:var(--font-h); font-size:30px; line-height:1.15; color:#fff; margin-bottom:14px; }
+  .rd-dek { font-family:var(--font-b); font-size:16px; line-height:1.5; color:var(--nr-smoke); margin-bottom:18px; }
+  .rd-byline { display:flex; align-items:center; gap:9px; padding-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:24px; font-family:var(--font-b); font-size:13px; color:#fff; font-weight:600; }
+  .rd-byline img { width:30px; height:30px; border-radius:50%; object-fit:cover; }
+  .rd-byline .rd-min { color:var(--nr-ash); font-weight:400; }
+  .rd-article p { font-family:Georgia, 'Times New Roman', serif; font-size:17px; line-height:1.72; color:#E8E8E8; margin-bottom:22px; }
+  .rd-article p:first-child::first-letter { font-family:var(--font-h); font-size:52px; line-height:0.9; float:left; padding:6px 8px 0 0; color:var(--nr-yellow,#EDBD1F); }
+  .rd-done { display:block; width:100%; background:var(--nr-red); color:#000; border:none; border-radius:6px; padding:15px; font-family:var(--font-m); font-size:13px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; margin-top:10px; }
+
+  /* ─────────── v3 STACK PASSAGE ─────────── */
+  .tabs { transition:transform 0.35s cubic-bezier(0.2,0.8,0.2,1); }
+  .tabs.gone { transform:translateY(115%); pointer-events:none; }
+  .sl-leave { position:absolute; left:50%; transform:translateX(-50%) translateY(180%); bottom:26px; z-index:62;
+    background:rgba(0,0,0,0.55); color:rgba(255,255,255,0.75); border:1px solid rgba(255,255,255,0.22); border-radius:999px;
+    padding:9px 16px; font-family:var(--font-m); font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase;
+    cursor:pointer; backdrop-filter:blur(8px); transition:transform 0.35s cubic-bezier(0.2,0.8,0.2,1); }
+  .sl-leave.on { transform:translateX(-50%) translateY(0); }
+  .chap { position:absolute; inset:0; z-index:70; background:#0D0D0D; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 34px; opacity:0; pointer-events:none; transition:opacity 0.25s ease; }
+  .chap.on { opacity:1; }
+  .chap-n { font-family:var(--font-m); font-size:11px; letter-spacing:0.3em; color:var(--nr-yellow,#EDBD1F); text-transform:uppercase; margin-bottom:14px; }
+  .chap-tag { font-family:var(--font-m); font-size:10.5px; letter-spacing:0.2em; color:var(--nr-ash); text-transform:uppercase; margin-bottom:10px; }
+  .chap-head { font-family:var(--font-h); font-size:27px; line-height:1.2; color:#fff; }
+  .sdone { position:absolute; inset:0; z-index:75; background:#101010; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 38px; overflow:hidden; }
+  .sdone.on { display:flex; }
+  .sdone-benny { width:120px; margin-bottom:22px; }
+  .sdone-title { font-family:var(--font-h); font-size:34px; color:#fff; margin-bottom:10px; }
+  .sdone-sub { font-family:var(--font-b); font-size:14.5px; line-height:1.5; color:var(--nr-silver); margin-bottom:20px; }
+  .sdone-stats { display:flex; gap:10px; justify-content:center; font-family:var(--font-m); font-size:11px; letter-spacing:0.14em; color:var(--nr-yellow,#EDBD1F); margin-bottom:30px; }
+  .sdone-btn { background:var(--nr-red); color:#000; border:none; border-radius:6px; padding:14px 34px; font-family:var(--font-m); font-size:13px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; }
+
+  /* ─────────── v3 STACK ENTRY (film countdown) ─────────── */
+  .se { position:absolute; inset:0; background:#101010; z-index:80; display:none; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; }
+  .se.on { display:flex; }
+  .se-grain { position:absolute; inset:-20%; opacity:0.55; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:seGrain 0.35s steps(3) infinite; }
+  @keyframes seGrain { 0% { transform:translate(0,0); } 33% { transform:translate(-3%,2%); } 66% { transform:translate(2%,-3%); } 100% { transform:translate(0,0); } }
+  .se-kicker { font-family:var(--font-m); font-size:11px; letter-spacing:0.34em; text-transform:uppercase; color:var(--nr-silver); margin-bottom:8px; }
+  .se-title { font-family:var(--font-h); font-size:34px; color:#fff; margin-bottom:34px; }
+  .se-ring { position:relative; width:210px; height:210px; border-radius:50%; border:2.5px solid rgba(255,255,255,0.75); display:flex; align-items:center; justify-content:center; margin-bottom:34px; }
+  .se-ring::after { content:''; position:absolute; inset:14px; border-radius:50%; border:1.5px solid rgba(255,255,255,0.35); }
+  .se-cross { position:absolute; background:rgba(255,255,255,0.35); }
+  .se-cross--h { left:-34px; right:-34px; top:50%; height:1.5px; }
+  .se-cross--v { top:-34px; bottom:-34px; left:50%; width:1.5px; }
+  .se-sweep { position:absolute; inset:2px; border-radius:50%; background:conic-gradient(rgba(237,189,31,0.35) 0deg, rgba(237,189,31,0.35) var(--sweep,0deg), transparent var(--sweep,0deg)); }
+  .se-num { position:relative; font-family:var(--font-h); font-size:110px; color:#fff; z-index:1; }
+  .se-meta { font-family:var(--font-m); font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--nr-ash); }
+  .se-flash { position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; }
+  .se-flash.go { animation:seFlash 0.22s ease-out forwards; }
+  @keyframes seFlash { 0% { opacity:0; } 40% { opacity:0.9; } 100% { opacity:0; } }
+
   /* v3 stubs */
   .v3stub { position:absolute; inset:0; background:#000; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); z-index:26; display:flex; align-items:center; justify-content:center; }
   .v3stub.on { transform:translateY(0); }
@@ -940,6 +1033,40 @@
 
   <!-- v3 Home scene -->
   <div class="home" id="home"></div>
+
+  <!-- v3 long-form reader -->
+  <div class="reader" id="reader"></div>
+
+  <!-- v3 Stack passage chrome -->
+  <button class="sl-leave" id="stackLeave" onclick="leaveStack()">✕ &nbsp;Leave the Stack</button>
+  <div class="chap" id="chapCard">
+    <div class="chap-n" id="chapN"></div>
+    <div class="chap-tag" id="chapTag"></div>
+    <div class="chap-head" id="chapHead"></div>
+  </div>
+  <div class="sdone" id="stackDone">
+    <div class="se-grain"></div>
+    <img class="sdone-benny" src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
+    <div class="sdone-title">You're caught up.</div>
+    <div class="sdone-sub">That was the whole day. Nothing is waiting for you here.</div>
+    <div class="sdone-stats"><span>4 / 4 STORIES</span><span>·</span><span>🔥 STREAK 13</span></div>
+    <button class="sdone-btn" onclick="leaveStack()">Back home</button>
+  </div>
+
+  <!-- v3 Stack entry: film countdown -->
+  <div class="se" id="stackEntry" onclick="seSkip()">
+    <div class="se-grain"></div>
+    <div class="se-kicker">Newsreel presents</div>
+    <div class="se-title">Today's Stack</div>
+    <div class="se-ring">
+      <div class="se-cross se-cross--h"></div>
+      <div class="se-cross se-cross--v"></div>
+      <div class="se-sweep" id="seSweep"></div>
+      <div class="se-num" id="seNum">3</div>
+    </div>
+    <div class="se-meta" id="seMeta">SUNDAY · JULY 26</div>
+    <div class="se-flash" id="seFlash"></div>
+  </div>
 
   <!-- v3 Benny catch-up overlay -->
   <div class="bo-scrim" id="boScrim" onclick="closeBennyOverlay()"></div>
@@ -1258,20 +1385,71 @@ const STORIES = [
   },
   {
     tag:"Politics",
+    format:"brief",
     headline:"Trump threatens to block new bridge to Canada",
     creatorId:1,
     slides:[
       { type:"video", img:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=900&h=1600&fit=crop" },
+      { type:"video", img:"https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=900&h=1600&fit=crop", subtitle:"The bridge is fully built. Canada paid the $4.2 billion. It opens in October — unless it doesn't." },
+      { type:"quiz",
+        q:"Trump says the U.S. should own what share of the Gordie Howe Bridge before it opens?",
+        opts:["Half","A quarter","All of it","10%"], answer:0 },
+      { type:"poll", pollId:'bridge-reneg',
+        q:"A president should be able to renegotiate cross-border projects after they're already built." },
+      { type:"xp", streak:4, msg:"Two down. Keep going", storyXp:5, quizXp:10, level:1, levelMax:40, levelCurrent:20 },
     ],
   },
   {
     tag:"Climate",
-    headline:"EPA's new methane rule could reshape every gas bill",
+    format:"read",
+    headline:"The pipe under your street is about to get expensive",
     creatorId:2,
     slides:[
-      { type:"video", img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=900&h=1600&fit=crop" },
-      { type:"video", img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=900&h=1600&fit=crop" },
-      { type:"video", img:"https://images.unsplash.com/photo-1620266757065-5814239881fd?w=900&h=1600&fit=crop" },
+      { type:"longcover",
+        img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=900&h=1600&fit=crop",
+        dek:"The EPA's methane rule is the biggest change to how gas gets to your stove in forty years. Almost nobody has read it. We did.",
+        readMin:11 },
+      { type:"longtext", n:1, total:3,
+        text:"Utilities must now find and fix methane leaks across <em>2.3 million miles</em> of distribution pipe — and under most state law, they're allowed to bill the repairs straight back to you." },
+      { type:"longtext", n:2, total:3,
+        text:"The math lands on your stove: an estimated <em>$9–14 a month</em> on the average residential gas bill by 2028. Rural lines cost the most per customer to fix — the fewest people are splitting the check." },
+      { type:"longtext", n:3, total:3,
+        text:"The real fight is <em>who eats the cost</em> — shareholders or ratepayers. Three state utility commissions have already opened rate cases. Every other state is watching them." },
+      { type:"poll", pollId:'methane-cost',
+        q:"Utilities, not customers, should absorb the cost of fixing their own leaking pipes." },
+      { type:"xp", streak:4, msg:"That was the long one", storyXp:10, quizXp:0, level:1, levelMax:40, levelCurrent:30 },
+    ],
+    article: {
+      title:"The pipe under your street is about to get expensive",
+      dek:"The EPA's methane rule is the biggest change to how gas gets to your stove in forty years. Almost nobody has read it. We did.",
+      readMin:11,
+      body:[
+        "There are 2.3 million miles of natural-gas distribution pipe in the United States, and a meaningful fraction of it leaks. Not dramatically. Not visibly. A little, everywhere, all the time — enough that methane, a greenhouse gas roughly eighty times more potent than carbon dioxide over twenty years, seeps out of American cities the way heat leaks out of an old house.",
+        "The EPA's new rule, finalized last month and effective this week, does something regulators have circled for decades: it makes utilities responsible for finding those leaks, fixing them on a schedule, and proving both. Aerial surveys, continuous monitors, quarterly reporting. The technology exists. The deadline is real. The question the rule deliberately does not answer is the one that will define the next five years of state politics: who pays.",
+        "Under most state law, the answer defaults to you. Utility rate structures let regulated monopolies recover 'prudent' infrastructure spending from customers, plus a guaranteed return — typically 9 to 10 percent. Fixing pipe is about as prudent as spending gets. Which means the methane rule, whatever it does for the climate, is also a rate case in waiting in all fifty states.",
+        "The numbers are not small. Industry filings put compliance at $40 to 60 billion over a decade. Spread over roughly 68 million residential gas customers, analysts project $9 to $14 a month on the average bill by 2028 — more in rural service areas, where miles of line are split among the fewest households. In parts of the Plains, per-customer costs could run triple the national average.",
+        "Three state commissions — Colorado, Illinois, and Massachusetts — have already opened proceedings on whether shareholders should absorb part of the cost, on a simple theory: the leaks represent product the utility lost and customers already paid for. Utilities counter that they operated the pipes exactly as regulators required for a century. Both things are true. That is what makes it a fight.",
+        "What happens next will not be decided in Washington. It will be decided in fifty drab hearing rooms, one rate case at a time, by commissioners most voters have never heard of. The pipe under your street is about to get expensive. The only open question is whose expense it is.",
+      ],
+    },
+  },
+  {
+    tag:"World",
+    format:"video",
+    headline:"60 seconds over the Strait of Hormuz",
+    creatorId:0,
+    slides:[
+      { type:"videoplay",
+        img:"https://images.unsplash.com/photo-1494412651409-8963ce7935a7?w=900&h=1600&fit=crop",
+        duration:"0:58",
+        captions:[
+          "A fifth of the world's oil moves through this 21-mile gap.",
+          "Navy escorts began at dawn Sunday. Shipping insurance tripled by lunch.",
+          "If tankers stop sailing, you feel it at the pump in nine days.",
+        ] },
+      { type:"poll", pollId:'hormuz-escort',
+        q:"The U.S. should escort commercial ships through the Strait, even at risk of confrontation." },
+      { type:"xp", streak:5, msg:"That's the whole Stack. See you tomorrow", storyXp:5, quizXp:0, level:1, levelMax:40, levelCurrent:35 },
     ],
   },
 ];
@@ -1412,6 +1590,46 @@ function renderSlide(sl, i, k) {
       </div>
     `;
   }
+  if (sl.type === 'longcover') {
+    const st = STORIES[i], c = CREATORS[st.creatorId];
+    return `
+      <div class="slide slide--longcover">
+        <img class="slide-img" src="${sl.img}" alt="">
+        <div class="lc-shade"></div>
+        <div class="lc-body">
+          <div class="lc-kicker">Long read · ${sl.readMin} min</div>
+          <h1 class="lc-title">${st.headline}</h1>
+          <p class="lc-dek">${sl.dek}</p>
+          <div class="lc-byline"><img src="${c.avatar}" alt=""><span>${c.name}</span>${c.verified ? VERIF_SVG : ''}</div>
+          <button class="lc-read" onclick="openReader(${i})">Read the full piece</button>
+          <div class="lc-alt">or swipe for the 60-second version →</div>
+        </div>
+      </div>
+    `;
+  }
+  if (sl.type === 'longtext') {
+    return `
+      <div class="slide slide--longtext">
+        <div class="lt-wrap">
+          <div class="lt-n">${sl.n} / ${sl.total}</div>
+          <p class="lt-text">${sl.text}</p>
+          <button class="lt-full" onclick="openReader(${i})">Read the full piece ↗</button>
+        </div>
+      </div>
+    `;
+  }
+  if (sl.type === 'videoplay') {
+    return `
+      <div class="slide slide--videoplay">
+        <div class="vp-frame"><img class="slide-img vp-img" src="${sl.img}" alt=""></div>
+        <div class="vp-chip"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg>${sl.duration}</div>
+        <div class="vp-caps">
+          ${sl.captions.map((cap, ci) => `<div class="vp-cap" style="animation-delay:${ci * 4}s">${cap}</div>`).join('')}
+        </div>
+        <div class="vp-progress"><div class="vp-progress-fill"></div></div>
+      </div>
+    `;
+  }
   return `
     <div class="slide">
       <img class="slide-img" src="${sl.img}" alt="">
@@ -1450,7 +1668,7 @@ function renderStory(s, i) {
         <button class="sa-btn sa-btn--benny" aria-label="Ask Benny" onclick="openBennyAssist(${i})"><img src="assets/benny/benny-head.png" alt=""></button>
       </div>
 
-      <div class="b-overlay">
+      <div class="b-overlay ${['benny','xp','longcover','longtext'].includes(s.slides[0].type) ? 'hidden-overlay' : ''}">
         <button class="author-chip" onclick="openCreator(${s.creatorId})">
           <img class="author-av" src="${c.avatar}" alt="">
           <span class="author-name">${c.name}</span>
@@ -1502,7 +1720,7 @@ function goSlide(storyI, k) {
   const overlay = document.querySelector(`.story[data-i="${storyI}"] .b-overlay`);
   if (overlay) {
     overlay.classList.toggle('compact', k > 0);
-    const hideTypes = ['benny','xp'];
+    const hideTypes = ['benny','xp','longcover','longtext'];
     overlay.classList.toggle('hidden-overlay', hideTypes.includes(s.slides[k].type));
   }
   // Reset any opened Benny slides we navigated away from
@@ -2568,6 +2786,7 @@ function v3CloseAll() {
   document.getElementById('stubProfile').classList.remove('on');
   creatorEl.classList.remove('on');
   feedEl.classList.remove('hidden');
+  document.getElementById('reader')?.classList.remove('on');
 }
 function v3Home()     { v3CloseAll(); renderHome(); homeEl.classList.add('on'); v3Tab(0); }
 function v3Feed()     { v3CloseAll(); v3Tab(1); }
@@ -2578,14 +2797,125 @@ function v3Profile()  { v3CloseAll(); document.getElementById('stubProfile').cla
 function hmJump(i) { v3Feed(); goStory(i); goSlide(i, 0); }
 function hmStart() {
   const next = STORIES.findIndex((s, i) => !COMPLETED.has(i));
-  hmJump(next === -1 ? 0 : next);
+  seRun(next === -1 ? 0 : next);
 }
 
-// Mark a story complete when its last slide is reached, so the Home ring moves
+// ─── Stack entry: film countdown ───
+try { CSS.registerProperty({ name:'--sweep', syntax:'<angle>', inherits:false, initialValue:'0deg' }); } catch(e) {}
+const seEl = document.getElementById('stackEntry');
+let seTimers = [], seTarget = 0;
+function seRun(target) {
+  seTarget = target;
+  document.getElementById('seMeta').textContent =
+    `SUNDAY · JULY 26 · ${STORIES.length} STORIES`;
+  seEl.classList.add('on');
+  const num = document.getElementById('seNum');
+  const sweep = document.getElementById('seSweep');
+  const beat = 620;
+  [3, 2, 1].forEach((n, i) => {
+    seTimers.push(setTimeout(() => {
+      num.textContent = n;
+      sweep.animate(
+        [{ '--sweep': '0deg' }, { '--sweep': '360deg' }],
+        { duration: beat, easing: 'linear' }
+      );
+    }, i * beat));
+  });
+  seTimers.push(setTimeout(() => {
+    document.getElementById('seFlash').classList.add('go');
+  }, 3 * beat));
+  seTimers.push(setTimeout(seFinish, 3 * beat + 200));
+}
+function seFinish() {
+  seTimers.forEach(clearTimeout); seTimers = [];
+  seEl.classList.remove('on');
+  document.getElementById('seFlash').classList.remove('go');
+  document.getElementById('seNum').textContent = '3';
+  enterStackAt(seTarget);
+}
+function seSkip() { seFinish(); }
+
+// ─── Long-form reader ───
+const readerEl = document.getElementById('reader');
+function openReader(i) {
+  const st = STORIES[i], a = st.article, c = CREATORS[st.creatorId];
+  if (!a) return;
+  readerEl.innerHTML = `
+    <div class="rd-top">
+      <img class="rd-top-brand" src="assets/newsreel-wordmark-white.png" alt="newsreel">
+      <button class="rd-close" onclick="closeReader()">✕</button>
+    </div>
+    <div class="rd-body">
+      <div class="rd-kicker">${st.tag} · Long read</div>
+      <h1 class="rd-title">${a.title}</h1>
+      <p class="rd-dek">${a.dek}</p>
+      <div class="rd-byline"><img src="${c.avatar}" alt=""><span>${c.name}</span><span class="rd-min">· ${a.readMin} min</span></div>
+      <div class="rd-article">${a.body.map(p => `<p>${p}</p>`).join('')}</div>
+      <button class="rd-done" onclick="readerDone(${i})">Done — back to the Stack</button>
+    </div>
+  `;
+  readerEl.classList.add('on');
+  readerEl.scrollTop = 0;
+}
+function closeReader() { readerEl.classList.remove('on'); }
+function readerDone(i) {
+  closeReader();
+  const pollK = STORIES[i].slides.findIndex(sl => sl.type === 'poll');
+  if (pollK > 0) goSlide(i, pollK);
+}
+
+// ─── Stack passage mode: no tabs, chapter cards, exit ritual ───
+let stackMode = false, chapTimer = null, suppressChap = false;
+
+function enterStackAt(i) {
+  v3CloseAll();
+  stackMode = true;
+  document.querySelector('.tabs').classList.add('gone');
+  document.getElementById('stackLeave').classList.add('on');
+  suppressChap = true;           // countdown already announced the entry
+  goStory(i); goSlide(i, 0);
+}
+function leaveStack() {
+  stackMode = false;
+  document.querySelector('.tabs').classList.remove('gone');
+  document.getElementById('stackLeave').classList.remove('on');
+  document.getElementById('stackDone').classList.remove('on');
+  document.getElementById('chapCard').classList.remove('on');
+  v3Home();
+}
+function showChap(i) {
+  const s = STORIES[i];
+  document.getElementById('chapN').textContent = `${i + 1} of ${STORIES.length}`;
+  document.getElementById('chapTag').textContent = s.tag + (s.format === 'video' ? ' · video' : s.format === 'read' ? ' · long read' : '');
+  document.getElementById('chapHead').textContent = s.headline;
+  const el = document.getElementById('chapCard');
+  el.classList.add('on');
+  clearTimeout(chapTimer);
+  chapTimer = setTimeout(() => el.classList.remove('on'), 950);
+}
+
+// Chapter card between stories while inside the Stack
+const _v3goStory = goStory;
+goStory = function(i) {
+  const changed = i !== storyIdx;
+  _v3goStory(i);
+  if (stackMode && changed) {
+    if (suppressChap) { suppressChap = false; return; }
+    showChap(i);
+  }
+  if (stackMode && !changed) suppressChap = false;
+};
+
+// Mark a story complete when its last slide is reached; exit ritual when the Stack is done
 const _v3goSlide = goSlide;
 goSlide = function(s, k) {
   _v3goSlide(s, k);
-  if (STORIES[s] && k >= STORIES[s].slides.length - 1) COMPLETED.add(s);
+  if (STORIES[s] && k >= STORIES[s].slides.length - 1) {
+    COMPLETED.add(s);
+    if (stackMode && COMPLETED.size >= STORIES.length) {
+      setTimeout(() => { if (stackMode) document.getElementById('stackDone').classList.add('on'); }, 1600);
+    }
+  }
 };
 
 function hmRing(done, total) {
@@ -2630,7 +2960,7 @@ function renderHome() {
   const rows = [
     { tag:"BUSINESS", head:STORIES[0].headline, c:CREATORS[STORIES[0].creatorId], img:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=300&h=300&fit=crop", jump:0 },
     { tag:"CLIMATE", head:STORIES[2].headline, c:CREATORS[STORIES[2].creatorId], img:"https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=300&h=300&fit=crop", jump:2 },
-    { tag:"WORLD", head:"U.S. begins guiding ships out of the Strait of Hormuz", c:CREATORS[1], img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=300&h=300&fit=crop", jump:0 },
+    { tag:"WORLD", head:"60 seconds over the Strait of Hormuz", c:CREATORS[0], img:"https://images.unsplash.com/photo-1494412651409-8963ce7935a7?w=300&h=300&fit=crop", jump:3 },
     { tag:"BUSINESS", head:"The Fed's one-cut signal — what it means for your loans", c:CREATORS[0], img:"https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=300&h=300&fit=crop", jump:0 },
   ];
   const rowsHtml = rows.map(r => `
@@ -2659,7 +2989,7 @@ function renderHome() {
     <div class="hm-stack">
       <div class="hm-stack-eyebrow">Today's Stack</div>
       <div class="hm-stack-title">${allDone ? "You're caught up." : `${total} stories, 5 minutes.`}</div>
-      <div class="hm-stack-sub">${allDone ? "That's the whole day. Come back tomorrow." : "Read these and you're done for the day."}</div>
+      <div class="hm-stack-sub">${allDone ? "That's the whole day. Come back tomorrow." : hmFormatLine()}</div>
       <div class="hm-stack-row">
         ${hmRing(done, total)}
         ${allDone
@@ -2705,6 +3035,16 @@ function renderHome() {
     </button>
     <div>${rowsHtml}</div>
   `;
+}
+
+function hmFormatLine() {
+  const n = { brief:0, read:0, video:0 };
+  STORIES.forEach(s => { n[s.format || 'brief']++; });
+  const bits = [];
+  if (n.brief) bits.push(`${n.brief} brief${n.brief > 1 ? 's' : ''}`);
+  if (n.video) bits.push(`${n.video} video`);
+  if (n.read) bits.push(`${n.read} long read`);
+  return bits.join(' · ') + ". Then you're done for the day.";
 }
 
 function hmVote(i) {
