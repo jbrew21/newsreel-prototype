@@ -997,8 +997,24 @@
   .sdone-benny { width:120px; margin-bottom:22px; }
   .sdone-title { font-family:var(--font-h); font-size:34px; color:#fff; margin-bottom:10px; }
   .sdone-sub { font-family:var(--font-b); font-size:14.5px; line-height:1.5; color:var(--nr-silver); margin-bottom:20px; }
-  .sdone-stats { display:flex; gap:10px; justify-content:center; font-family:var(--font-m); font-size:11px; letter-spacing:0.14em; color:var(--nr-yellow,#EDBD1F); margin-bottom:30px; }
+  .sdone-stats { display:flex; gap:8px; justify-content:center; font-family:var(--font-m); font-size:10px; letter-spacing:0.08em; color:var(--nr-yellow,#EDBD1F); margin-bottom:30px; white-space:nowrap; }
+  .sdone-stats span { white-space:nowrap; }
   .sdone-btn { background:var(--nr-red); color:#000; border:none; border-radius:6px; padding:14px 34px; font-family:var(--font-m); font-size:13px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; }
+  .sdone-btn--ghost { background:transparent; color:var(--nr-silver); border:1.5px solid rgba(255,255,255,0.25); }
+  .sdone-actions { display:flex; gap:10px; justify-content:center; }
+  .sdone-recap { text-align:left; margin:0 0 22px; max-width:320px; }
+  .recap-row { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.07); align-items:flex-start; }
+  .recap-row:last-child { border-bottom:none; }
+  .recap-dot { flex-shrink:0; font-size:13px; padding-top:1px; }
+  .recap-text { font-family:var(--font-b); font-size:13.5px; line-height:1.45; color:var(--nr-smoke); }
+  .sdone-stats b { color:#fff; font-weight:600; }
+  .hm-stack--done { border-color:rgba(237,189,31,0.35); }
+  .hm-recap { margin:2px 0 14px; }
+  .hm-done-meta { display:flex; justify-content:space-between; font-family:var(--font-m); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--nr-yellow,#EDBD1F); margin-bottom:14px; }
+  .hm-done-meta b { color:#fff; }
+  .hm-offclock { padding:0 20px 12px; font-family:var(--font-b); font-size:12.5px; color:var(--nr-ash); }
+  .share-toast { position:absolute; left:50%; bottom:150px; transform:translateX(-50%) translateY(8px); background:#fff; color:#000; font-family:var(--font-b); font-size:13px; font-weight:600; padding:10px 18px; border-radius:999px; opacity:0; pointer-events:none; transition:all 0.25s ease; z-index:90; }
+  .share-toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
 
   /* ─────────── v3 STACK ENTRY (film countdown) ─────────── */
   .se { position:absolute; inset:0; background:#101010; z-index:80; display:none; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; }
@@ -1046,7 +1062,7 @@
     </button>
     <button class="tab" onclick="v3Feed()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="8" y1="3" x2="8" y2="8"/></svg>
-      <span class="tab-label">Feed</span>
+      <span class="tab-label">Browse</span>
     </button>
     <button class="tab" onclick="v3Benny()">
       <span style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;">
@@ -1114,14 +1130,8 @@
     <div class="chap-tag" id="chapTag"></div>
     <div class="chap-head" id="chapHead"></div>
   </div>
-  <div class="sdone" id="stackDone">
-    <div class="se-grain"></div>
-    <img class="sdone-benny" src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
-    <div class="sdone-title">You're caught up.</div>
-    <div class="sdone-sub">That was the whole day. Nothing is waiting for you here.</div>
-    <div class="sdone-stats"><span>4 / 4 STORIES</span><span>·</span><span>🔥 STREAK 13</span></div>
-    <button class="sdone-btn" onclick="leaveStack()">Back home</button>
-  </div>
+  <div class="sdone" id="stackDone"></div>
+  <div class="share-toast" id="shareToast">Copied — paste it anywhere</div>
 
   <!-- v3 Stack entry: film countdown -->
   <div class="se" id="stackEntry" onclick="seSkip()">
@@ -1436,6 +1446,7 @@ const STORIES = [
   {
     tag:"Business",
     headline:"The US economy is fine probably",
+    takeaway:"The Fed held rates. One cut coming, maybe. Your loans aren't budging.",
     creatorId:0,
     slides:[
       { type:"video", img:"https://images.unsplash.com/photo-1554224155-1696413565d3?w=900&h=1600&fit=crop" },
@@ -1457,6 +1468,7 @@ const STORIES = [
     tag:"Politics",
     format:"brief",
     headline:"Trump threatens to block new bridge to Canada",
+    takeaway:"Trump wants half-ownership of a bridge Canada already paid for.",
     creatorId:1,
     slides:[
       { type:"video", img:"https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=900&h=1600&fit=crop" },
@@ -1473,6 +1485,7 @@ const STORIES = [
     tag:"Climate",
     format:"read",
     headline:"The pipe under your street is about to get expensive",
+    takeaway:"Utilities must fix methane leaks — and can bill you $9–14/mo for it.",
     creatorId:2,
     slides:[
       { type:"longcover",
@@ -1507,6 +1520,7 @@ const STORIES = [
     tag:"World",
     format:"video",
     headline:"60 seconds over the Strait of Hormuz",
+    takeaway:"The Navy now escorts tankers through Hormuz. Pump prices react in 9 days.",
     creatorId:0,
     slides:[
       { type:"videoplay",
@@ -3015,7 +3029,7 @@ goSlide = function(s, k) {
   if (STORIES[s] && k >= STORIES[s].slides.length - 1) {
     COMPLETED.add(s);
     if (stackMode && COMPLETED.size >= STORIES.length) {
-      setTimeout(() => { if (stackMode) document.getElementById('stackDone').classList.add('on'); }, 1600);
+      setTimeout(() => { if (stackMode) { renderStackDone(); document.getElementById('stackDone').classList.add('on'); } }, 1600);
     }
   }
 };
@@ -3088,17 +3102,24 @@ function renderHome() {
 
     <div class="hm-faces">${facesHtml}</div>
 
+    ${allDone ? `
+    <div class="hm-stack hm-stack--done">
+      <div class="hm-stack-eyebrow">Today's Stack · complete</div>
+      <div class="hm-stack-title">You're caught up. ✓</div>
+      <div class="hm-stack-sub">The ${total} things you now know:</div>
+      <div class="hm-recap">${hmRecapHtml()}</div>
+      <div class="hm-done-meta"><span>🔥 ${NR_STREAK}-day streak</span><span>Next Stack in <b id="hmCd">—</b></span></div>
+      <button class="hm-stack-cta" onclick="hmShare()">Share</button>
+    </div>` : `
     <div class="hm-stack">
       <div class="hm-stack-eyebrow">Today's Stack</div>
-      <div class="hm-stack-title">${allDone ? "You're caught up." : `${total} stories, 5 minutes.`}</div>
-      <div class="hm-stack-sub">${allDone ? "That's the whole day. Come back tomorrow." : hmFormatLine()}</div>
+      <div class="hm-stack-title">${total} stories, 5 minutes.</div>
+      <div class="hm-stack-sub">${hmFormatLine()}</div>
       <div class="hm-stack-row">
         ${hmRing(done, total)}
-        ${allDone
-          ? `<span class="hm-stack-done">Done for today ✓</span>`
-          : `<button class="hm-stack-cta" onclick="hmStart()">${done === 0 ? "Start today's Stack" : `Continue · ${total - done} left`}</button>`}
+        <button class="hm-stack-cta" onclick="hmStart()">${done === 0 ? "Start today's Stack" : `Continue · ${total - done} left`}</button>
       </div>
-    </div>
+    </div>`}
 
     <div class="hm-h"><img src="assets/benny/benny-head.png" alt=""><span class="hm-h-title">Catch me up</span></div>
     <div class="hm-benny">
@@ -3126,9 +3147,10 @@ function renderHome() {
       <div class="hm-poll-meta">${myVote !== undefined ? `${HM_POLL.votes.toLocaleString()} readers answered` : 'Tap to see where readers stand'}</div>
     </div>
 
-    <div class="hm-h" style="padding-top:22px;"><span class="hm-h-title">The latest</span></div>
+    <div class="hm-h" style="padding-top:22px;"><span class="hm-h-title">${allDone ? 'Off the clock' : 'The latest'}</span></div>
+    ${allDone ? `<div class="hm-offclock">Nothing here counts toward anything. Browse because you feel like it, or don't.</div>` : ''}
     <button class="hm-hero" onclick="hmJump(1)">
-      <span class="hm-hero-label">Top story</span>
+      <span class="hm-hero-label">${allDone ? 'If you want more' : 'Top story'}</span>
       <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?w=900&h=560&fit=crop" alt="">
       <span class="hm-hero-body" style="display:block">
         <span class="hm-hero-headline" style="display:block">${hero.headline}</span>
@@ -3137,6 +3159,7 @@ function renderHome() {
     </button>
     <div>${rowsHtml}</div>
   `;
+  if (allDone) startCountdown('hmCd');
 }
 
 function hmFormatLine() {
@@ -3167,6 +3190,58 @@ closeCreator = function() {
   _v3closeCreator();
   if (v3CreatorFrom === 'home') { v3CreatorFrom = 'feed'; v3Home(); }
 };
+
+// ─── Completion moment (Wordle/NYT pattern: reward + countdown + share, one screen) ───
+const NR_STREAK = 13, NR_EDITION = 87;
+function hmFormatEmoji(s) { return s.format === 'video' ? '🟥' : s.format === 'read' ? '🟦' : '🟨'; }
+function hmShareText() {
+  const done = [...COMPLETED].filter(i => STORIES[i]).length;
+  return `Newsreel No. ${NR_EDITION} · ${done}/${STORIES.length}\n${STORIES.map(hmFormatEmoji).join('')}\n🔥 ${NR_STREAK}-day streak`;
+}
+function hmShare() {
+  const text = hmShareText();
+  if (navigator.share) { navigator.share({ text }).catch(() => {}); return; }
+  navigator.clipboard?.writeText(text);
+  const t = document.getElementById('shareToast');
+  t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 1800);
+}
+let cdTimer = null;
+function startCountdown(elId) {
+  clearInterval(cdTimer);
+  const tick = () => {
+    const el = document.getElementById(elId);
+    if (!el) { clearInterval(cdTimer); return; }
+    const now = new Date(), next = new Date(now);
+    next.setHours(7, 0, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 1);
+    const s = Math.floor((next - now) / 1000);
+    el.textContent = `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor(s/60)%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+  };
+  tick();
+  cdTimer = setInterval(tick, 1000);
+}
+function hmRecapHtml() {
+  return STORIES.map(s => `
+    <div class="recap-row">
+      <span class="recap-dot">${hmFormatEmoji(s) === '🟥' ? '🎬' : hmFormatEmoji(s) === '🟦' ? '📖' : '📰'}</span>
+      <span class="recap-text">${s.takeaway}</span>
+    </div>`).join('');
+}
+function renderStackDone() {
+  document.getElementById('stackDone').innerHTML = `
+    <div class="se-grain"></div>
+    <img class="sdone-benny" src="assets/benny/benny-paperboy-v2-transparent.png" alt="">
+    <div class="sdone-title">You're caught up.</div>
+    <div class="sdone-sub">The ${STORIES.length} things you now know:</div>
+    <div class="sdone-recap">${hmRecapHtml()}</div>
+    <div class="sdone-stats"><span>${STORIES.length} / ${STORIES.length}</span><span>·</span><span>🔥 ${NR_STREAK}-DAY STREAK</span><span>·</span><span>NEXT STACK <b id="sdCd">—</b></span></div>
+    <div class="sdone-actions">
+      <button class="sdone-btn" onclick="hmShare()">Share</button>
+      <button class="sdone-btn sdone-btn--ghost" onclick="leaveStack()">Back home</button>
+    </div>`;
+  startCountdown('sdCd');
+}
 
 // Home chatbox → hands the question to the Benny tab's chat (cited replies)
 function hmAskGo() {
