@@ -818,6 +818,29 @@
   .hm-b-ic--time { background:rgba(237,189,31,0.14); color:var(--nr-yellow,#EDBD1F); }
   .hm-b-ic--left { background:rgba(96,140,255,0.16); color:#7FA3FF; }
   .hm-b-ic--right { background:rgba(255,99,67,0.14); color:var(--nr-red); }
+  .hm-b-ic--split { background:linear-gradient(105deg, rgba(108,155,242,0.18) 49.5%, rgba(255,99,67,0.16) 50.5%); color:#fff; }
+  .hm-b-ask { display:flex; align-items:center; gap:10px; background:var(--nr-charcoal); padding:12px 14px; }
+  .hm-b-ask img { width:28px; height:28px; border-radius:50%; background:#fff; object-fit:cover; flex-shrink:0; }
+  .hm-b-ask input { flex:1; background:var(--nr-lead); border:1px solid rgba(255,255,255,0.09); border-radius:999px; padding:10px 16px; color:#fff; font-family:var(--font-b); font-size:13.5px; outline:none; min-width:0; }
+  .hm-b-ask input::placeholder { color:var(--nr-ash); }
+  .hm-b-ask input:focus { border-color:rgba(237,189,31,0.5); }
+  .hm-b-ask-go { width:34px; height:34px; border-radius:50%; background:var(--nr-red); color:#000; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+  .hm-b-ask-go svg { width:15px; height:15px; }
+
+  /* Split Screen overlay (mirrors Perspectives homepage module) */
+  .sp-cols { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:14px 14px 4px; }
+  .sp-col { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:10px; min-width:0; }
+  .sp-col-label { font-family:var(--font-m); font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; padding-bottom:8px; margin-bottom:4px; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .sp-col-label--left { color:#6C9BF2; }
+  .sp-col-label--right { color:var(--nr-red); }
+  .sp-topic { padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+  .sp-topic:last-child { border-bottom:none; }
+  .sp-topic-name { font-family:var(--font-b); font-size:12.5px; font-weight:700; color:#fff; line-height:1.3; margin-bottom:3px; }
+  .sp-topic-meta { font-family:var(--font-m); font-size:9px; letter-spacing:0.06em; color:var(--nr-ash); text-transform:uppercase; margin-bottom:6px; }
+  .sp-faces { display:flex; }
+  .sp-face { width:22px; height:22px; border-radius:50%; object-fit:cover; border:1.5px solid var(--nr-charcoal); margin-left:-6px; filter:grayscale(1); }
+  .sp-face:first-child { margin-left:0; }
+  .bo-foot { padding:12px 18px 4px; font-family:var(--font-m); font-size:10px; letter-spacing:0.08em; color:var(--nr-ash); text-transform:uppercase; }
   .hm-b-text { flex:1; min-width:0; }
   .hm-b-title { font-family:var(--font-b); font-size:14.5px; font-weight:600; color:#fff; margin-bottom:2px; }
   .hm-b-sub { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
@@ -2753,23 +2776,23 @@ const BO_TIMELINE = [
   { time:"SUN 8:00A", head:"U.S. Navy begins escorting ships through the Strait of Hormuz", src:"Newsreel Wire · World", story:null },
 ];
 
-const BO_SIDES = {
-  left: {
-    title:"What the Left is talking about",
-    topics:[
-      { name:"AI data centers hitting power bills", count:"14 voices · past 48h", quote:"<strong>Robert Reich:</strong> “Big Tech builds the data centers. You pay the electric bill. That's the deal nobody voted for.”" },
-      { name:"Tariffs as a grocery tax", count:"11 voices · past 48h", quote:"<strong>Chris Murphy:</strong> “A tariff on everything is a sales tax on everyone. Call it what it is.”" },
-      { name:"Medicaid enrollment freeze", count:"8 voices · past 48h", quote:"<strong>Pramila Jayapal:</strong> “Freezing enrollment doesn't cut costs. It cuts people.”" },
-    ],
-  },
-  right: {
-    title:"What the Right is talking about",
-    topics:[
-      { name:"Tariffs bringing factories home", count:"13 voices · past 48h", quote:"<strong>Nikki Haley:</strong> “If the price of cheap goods is dependence on Beijing, it was never cheap.”" },
-      { name:"Saudi deal & recognizing Israel", count:"9 voices · past 48h", quote:"<strong>Ben Shapiro:</strong> “A nuclear deal that starts with recognizing Israel is the first sane precondition in a decade.”" },
-      { name:"Spending, not revenue", count:"7 voices · past 48h", quote:"<strong>Thomas Massie:</strong> “We don't have a tariff problem or a tax problem. We have a spending problem.”" },
-    ],
-  },
+// Live data pulled from newsreel-perspectives.onrender.com /api/agenda (48h window, Jul 26 11:57 AM ET)
+const PX_PHOTO = "https://newsreel-perspectives.onrender.com/photos/";
+const PX_UPDATED = "11:57 AM ET";
+const PX = {
+  leftClassified:124, rightClassified:88,
+  left:[
+    { t:"Trump Administration", v:26, p:69, ids:["brian-tyler-cohen","adam-schiff","david-pakman"], names:["Brian Tyler Cohen","Adam Schiff","David Pakman"] },
+    { t:"Elections & Campaigns", v:20, p:30, ids:["cenk-uygur","cori-bush","young-turks"], names:["Cenk Uygur","Cori Bush","The Young Turks"] },
+    { t:"Civil Rights & Race", v:11, p:24, ids:["roland-martin","jamelle-bouie","david-sirota"], names:["Roland Martin","Jamelle Bouie","David Sirota"] },
+    { t:"Economy & Trade", v:11, p:17, ids:["robert-reich","ro-khanna","justin-wolfers"], names:["Robert Reich","Ro Khanna","Justin Wolfers"] },
+  ],
+  right:[
+    { t:"Culture War", v:20, p:33, ids:["tom-nichols","jordan-peterson","russell-brand"], names:["Tom Nichols","Jordan B. Peterson","Russell Brand"] },
+    { t:"Media & Press", v:14, p:22, ids:["russell-brand","benny-johnson","clay-travis"], names:["Russell Brand","Benny Johnson","Clay Travis"] },
+    { t:"Elections & Campaigns", v:12, p:16, ids:["jesse-watters","sean-hannity","ted-cruz"], names:["Jesse Watters","Sean Hannity","Ted Cruz"] },
+    { t:"Immigration", v:10, p:14, ids:["tomi-lahren","sean-hannity","heritage-foundation"], names:["Tomi Lahren","Sean Hannity","Heritage Foundation"] },
+  ],
 };
 
 function v3Tab(i) {
@@ -2936,7 +2959,7 @@ function renderHome() {
   const myVote = userPollVotes['home-daily'];
 
   const faces = [
-    ...CREATORS.map((c, i) => ({ name:c.name.split(' ')[0] === 'The' ? c.name : c.name.split(' ')[0], avatar:c.avatar, dot:i !== 0, tap:`closeExplore(); homeEl.classList.remove('on'); openCreator(${i})` })),
+    ...CREATORS.map((c, i) => ({ name:c.name.split(' ')[0] === 'The' ? c.name : c.name.split(' ')[0], avatar:c.avatar, dot:i !== 0, tap:`v3OpenCreatorFromHome(${i})` })),
     ...HM_EXTRA_FACES.map(f => ({ name:f.name.split(' ')[0], avatar:f.avatar, dot:false, tap:'' })),
   ];
   const facesHtml = faces.map(f => `
@@ -3005,16 +3028,16 @@ function renderHome() {
         <span class="hm-b-text"><span class="hm-b-title" style="display:block">Timeline</span><span class="hm-b-sub" style="display:block">What mattered since you were here Thursday</span></span>
         <span class="hm-b-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
       </button>
-      <button class="hm-b-row" onclick="openBennyOverlay('left')">
-        <span class="hm-b-ic hm-b-ic--left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11a8.4 8.4 0 0 1-9 8.4 9.5 9.5 0 0 1-3.2-.6L3 20l1.3-3.8A8 8 0 0 1 3 11a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 9 8.4z"/></svg></span>
-        <span class="hm-b-text"><span class="hm-b-title" style="display:block">What the Left is talking about</span><span class="hm-b-sub" style="display:block">Live from 40+ verified voices</span></span>
+      <button class="hm-b-row" onclick="openBennyOverlay('split')">
+        <span class="hm-b-ic hm-b-ic--split"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5"/></svg></span>
+        <span class="hm-b-text"><span class="hm-b-title" style="display:block">The Split Screen</span><span class="hm-b-sub" style="display:block">What each side is amplifying · ${PX.leftClassified + PX.rightClassified} voices, live</span></span>
         <span class="hm-b-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
       </button>
-      <button class="hm-b-row" onclick="openBennyOverlay('right')">
-        <span class="hm-b-ic hm-b-ic--right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11a8.4 8.4 0 0 1-9 8.4 9.5 9.5 0 0 1-3.2-.6L3 20l1.3-3.8A8 8 0 0 1 3 11a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 9 8.4z"/></svg></span>
-        <span class="hm-b-text"><span class="hm-b-title" style="display:block">What the Right is talking about</span><span class="hm-b-sub" style="display:block">Live from 40+ verified voices</span></span>
-        <span class="hm-b-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
-      </button>
+      <div class="hm-b-ask">
+        <img src="assets/benny/benny-head.png" alt="">
+        <input id="hmAsk" placeholder="Ask Benny anything…" onkeydown="if(event.key==='Enter')hmAskGo()">
+        <button class="hm-b-ask-go" onclick="hmAskGo()" aria-label="Ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      </div>
     </div>
 
     <div class="hm-poll">
@@ -3053,6 +3076,29 @@ function hmVote(i) {
   renderHome();
 }
 
+// Creator profile opened from Home returns to Home on close (feed-opened returns to feed)
+let v3CreatorFrom = 'feed';
+function v3OpenCreatorFromHome(i) {
+  v3CreatorFrom = 'home';
+  homeEl.classList.remove('on');
+  openCreator(i);
+}
+const _v3closeCreator = closeCreator;
+closeCreator = function() {
+  _v3closeCreator();
+  if (v3CreatorFrom === 'home') { v3CreatorFrom = 'feed'; v3Home(); }
+};
+
+// Home chatbox → hands the question to the Benny tab's chat (cited replies)
+function hmAskGo() {
+  const input = document.getElementById('hmAsk');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  v3Benny();
+  setTimeout(() => askBenny(q), 120);
+}
+
 function openBennyOverlay(kind) {
   let body = '';
   if (kind === 'timeline') {
@@ -3067,16 +3113,27 @@ function openBennyOverlay(kind) {
           </div>`).join('')}
       </div>`;
   } else {
-    const side = BO_SIDES[kind];
+    // Split Screen — mirrors the Perspectives homepage module
+    const col = (side, label, cls) => `
+      <div class="sp-col">
+        <div class="sp-col-label ${cls}">${label}</div>
+        ${PX[side].map(t => `
+          <div class="sp-topic">
+            <div class="sp-topic-name">${t.t}</div>
+            <div class="sp-topic-meta">${t.v} voices · ${t.p} posts</div>
+            <div class="sp-faces">
+              ${t.ids.map((id, j) => `<img class="sp-face" src="${PX_PHOTO}${id}.jpg" alt="${t.names[j]}" title="${t.names[j]}" onerror="this.remove()">`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>`;
     body = `
-      <div class="bo-head"><img src="assets/benny/benny-head.png" alt=""><span class="bo-title">${side.title}</span><button class="bo-close" onclick="closeBennyOverlay()">✕</button></div>
-      <div class="bo-note">Ranked by how much verified ${kind === 'left' ? 'left-leaning' : 'right-leaning'} voices are posting about it · past 48h</div>
-      ${side.topics.map((t, i) => `
-        <div class="bo-topic">
-          <div class="bo-topic-name">${i + 1}. ${t.name}</div>
-          <div class="bo-topic-count">${t.count}</div>
-          <div class="bo-quote">${t.quote}</div>
-        </div>`).join('')}`;
+      <div class="bo-head"><img src="assets/benny/benny-head.png" alt=""><span class="bo-title">The Split Screen</span><button class="bo-close" onclick="closeBennyOverlay()">✕</button></div>
+      <div class="bo-note">What each side's algorithm is amplifying right now · ${PX.leftClassified + PX.rightClassified} verified voices · updated ${PX_UPDATED}</div>
+      <div class="sp-cols">
+        ${col('left', 'Left-leaning voices', 'sp-col-label--left')}
+        ${col('right', 'Right-leaning voices', 'sp-col-label--right')}
+      </div>
+      <div class="bo-foot">Not left vs right — actual positions. Live from Newsreel Perspectives.</div>`;
   }
   boSheetEl.innerHTML = body;
   boScrimEl.classList.add('on');
