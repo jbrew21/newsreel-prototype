@@ -1015,6 +1015,11 @@
   .hm-offclock { padding:0 20px 12px; font-family:var(--font-b); font-size:12.5px; color:var(--nr-ash); }
   .share-toast { position:absolute; left:50%; bottom:150px; transform:translateX(-50%) translateY(8px); background:#fff; color:#000; font-family:var(--font-b); font-size:13px; font-weight:600; padding:10px 18px; border-radius:999px; opacity:0; pointer-events:none; transition:all 0.25s ease; z-index:90; }
   .share-toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
+  .sdck { width:74px; height:74px; border-radius:50%; border:3px solid var(--nr-yellow,#EDBD1F); color:var(--nr-yellow,#EDBD1F); font-size:34px; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+  .sdck-sub { font-family:var(--font-m); font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--nr-ash); margin-top:16px; }
+  .quiz-note { font-family:var(--font-m); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--nr-ash); text-align:center; margin:-6px 0 16px; }
+  .quiz-opt.soft-miss { border-color:rgba(255,255,255,0.25); color:var(--nr-silver); }
+  .hm-faces-label { padding:16px 20px 8px; font-family:var(--font-m); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--nr-ash); }
 
   /* ─────────── v3 STACK ENTRY (film countdown) ─────────── */
   .se { position:absolute; inset:0; background:#101010; z-index:80; display:none; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; }
@@ -1584,37 +1589,13 @@ function renderSlide(sl, i, k) {
     `;
   }
   if (sl.type === 'xp') {
-    const pct = sl.levelCurrent / sl.levelMax;
-    const dash = 565 * (1 - pct);
+    // No XP, no levels, no claiming — finishing is the reward (judge consensus)
     return `
       <div class="slide slide--xp">
         <div class="xp-wrap">
-          <div class="xp-streak">
-            <svg class="xp-streak-icon" viewBox="0 0 24 24" fill="#EDBD1F"><path d="M13.5 0.7s4.4 6.6 4.4 11.6c0 6.6-5.4 9.2-5.4 9.2-2-3 .5-5.6.5-7.6 0-3.6-2-5-2-5s-1 4-3 5.5C5.6 16.6 4 14.5 4 12c0-2 2.4-5 4-7 1-1.2 2.5-2 3.5-2.7l2-1.6z"/></svg>
-            <span class="xp-streak-num">${sl.streak}</span>
-          </div>
+          <div class="sdck">✓</div>
           <div class="xp-msg">${sl.msg}</div>
-          <div class="xp-cards">
-            <div class="xp-card">
-              <div class="xp-card-label">Story XP</div>
-              <div class="xp-card-val" style="color:#36C9B6"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>${sl.storyXp}</div>
-            </div>
-            <div class="xp-card">
-              <div class="xp-card-label">Quiz XP</div>
-              <div class="xp-card-val" style="color:#A78BFA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12 11 15 16 9"/></svg>${sl.quizXp}</div>
-            </div>
-          </div>
-          <div class="xp-ring">
-            <svg viewBox="0 0 200 200">
-              <circle class="xp-ring-bg" cx="100" cy="100" r="90"/>
-              <circle class="xp-ring-fg" cx="100" cy="100" r="90" style="stroke-dashoffset:${dash}"/>
-            </svg>
-            <div class="xp-ring-text">
-              <div class="xp-ring-level">Level ${sl.level}</div>
-              <div class="xp-ring-sub">${sl.levelCurrent}/${sl.levelMax} XP</div>
-            </div>
-          </div>
-          <button class="xp-claim">CLAIM XP</button>
+          <div class="sdck-sub">Swipe down when you're ready</div>
         </div>
       </div>
     `;
@@ -1667,6 +1648,7 @@ function renderSlide(sl, i, k) {
       <div class="slide slide--quiz">
         <div class="quiz-wrap">
           <div class="quiz-q">${sl.q}</div>
+          <div class="quiz-note">Just a guess — no score, nothing tracked.</div>
           <div class="quiz-opts">
             ${sl.opts.map((o, oi) => `<button class="quiz-opt" onclick="answerQuiz(${i}, ${k}, ${oi})">${o}</button>`).join('')}
           </div>
@@ -1681,12 +1663,12 @@ function renderSlide(sl, i, k) {
         <img class="slide-img" src="${sl.img}" alt="">
         <div class="lc-shade"></div>
         <div class="lc-body">
-          <div class="lc-kicker">Long read · ${sl.readMin} min</div>
+          <div class="lc-kicker">Long read · 60-sec version</div>
           <h1 class="lc-title">${st.headline}</h1>
           <p class="lc-dek">${sl.dek}</p>
           <div class="lc-byline"><img src="${c.avatar}" alt=""><span>${c.name}</span>${c.verified ? VERIF_SVG : ''}</div>
-          <button class="lc-read" onclick="openReader(${i})">Read the full piece</button>
-          <div class="lc-alt">or swipe for the 60-second version →</div>
+          <button class="lc-read" onclick="openReader(${i})">Read the full piece · ${sl.readMin} min</button>
+          <div class="lc-alt">or swipe → for the author's 60-second version</div>
         </div>
       </div>
     `;
@@ -1946,12 +1928,14 @@ function renderPollBars(i, k) {
   document.getElementById(`plFoot-${i}-${k}`).textContent = data.label;
 }
 
+let qzRight = 0, qzTotal = 0;
 function answerQuiz(i, k, oi) {
   const s = STORIES[i].slides[k];
+  qzTotal++; if (oi === s.answer) qzRight++;
   const opts = document.querySelectorAll(`.story[data-i="${i}"] .slide-track .slide`)[k].querySelectorAll('.quiz-opt');
   opts.forEach((b, j) => {
     if (j === s.answer) b.classList.add('right');
-    else if (j === oi) b.classList.add('wrong');
+    else if (j === oi) b.classList.add('soft-miss');
     b.disabled = true;
   });
 }
@@ -2917,6 +2901,7 @@ function hmStart() {
 try { CSS.registerProperty({ name:'--sweep', syntax:'<angle>', inherits:false, initialValue:'0deg' }); } catch(e) {}
 const seEl = document.getElementById('stackEntry');
 let seTimers = [], seTarget = 0;
+let seRunCount = 0;
 function seRun(target) {
   seTarget = target;
   document.getElementById('seMeta').textContent =
@@ -2925,7 +2910,9 @@ function seRun(target) {
   const num = document.getElementById('seNum');
   const sweep = document.getElementById('seSweep');
   const beat = 620;
-  [3, 2, 1].forEach((n, i) => {
+  // Full 3-2-1 leader on first entry; a single beat on re-entries (ceremony shouldn't compound into friction)
+  const counts = seRunCount++ === 0 ? [3, 2, 1] : [1];
+  counts.forEach((n, i) => {
     seTimers.push(setTimeout(() => {
       num.textContent = n;
       sweep.animate(
@@ -2936,8 +2923,8 @@ function seRun(target) {
   });
   seTimers.push(setTimeout(() => {
     document.getElementById('seFlash').classList.add('go');
-  }, 3 * beat));
-  seTimers.push(setTimeout(seFinish, 3 * beat + 200));
+  }, counts.length * beat));
+  seTimers.push(setTimeout(seFinish, counts.length * beat + 200));
 }
 function seFinish() {
   seTimers.forEach(clearTimeout); seTimers = [];
@@ -3052,7 +3039,7 @@ function renderHome() {
   const myVote = userPollVotes['home-daily'];
 
   const faces = [
-    ...CREATORS.map((c, i) => ({ name:c.name.split(' ')[0] === 'The' ? c.name : c.name.split(' ')[0], avatar:c.avatar, dot:i !== 0, tap:`v3OpenCreatorFromHome(${i})` })),
+    ...CREATORS.map((c, i) => ({ name:c.name.split(' ')[0] === 'The' ? c.name : c.name.split(' ')[0], avatar:c.avatar, dot:false, tap:`v3OpenCreatorFromHome(${i})` })),
     ...HM_EXTRA_FACES.map(f => ({ name:f.name.split(' ')[0], avatar:f.avatar, dot:false, tap:'' })),
   ];
   const facesHtml = faces.map(f => `
@@ -3097,10 +3084,8 @@ function renderHome() {
         <img class="hm-avatar" src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200&h=200&fit=crop" alt="">
       </div>
     </div>
-    <div class="hm-greet">Mornin', Jack.</div>
+    <div class="hm-greet">Morning, Jack.</div>
     <div class="hm-date">Sunday · July 26</div>
-
-    <div class="hm-faces">${facesHtml}</div>
 
     ${allDone ? `
     <div class="hm-stack hm-stack--done">
@@ -3108,7 +3093,7 @@ function renderHome() {
       <div class="hm-stack-title">You're caught up. ✓</div>
       <div class="hm-stack-sub">The ${total} things you now know:</div>
       <div class="hm-recap">${hmRecapHtml()}</div>
-      <div class="hm-done-meta"><span>🔥 ${NR_STREAK}-day streak</span><span>Next Stack in <b id="hmCd">—</b></span></div>
+      <div class="hm-done-meta"><span>🔥 ${NR_STREAK}-day streak · 🛡 1 shield</span><span>Next Stack <b>tomorrow, 7am</b></span></div>
       <button class="hm-stack-cta" onclick="hmShare()">Share</button>
     </div>` : `
     <div class="hm-stack">
@@ -3121,6 +3106,9 @@ function renderHome() {
       </div>
     </div>`}
 
+    <div class="hm-faces-label">They made today's Stack</div>
+    <div class="hm-faces">${facesHtml}</div>
+
     <div class="hm-h"><img src="assets/benny/benny-head.png" alt=""><span class="hm-h-title">Catch me up</span></div>
     <div class="hm-benny">
       <button class="hm-b-row" onclick="openBennyOverlay('timeline')">
@@ -3130,7 +3118,7 @@ function renderHome() {
       </button>
       <button class="hm-b-row" onclick="openBennyOverlay('split')">
         <span class="hm-b-ic hm-b-ic--split"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5"/></svg></span>
-        <span class="hm-b-text"><span class="hm-b-title" style="display:block">The Split Screen</span><span class="hm-b-sub" style="display:block">What each side is amplifying · ${PX.leftClassified + PX.rightClassified} voices, live</span></span>
+        <span class="hm-b-text"><span class="hm-b-title" style="display:block">The Split Screen</span><span class="hm-b-sub" style="display:block">What each side is amplifying · ${PX.leftClassified + PX.rightClassified} voices</span></span>
         <span class="hm-b-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
       </button>
       <div class="hm-b-ask">
@@ -3159,7 +3147,6 @@ function renderHome() {
     </button>
     <div>${rowsHtml}</div>
   `;
-  if (allDone) startCountdown('hmCd');
 }
 
 function hmFormatLine() {
@@ -3196,7 +3183,8 @@ const NR_STREAK = 13, NR_EDITION = 87;
 function hmFormatEmoji(s) { return s.format === 'video' ? '🟥' : s.format === 'read' ? '🟦' : '🟨'; }
 function hmShareText() {
   const done = [...COMPLETED].filter(i => STORIES[i]).length;
-  return `Newsreel No. ${NR_EDITION} · ${done}/${STORIES.length}\n${STORIES.map(hmFormatEmoji).join('')}\n🔥 ${NR_STREAK}-day streak`;
+  const quiz = qzTotal ? ` · Quiz ${qzRight}/${qzTotal}` : '';
+  return `Today I learned: ${STORIES[1].takeaway}\nNewsreel No. ${NR_EDITION} · ${done}/${STORIES.length} caught up${quiz} · 🔥 ${NR_STREAK}\nCan you go ${STORIES.length}/${STORIES.length}? newsreel.co`;
 }
 function hmShare() {
   const text = hmShareText();
@@ -3235,12 +3223,11 @@ function renderStackDone() {
     <div class="sdone-title">You're caught up.</div>
     <div class="sdone-sub">The ${STORIES.length} things you now know:</div>
     <div class="sdone-recap">${hmRecapHtml()}</div>
-    <div class="sdone-stats"><span>${STORIES.length} / ${STORIES.length}</span><span>·</span><span>🔥 ${NR_STREAK}-DAY STREAK</span><span>·</span><span>NEXT STACK <b id="sdCd">—</b></span></div>
+    <div class="sdone-stats"><span>${STORIES.length}/${STORIES.length}</span><span>·</span><span>🔥 ${NR_STREAK} DAYS</span><span>·</span><span>🛡 1 SHIELD</span><span>·</span><span>NEXT STACK <b>TOMORROW 7AM</b></span></div>
     <div class="sdone-actions">
       <button class="sdone-btn" onclick="hmShare()">Share</button>
       <button class="sdone-btn sdone-btn--ghost" onclick="leaveStack()">Back home</button>
     </div>`;
-  startCountdown('sdCd');
 }
 
 // Home chatbox → hands the question to the Benny tab's chat (cited replies)
