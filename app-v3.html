@@ -939,7 +939,8 @@
   .lc-byline { display:flex; align-items:center; gap:8px; font-family:var(--font-b); font-size:13px; font-weight:600; color:#fff; margin-bottom:18px; }
   .lc-byline img { width:26px; height:26px; border-radius:50%; object-fit:cover; }
   .lc-read { display:block; width:100%; background:var(--nr-red); color:#000; border:none; border-radius:6px; padding:14px; font-family:var(--font-m); font-size:13px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; margin-bottom:10px; }
-  .lc-alt { text-align:center; font-family:var(--font-b); font-size:12.5px; color:var(--nr-silver); }
+  .lc-alt { text-align:center; }
+  .lc-full-link { background:none; border:none; font-family:var(--font-b); font-size:12.5px; color:var(--nr-silver); text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
 
   /* Long-form TL;DR slides */
   .slide--longtext { background:#0F0F0F; display:flex; align-items:center; }
@@ -1663,12 +1664,12 @@ function renderSlide(sl, i, k) {
         <img class="slide-img" src="${sl.img}" alt="">
         <div class="lc-shade"></div>
         <div class="lc-body">
-          <div class="lc-kicker">Long read · 60-sec version</div>
+          <div class="lc-kicker">Long read</div>
           <h1 class="lc-title">${st.headline}</h1>
           <p class="lc-dek">${sl.dek}</p>
           <div class="lc-byline"><img src="${c.avatar}" alt=""><span>${c.name}</span>${c.verified ? VERIF_SVG : ''}</div>
-          <button class="lc-read" onclick="openReader(${i})">Read the full piece · ${sl.readMin} min</button>
-          <div class="lc-alt">or swipe → for the author's 60-second version</div>
+          <button class="lc-read" onclick="goSlide(${i}, ${k + 1})">The author's 60-second version →</button>
+          <div class="lc-alt"><button class="lc-full-link" onclick="openReader(${i})">Or read the full piece · ${sl.readMin} min</button></div>
         </div>
       </div>
     `;
@@ -1928,10 +1929,9 @@ function renderPollBars(i, k) {
   document.getElementById(`plFoot-${i}-${k}`).textContent = data.label;
 }
 
-let qzRight = 0, qzTotal = 0;
 function answerQuiz(i, k, oi) {
+  // Genuinely untracked — no counters anywhere, matching the "nothing tracked" promise
   const s = STORIES[i].slides[k];
-  qzTotal++; if (oi === s.answer) qzRight++;
   const opts = document.querySelectorAll(`.story[data-i="${i}"] .slide-track .slide`)[k].querySelectorAll('.quiz-opt');
   opts.forEach((b, j) => {
     if (j === s.answer) b.classList.add('right');
@@ -3128,12 +3128,13 @@ function renderHome() {
       </div>
     </div>
 
+    ${allDone ? `
     <div class="hm-poll">
       <div class="hm-poll-eyebrow">Today's question</div>
       <div class="hm-poll-q">${HM_POLL.q}</div>
       ${pollHtml}
       <div class="hm-poll-meta">${myVote !== undefined ? `${HM_POLL.votes.toLocaleString()} readers answered` : 'Tap to see where readers stand'}</div>
-    </div>
+    </div>` : ''}
 
     <div class="hm-h" style="padding-top:22px;"><span class="hm-h-title">${allDone ? 'Off the clock' : 'The latest'}</span></div>
     ${allDone ? `<div class="hm-offclock">Nothing here counts toward anything. Browse because you feel like it, or don't.</div>` : ''}
@@ -3182,9 +3183,10 @@ closeCreator = function() {
 const NR_STREAK = 13, NR_EDITION = 87;
 function hmFormatEmoji(s) { return s.format === 'video' ? '🟥' : s.format === 'read' ? '🟦' : '🟨'; }
 function hmShareText() {
+  // No quiz score here, ever — the quiz promises "nothing tracked," so nothing downstream may render it.
+  // Completion is the flex; every sharer has it.
   const done = [...COMPLETED].filter(i => STORIES[i]).length;
-  const quiz = qzTotal ? ` · Quiz ${qzRight}/${qzTotal}` : '';
-  return `Today I learned: ${STORIES[1].takeaway}\nNewsreel No. ${NR_EDITION} · ${done}/${STORIES.length} caught up${quiz} · 🔥 ${NR_STREAK}\nCan you go ${STORIES.length}/${STORIES.length}? newsreel.co`;
+  return `Today I learned: ${STORIES[1].takeaway}\nNewsreel No. ${NR_EDITION} · ${done}/${STORIES.length} caught up · 🔥 ${NR_STREAK}-day streak\nCan you go ${STORIES.length}/${STORIES.length}? newsreel.co`;
 }
 function hmShare() {
   const text = hmShareText();
