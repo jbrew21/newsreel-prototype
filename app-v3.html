@@ -841,6 +841,39 @@
   .sp-face { width:22px; height:22px; border-radius:50%; object-fit:cover; border:1.5px solid var(--nr-charcoal); margin-left:-6px; filter:grayscale(1); }
   .sp-face:first-child { margin-left:0; }
   .bo-foot { padding:12px 18px 4px; font-family:var(--font-m); font-size:10px; letter-spacing:0.08em; color:var(--nr-ash); text-transform:uppercase; }
+  .sp-topic { display:block; width:100%; text-align:left; background:none; border:none; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); cursor:pointer; }
+  .sp-topic:last-child { border-bottom:none; }
+  .sp-topic:active { background:rgba(255,255,255,0.04); }
+  .sp-chev { width:13px; height:13px; color:var(--nr-iron); margin-left:auto; align-self:center; }
+  .sp-faces { align-items:center; }
+  .sp-post { display:flex; gap:11px; padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.06); text-decoration:none; color:inherit; }
+  .sp-post:active { background:rgba(255,255,255,0.04); }
+  .sp-post-av { width:34px; height:34px; border-radius:50%; object-fit:cover; flex-shrink:0; filter:grayscale(1); }
+  .sp-post-body { flex:1; min-width:0; }
+  .sp-post-who { display:block; font-family:var(--font-b); font-size:13px; font-weight:700; color:#fff; margin-bottom:3px; }
+  .sp-post-who em { font-style:normal; font-weight:400; font-family:var(--font-m); font-size:10px; color:var(--nr-ash); text-transform:uppercase; letter-spacing:0.08em; }
+  .sp-post-text { display:block; font-family:var(--font-b); font-size:13.5px; line-height:1.45; color:var(--nr-smoke); }
+  .sp-post-voice { background:none; border:none; padding:0; cursor:pointer; align-self:flex-start; }
+  button.sp-post-who { background:none; border:none; padding:0; text-align:left; cursor:pointer; }
+  .sp-post-src { display:inline-block; margin-top:7px; font-family:var(--font-m); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--nr-silver); text-decoration:none; border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:5px 10px; }
+  .vc-hero { display:flex; align-items:center; gap:14px; padding:18px; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .vc-av { width:58px; height:58px; border-radius:50%; object-fit:cover; filter:grayscale(1); }
+  .vc-lean { display:inline-block; font-family:var(--font-m); font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; padding:4px 9px; border-radius:4px; margin-bottom:7px; }
+  .vc-lean--left { background:rgba(108,155,242,0.15); color:#6C9BF2; }
+  .vc-lean--right { background:rgba(255,99,67,0.14); color:var(--nr-red); }
+  .vc-note { display:block; font-family:var(--font-b); font-size:11.5px; color:var(--nr-ash); line-height:1.4; }
+
+  /* Gesture coach */
+  .coach { position:absolute; inset:0; z-index:85; background:rgba(0,0,0,0.82); backdrop-filter:blur(3px); display:none; flex-direction:column; align-items:center; justify-content:center; gap:26px; cursor:pointer; }
+  .coach.on { display:flex; }
+  .coach-row { display:flex; align-items:center; gap:18px; }
+  .coach-arrows { font-family:var(--font-h); font-size:38px; color:var(--nr-yellow,#EDBD1F); letter-spacing:6px; animation:coachPulse 1.4s ease-in-out infinite; }
+  .coach-arrows--v { font-size:22px; line-height:1.05; letter-spacing:0; text-align:center; }
+  @keyframes coachPulse { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
+  .coach-label { font-family:var(--font-b); font-size:15px; line-height:1.45; color:#fff; }
+  .coach-label strong { color:var(--nr-yellow,#EDBD1F); }
+  .coach-div { width:44px; height:1px; background:rgba(255,255,255,0.2); }
+  .coach-tap { position:absolute; bottom:60px; font-family:var(--font-m); font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--nr-silver); }
   .hm-b-text { flex:1; min-width:0; }
   .hm-b-title { font-family:var(--font-b); font-size:14.5px; font-weight:600; color:#fff; margin-bottom:2px; }
   .hm-b-sub { font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
@@ -1059,6 +1092,20 @@
 
   <!-- v3 long-form reader -->
   <div class="reader" id="reader"></div>
+
+  <!-- v3 gesture coach (first Stack entry only) -->
+  <div class="coach" id="gestureCoach" onclick="coachDismiss()">
+    <div class="coach-row">
+      <div class="coach-arrows">‹ ›</div>
+      <div class="coach-label">Swipe <strong>side to side</strong><br>to move through a story</div>
+    </div>
+    <div class="coach-div"></div>
+    <div class="coach-row">
+      <div class="coach-arrows coach-arrows--v">⌃<br>⌄</div>
+      <div class="coach-label">Swipe <strong>up or down</strong><br>for the next story</div>
+    </div>
+    <div class="coach-tap">Tap anywhere to start</div>
+  </div>
 
   <!-- v3 Stack passage chrome -->
   <button class="sl-leave" id="stackLeave" onclick="leaveStack()">✕ &nbsp;Leave the Stack</button>
@@ -2782,16 +2829,45 @@ const PX_UPDATED = "11:57 AM ET";
 const PX = {
   leftClassified:124, rightClassified:88,
   left:[
-    { t:"Trump Administration", v:26, p:69, ids:["brian-tyler-cohen","adam-schiff","david-pakman"], names:["Brian Tyler Cohen","Adam Schiff","David Pakman"] },
-    { t:"Elections & Campaigns", v:20, p:30, ids:["cenk-uygur","cori-bush","young-turks"], names:["Cenk Uygur","Cori Bush","The Young Turks"] },
-    { t:"Civil Rights & Race", v:11, p:24, ids:["roland-martin","jamelle-bouie","david-sirota"], names:["Roland Martin","Jamelle Bouie","David Sirota"] },
-    { t:"Economy & Trade", v:11, p:17, ids:["robert-reich","ro-khanna","justin-wolfers"], names:["Robert Reich","Ro Khanna","Justin Wolfers"] },
+    { t:"Trump Administration", v:26, p:69, ids:["brian-tyler-cohen","adam-schiff","david-pakman"], names:["Brian Tyler Cohen","Adam Schiff","David Pakman"],
+      posts:[
+        { id:"adam-schiff", name:"Adam Schiff", pf:"x", text:"Todd Blanche testified he wasn't involved in firing people at DOJ connected to the cases he worked on as Donald Trump's personal lawyer.", url:"https://x.com/SenAdamSchiff/status/2081179541007966540" },
+        { id:"david-pakman", name:"David Pakman", pf:"youtube", text:"Trump BLINDSIDED by RFK's latest catastrophe", url:"https://www.youtube.com/watch?v=hdoGazQ7cI0" },
+      ] },
+    { t:"Elections & Campaigns", v:20, p:30, ids:["cenk-uygur","cori-bush","young-turks"], names:["Cenk Uygur","Cori Bush","The Young Turks"],
+      posts:[
+        { id:"cenk-uygur", name:"Cenk Uygur", pf:"x", text:"So, let's unite to kill the corruption. It's not Democratic donors versus Republican donors, it's us versus all of them.", url:"https://x.com/cenkuygur/status/2081186956382175704" },
+        { id:"young-turks", name:"The Young Turks", pf:"youtube", text:"Hakeem Jeffries CONFRONTED Bernie Sanders For Endorsement", url:"https://www.youtube.com/watch?v=liPsCkcAeeE" },
+      ] },
+    { t:"Civil Rights & Race", v:11, p:24, ids:["roland-martin","jamelle-bouie","david-sirota"], names:["Roland Martin","Jamelle Bouie","David Sirota"],
+      posts:[
+        { id:"roland-martin", name:"Roland Martin", pf:"x", text:"Nolan Wells Laid To Rest. $100K Reward Offered. Officer Quits After Violent Arrest of Black Teen.", url:"https://x.com/rolandsmartin/status/2081288438960025889" },
+      ] },
+    { t:"Economy & Trade", v:11, p:17, ids:["robert-reich","ro-khanna","justin-wolfers"], names:["Robert Reich","Ro Khanna","Justin Wolfers"],
+      posts:[
+        { id:"ro-khanna", name:"Ro Khanna", pf:"x", text:"The war in Iran and tariff policy have cost Americans $3500 more a year, increased gas and food prices, and lowered wages.", url:"https://x.com/RoKhanna/status/2081140064814297529" },
+        { id:"justin-wolfers", name:"Justin Wolfers", pf:"bluesky", text:"Skip the armchair psychology on Trump's brain. Look at the incentives: the 10% global tariff truce expires this week.", url:"https://bsky.app/profile/justinwolfers.bsky.social" },
+      ] },
   ],
   right:[
-    { t:"Culture War", v:20, p:33, ids:["tom-nichols","jordan-peterson","russell-brand"], names:["Tom Nichols","Jordan B. Peterson","Russell Brand"] },
-    { t:"Media & Press", v:14, p:22, ids:["russell-brand","benny-johnson","clay-travis"], names:["Russell Brand","Benny Johnson","Clay Travis"] },
-    { t:"Elections & Campaigns", v:12, p:16, ids:["jesse-watters","sean-hannity","ted-cruz"], names:["Jesse Watters","Sean Hannity","Ted Cruz"] },
-    { t:"Immigration", v:10, p:14, ids:["tomi-lahren","sean-hannity","heritage-foundation"], names:["Tomi Lahren","Sean Hannity","Heritage Foundation"] },
+    { t:"Culture War", v:20, p:33, ids:["tom-nichols","jordan-peterson","russell-brand"], names:["Tom Nichols","Jordan B. Peterson","Russell Brand"],
+      posts:[
+        { id:"jordan-peterson", name:"Jordan B. Peterson", pf:"x", text:"From Grok: The chart “Aspects and Assumptions of Whiteness and White Culture in the United States”…", url:"https://x.com/jordanbpeterson/status/2081280571855253554" },
+        { id:"tom-nichols", name:"Tom Nichols", pf:"bluesky", text:"Are snails meat? I think of them as little cows", url:"https://bsky.app/profile/radiofreetom.bsky.social" },
+      ] },
+    { t:"Media & Press", v:14, p:22, ids:["russell-brand","benny-johnson","clay-travis"], names:["Russell Brand","Benny Johnson","Clay Travis"],
+      posts:[
+        { id:"benny-johnson", name:"Benny Johnson", pf:"x", text:"Ilhan Omar… is telling Trump to “get the hell out”…", url:"https://x.com/bennyjohnson/status/2081163257234984984" },
+      ] },
+    { t:"Elections & Campaigns", v:12, p:16, ids:["jesse-watters","sean-hannity","ted-cruz"], names:["Jesse Watters","Sean Hannity","Ted Cruz"],
+      posts:[
+        { id:"sean-hannity", name:"Sean Hannity", pf:"x", text:"“My money is on AOC being the presidential nominee.” Benny Johnson on why he believes AOC will be the Democrats' pick.", url:"https://x.com/seanhannity/status/2081122321562239265" },
+      ] },
+    { t:"Immigration", v:10, p:14, ids:["tomi-lahren","sean-hannity","heritage-foundation"], names:["Tomi Lahren","Sean Hannity","Heritage Foundation"],
+      posts:[
+        { id:"tomi-lahren", name:"Tomi Lahren", pf:"x", text:"Anchor baby births are outpacing deportations. How is this sustainable?", url:"https://x.com/TomiLahren/status/2081109558274015696" },
+        { id:"heritage-foundation", name:"Heritage Foundation", pf:"x", text:"U.S. taxpayers should not be footing the bill for a radical U.N. agency…", url:"https://x.com/Heritage/status/2081131758930538888" },
+      ] },
   ],
 };
 
@@ -2890,6 +2966,7 @@ function readerDone(i) {
 // ─── Stack passage mode: no tabs, chapter cards, exit ritual ───
 let stackMode = false, chapTimer = null, suppressChap = false;
 
+let coachShown = false;
 function enterStackAt(i) {
   v3CloseAll();
   stackMode = true;
@@ -2897,7 +2974,9 @@ function enterStackAt(i) {
   document.getElementById('stackLeave').classList.add('on');
   suppressChap = true;           // countdown already announced the entry
   goStory(i); goSlide(i, 0);
+  if (!coachShown) { coachShown = true; document.getElementById('gestureCoach').classList.add('on'); }
 }
+function coachDismiss() { document.getElementById('gestureCoach').classList.remove('on'); }
 function leaveStack() {
   stackMode = false;
   document.querySelector('.tabs').classList.remove('gone');
@@ -3113,22 +3192,23 @@ function openBennyOverlay(kind) {
           </div>`).join('')}
       </div>`;
   } else {
-    // Split Screen — mirrors the Perspectives homepage module
+    // Split Screen — mirrors the Perspectives homepage module; topics drill in to real posts
     const col = (side, label, cls) => `
       <div class="sp-col">
         <div class="sp-col-label ${cls}">${label}</div>
-        ${PX[side].map(t => `
-          <div class="sp-topic">
+        ${PX[side].map((t, ti) => `
+          <button class="sp-topic" onclick="spOpenTopic('${side}',${ti})">
             <div class="sp-topic-name">${t.t}</div>
             <div class="sp-topic-meta">${t.v} voices · ${t.p} posts</div>
             <div class="sp-faces">
               ${t.ids.map((id, j) => `<img class="sp-face" src="${PX_PHOTO}${id}.jpg" alt="${t.names[j]}" title="${t.names[j]}" onerror="this.remove()">`).join('')}
+              <svg class="sp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
             </div>
-          </div>`).join('')}
+          </button>`).join('')}
       </div>`;
     body = `
       <div class="bo-head"><img src="assets/benny/benny-head.png" alt=""><span class="bo-title">The Split Screen</span><button class="bo-close" onclick="closeBennyOverlay()">✕</button></div>
-      <div class="bo-note">What each side's algorithm is amplifying right now · ${PX.leftClassified + PX.rightClassified} verified voices · updated ${PX_UPDATED}</div>
+      <div class="bo-note">What each side's algorithm is amplifying right now · ${PX.leftClassified + PX.rightClassified} verified voices · updated ${PX_UPDATED} · tap a topic for the posts</div>
       <div class="sp-cols">
         ${col('left', 'Left-leaning voices', 'sp-col-label--left')}
         ${col('right', 'Right-leaning voices', 'sp-col-label--right')}
@@ -3139,6 +3219,65 @@ function openBennyOverlay(kind) {
   boScrimEl.classList.add('on');
   boSheetEl.classList.add('on');
 }
+// Split Screen drill-in: full-width posts for one topic, back returns to the split view
+function spOpenTopic(side, ti) {
+  const t = PX[side][ti];
+  const lean = side === 'left' ? 'sp-col-label--left' : 'sp-col-label--right';
+  boSheetEl.innerHTML = `
+    <div class="bo-head">
+      <button class="bo-close" onclick="openBennyOverlay('split')" aria-label="Back" style="transform:rotate(180deg)">➜</button>
+      <span class="bo-title">${t.t}</span>
+      <button class="bo-close" onclick="closeBennyOverlay()">✕</button>
+    </div>
+    <div class="bo-note"><span class="${lean}" style="border:none;padding:0;">${side === 'left' ? 'Left' : 'Right'}-leaning voices</span> · ${t.v} voices · ${t.p} posts in the past 48h</div>
+    ${t.posts.map(p => `
+      <div class="sp-post">
+        <button class="sp-post-voice" onclick="spVoiceCard('${p.id}',&quot;${p.name}&quot;,'${side}',${ti})">
+          <img class="sp-post-av" src="${PX_PHOTO}${p.id}.jpg" alt="" onerror="this.style.visibility='hidden'">
+        </button>
+        <span class="sp-post-body">
+          <button class="sp-post-who" onclick="spVoiceCard('${p.id}',&quot;${p.name}&quot;,'${side}',${ti})">${p.name} <em>· ${p.pf}</em></button>
+          <span class="sp-post-text">${p.text}</span>
+          <a class="sp-post-src" href="${p.url}" target="_blank" rel="noopener">View original ↗</a>
+        </span>
+      </div>`).join('')}
+    <div class="bo-foot">Real posts, pulled live. Tap a name for the voice, or view the original.</div>`;
+  boSheetEl.scrollTop = 0;
+}
+
+// In-app voice card for Perspectives voices — never eject the reader to X by default
+function spVoiceCard(id, name, side, ti) {
+  const posts = [];
+  ['left','right'].forEach(s => PX[s].forEach(t => t.posts.forEach(p => {
+    if (p.id === id) posts.push({ ...p, lean:s });
+  })));
+  const lean = side; // lean comes from the column the reader tapped in
+  boSheetEl.innerHTML = `
+    <div class="bo-head">
+      <button class="bo-close" onclick="spOpenTopic('${side}',${ti})" aria-label="Back">‹</button>
+      <span class="bo-title">${name}</span>
+      <button class="bo-close" onclick="closeBennyOverlay()">✕</button>
+    </div>
+    <div class="vc-hero">
+      <img class="vc-av" src="${PX_PHOTO}${id}.jpg" alt="" onerror="this.style.visibility='hidden'">
+      <div class="vc-meta">
+        <span class="vc-lean ${lean === 'left' ? 'vc-lean--left' : 'vc-lean--right'}">${lean === 'left' ? 'Left-leaning' : 'Right-leaning'}</span>
+        <span class="vc-note">Tracked by Newsreel Perspectives · not a Newsreel contributor</span>
+      </div>
+    </div>
+    ${posts.length ? posts.map(p => `
+      <div class="sp-post">
+        <span class="sp-post-body">
+          <span class="sp-post-who" style="cursor:default">Recent post <em>· ${p.pf}</em></span>
+          <span class="sp-post-text">${p.text}</span>
+          <a class="sp-post-src" href="${p.url}" target="_blank" rel="noopener">View original ↗</a>
+        </span>
+      </div>`).join('') : `
+      <div class="sp-post"><span class="sp-post-body"><span class="sp-post-text">Posting on this topic in the past 48 hours — see their full position history on Perspectives.</span></span></div>`}
+    <div class="bo-foot">Every position, in their own words — on Newsreel Perspectives.</div>`;
+  boSheetEl.scrollTop = 0;
+}
+
 function closeBennyOverlay() {
   boScrimEl.classList.remove('on');
   boSheetEl.classList.remove('on');
