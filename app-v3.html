@@ -793,13 +793,29 @@
   .hm-face-av img { width:60px; height:60px; border-radius:20px; object-fit:cover; display:block; }
   .hm-face-dot { position:absolute; top:-2px; right:-2px; width:14px; height:14px; border-radius:50%; background:var(--nr-red); border:2.5px solid #000; }
   .hm-face-name { font-family:var(--font-b); font-size:11px; color:var(--nr-smoke); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:64px; }
-  /* Following cards: face + headline preview (headlines navigate, faces attribute) */
-  .hm-flw { flex-shrink:0; width:172px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:12px; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:8px; }
-  .hm-flw-top { display:flex; align-items:center; gap:8px; }
-  .hm-flw-top img { width:28px; height:28px; border-radius:50%; object-fit:cover; }
-  .hm-flw-name { font-family:var(--font-b); font-size:12px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .hm-flw-head { font-family:var(--font-b); font-size:12.5px; line-height:1.35; color:var(--nr-smoke); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:34px; }
-  .hm-flw-tag { font-family:var(--font-m); font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:var(--nr-yellow,#EDBD1F); }
+  /* Following tiles: story art leads, headline captions, face badge attributes */
+  .hm-flw { position:relative; flex-shrink:0; width:138px; aspect-ratio:4/5.4; border-radius:10px; overflow:hidden; border:none; padding:0; text-align:left; cursor:pointer; background:var(--nr-lead); }
+  .hm-flw-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .hm-flw-shade { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.88) 8%, rgba(0,0,0,0.28) 48%, rgba(0,0,0,0.05)); }
+  .hm-flw-body { position:absolute; left:9px; right:9px; bottom:9px; }
+  .hm-flw-head { display:block; font-family:var(--font-b); font-size:12.5px; font-weight:700; line-height:1.28; color:#fff; margin-bottom:7px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .hm-flw-by { display:flex; align-items:center; gap:5px; font-family:var(--font-b); font-size:10.5px; font-weight:600; color:rgba(255,255,255,0.85); }
+  .hm-flw-by img { width:16px; height:16px; border-radius:50%; object-fit:cover; border:1px solid rgba(255,255,255,0.4); }
+  /* Stack filmstrip */
+  .hm-strip { display:grid; grid-template-columns:repeat(4, 1fr); gap:7px; margin-bottom:14px; }
+  .hm-strip-frame { position:relative; aspect-ratio:3/4; border-radius:6px; overflow:hidden; background:var(--nr-lead); }
+  .hm-strip-frame img { width:100%; height:100%; object-fit:cover; }
+  .hm-strip-frame.done img { filter:grayscale(1) brightness(0.5); }
+  .hm-strip-chip { position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.65); color:#fff; font-family:var(--font-m); font-size:8.5px; padding:2px 5px; border-radius:4px; }
+  .hm-strip-check { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--nr-yellow,#EDBD1F); font-size:20px; font-weight:700; }
+  /* Latest mosaic */
+  .hm-mosaic { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 20px; }
+  .hm-mo { position:relative; aspect-ratio:4/5; border-radius:10px; overflow:hidden; border:none; padding:0; text-align:left; cursor:pointer; background:var(--nr-lead); }
+  .hm-mo-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .hm-mo-shade { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.3) 52%, rgba(0,0,0,0.05)); }
+  .hm-mo-body { position:absolute; left:11px; right:11px; bottom:11px; }
+  .hm-mo-tag { display:inline-block; font-family:var(--font-m); font-size:8.5px; letter-spacing:0.14em; text-transform:uppercase; color:#000; background:var(--nr-yellow,#EDBD1F); padding:3px 6px; border-radius:3px; margin-bottom:7px; }
+  .hm-mo-head { display:block; font-family:var(--font-b); font-size:13.5px; font-weight:700; line-height:1.3; color:#fff; margin-bottom:7px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
 
   /* Stack card */
   .hm-stack { margin:0 20px 14px; background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:18px; }
@@ -3067,17 +3083,21 @@ function renderHome() {
   const allDone = done >= total;
   const myVote = userPollVotes['home-daily'];
 
-  // Faces never blind-open content — every card previews the story first (headline consent)
+  // News first, author attached: story art leads, headline captions, face badges attribution.
+  // Faces never blind-open content (headline consent).
   const following = [
-    ...CREATORS.map((c, i) => ({ name:c.name, avatar:c.avatar, head:c.posts[0].head, tag:c.posts[0].tag, tap:`v3OpenCreatorFromHome(${i})` })),
-    { name:"Mosheh", avatar:HM_EXTRA_FACES[0].avatar, head:"What the Hormuz escorts mean for gas prices", tag:"World", tap:'' },
-    { name:"Sophia Bell", avatar:HM_EXTRA_FACES[1].avatar, head:"The methane rule, explained by an energy analyst", tag:"Climate", tap:'' },
+    ...CREATORS.map((c, i) => ({ name:c.name.split(' ')[0] === 'The' ? c.name : c.name.split(' ')[0], avatar:c.avatar, head:c.posts[0].head, img:c.posts[0].img, tap:`v3OpenCreatorFromHome(${i})` })),
+    { name:"Mosheh", avatar:HM_EXTRA_FACES[0].avatar, head:"What the Hormuz escorts mean at the pump", img:"https://images.unsplash.com/photo-1494412651409-8963ce7935a7?w=500&h=700&fit=crop", tap:'' },
+    { name:"Sophia", avatar:HM_EXTRA_FACES[1].avatar, head:"An energy analyst reads the methane rule", img:"https://images.unsplash.com/photo-1620266757065-5814239881fd?w=500&h=700&fit=crop", tap:'' },
   ];
   const facesHtml = following.map(f => `
     <button class="hm-flw" onclick="${f.tap}">
-      <span class="hm-flw-top"><img src="${f.avatar}" alt=""><span class="hm-flw-name">${f.name}</span></span>
-      <span class="hm-flw-head">${f.head}</span>
-      <span class="hm-flw-tag">${f.tag}</span>
+      <img class="hm-flw-img" src="${f.img}" alt="">
+      <span class="hm-flw-shade"></span>
+      <span class="hm-flw-body">
+        <span class="hm-flw-head">${f.head}</span>
+        <span class="hm-flw-by"><img src="${f.avatar}" alt="">${f.name}</span>
+      </span>
     </button>`).join('');
 
   const pollHtml = HM_POLL.opts.map((o, i) => {
@@ -3098,15 +3118,16 @@ function renderHome() {
     { tag:"WORLD", head:"60 seconds over the Strait of Hormuz", c:CREATORS[0], img:"https://images.unsplash.com/photo-1494412651409-8963ce7935a7?w=300&h=300&fit=crop", jump:3 },
     { tag:"BUSINESS", head:"The Fed's one-cut signal — what it means for your loans", c:CREATORS[0], img:"https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=300&h=300&fit=crop", jump:0 },
   ];
-  const rowsHtml = rows.map(r => `
-    <button class="hm-story-row" onclick="hmJump(${r.jump})">
-      <span class="hm-story-text">
-        <span class="hm-story-tag" style="display:block">${r.tag}</span>
-        <span class="hm-story-headline" style="display:block">${r.head}</span>
-        <span class="hm-byline"><img src="${r.c.avatar}" alt="">${r.c.name}</span>
+  const rowsHtml = `<div class="hm-mosaic">${rows.map(r => `
+    <button class="hm-mo" onclick="hmJump(${r.jump})">
+      <img class="hm-mo-img" src="${r.img.replace('w=300&h=300', 'w=500&h=640')}" alt="">
+      <span class="hm-mo-shade"></span>
+      <span class="hm-mo-body">
+        <span class="hm-mo-tag">${r.tag}</span>
+        <span class="hm-mo-head">${r.head}</span>
+        <span class="hm-flw-by"><img src="${r.c.avatar}" alt="">${r.c.name.split(' ')[0] === 'The' ? r.c.name : r.c.name.split(' ')[0]}</span>
       </span>
-      <img class="hm-story-thumb" src="${r.img}" alt="">
-    </button>`).join('');
+    </button>`).join('')}</div>`;
 
   homeEl.innerHTML = `
     <div class="hm-top">
@@ -3130,8 +3151,15 @@ function renderHome() {
     </div>` : `
     <div class="hm-stack">
       <div class="hm-stack-eyebrow">Today's Stack</div>
+      <div class="hm-strip">
+        ${STORIES.map((s, i) => `
+          <span class="hm-strip-frame ${COMPLETED.has(i) ? 'done' : ''}">
+            <img src="${s.slides[0].img}" alt="">
+            ${s.format === 'video' ? '<span class="hm-strip-chip">▶</span>' : s.format === 'read' ? '<span class="hm-strip-chip">60s</span>' : ''}
+            ${COMPLETED.has(i) ? '<span class="hm-strip-check">✓</span>' : ''}
+          </span>`).join('')}
+      </div>
       <div class="hm-stack-title">${total} stories, 5 minutes.</div>
-      <div class="hm-stack-sub">${hmFormatLine()}</div>
       <div class="hm-stack-row">
         ${hmRing(done, total)}
         <button class="hm-stack-cta" onclick="hmStart()">${done === 0 ? "Start today's Stack" : `Continue · ${total - done} left`}</button>
