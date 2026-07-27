@@ -1,50 +1,57 @@
-# Newsreel app — purpose (locked before the v3 redesign)
+# Newsreel app — purpose (research-derived, July 26 2026)
 
-Researched through the lens of Substack's app designers, Nikita Bier, and builders who made
-hard daily jobs feel good (Wordle/NYT Games, Duolingo, Oura, People magazine). Distilled July 26, 2026;
-v3 (`app-v3.html`) is built against this.
+Derived from two sourced research passes through the mandated lens — Substack's app designers,
+Nikita Bier, and creators who made hard daily jobs beloved (Wordle, Duolingo, Oura) — then used
+as the gate to audit `app-v3.html`. Sources inline.
 
-## The purpose, one sentence
+## The purpose
 
-**Re-engage people who have given up on news by making the news finishable: open the app, see in
-one glance what today asks of you, do it in ~5 minutes, feel smart, leave knowing you're done —
-told by verified humans you recognize.**
+**Give a young person who quit the news the daily five-minute ritual that leaves them feeling
+caught up, capable, and calm — a finite, finishable Stack told by verified humans they choose to
+follow, not a feed that maximizes time-on-app.**
 
-## The job to be done
+## Key research findings (cited)
 
-Not "stay informed" (nobody's actual job) but: **"let me feel caught up and smart without feeling
-anxious, dumb, or behind."** News apps fail because they make users feel behind and stupid; the feed
-never ends, so there is no moment of "done." The product's unit of value is the *completion moment*,
-not the impression.
+**Substack lens.** Chris Best frames media as "Future A (The Drug)" — engagement, outrage — vs
+"Future B (The Culture)" — trust, depth, direct payment (The Generalist, "Substack Playbook").
+Hamish McKenzie: rival platforms are "designed to keep you trapped in an endless scroll…"
+(hamish.substack.com, "Why we built a social network"). Design decisions: chronological inbox
+metaphor, follows-people-not-topics, Notes ranked for subscriptions not reactions. Documented
+failure modes for news: reader overwhelm ("20 subscriptions × 40+ weekly emails"), writer
+marketing grind, **no daily ritual, no finish line, no shared front page**.
 
-## What each lens contributed
+**Bier / hard-jobs lens.** Bier: apps are downloaded to find a mate, make money, or *unplug* —
+news must be the third, an escape not a stressor; "demonstrate your core value within the first
+three seconds"; night-one friend density decides survival; build apps "that make you feel good
+about yourself" (Lenny's Newsletter interview). The reframe pattern: Duolingo moved from XP-grind
+to "one lesson a day" and sold identity ("I keep my streak"); Wordle sold *completion* — "one
+Wordle means you've completed 100% of something" (Penn/Lamberton) — and scarcity ended the session
+for you; Oura collapsed a data firehose into one glanceable number. **Stop asking users to do the
+open-ended hard thing; sell a bounded ritual with a clean finish.**
 
-- **Substack designers**: people follow *people*, not outlets. Faces and bylines are the durable
-  retention asset. But (Brijesh's corollary) avatar-first navigation only works when the person IS
-  the product; in news, headlines must navigate and faces attribute — content-consent before commit.
-- **Nikita Bier**: night-one social density decides retention; presence not pressure ("Maya finished
-  today," never a nag). Ship the smallest loop that produces a feeling, and let the feeling market it.
-- **Wordle / NYT Games**: the daily gate converts completion into anticipation. Push the reward
-  screen (recap + streak + next-edition + share on ONE screen). Scarcity is a feature — "won't let
-  you binge" is the moat, not a limitation.
-- **Duolingo**: ritual chrome (streaks, pips, celebration) works when the metric is showing up, not
-  performance. Streak with a shield; no XP on news (grinding mechanics read as cynical here).
-- **Oura**: one glance = your state ("readiness 82" → "1/4 done, 3 left"). The home is a status
-  surface first, a library second.
-- **People magazine**: art direction with clear jobs — image leads, type captions, format is legible
-  at a glance. Text-heavy = wrong.
+**Why news is the hard job** (Reuters Institute DNR 2024): **39% selectively avoid news** (up from
+29% in 2017); 39% feel "worn out" by the volume; stated reasons are anxiety, powerlessness,
+repetition. News fails as a job because it is unbounded, negative, and disempowering.
 
-## Structural consequences (all shipped in v3)
+## The ten principles → conformance audit of app-v3
 
-1. **Home is the front door** (was the Explore tab's role): greeting, Today's Stack card (filmstrip,
-   ring, one CTA), Following tiles, Catch me up (Timeline / Split Screen / Ask Benny), daily question,
-   browse mosaic. The swipe feed is no longer the app's opening statement.
-2. **The feed is demoted from primary** — reachable from every story tile/hero; tab 2 evolved
-   (Feed → Browse → The Wire) per Jack's direction into the social surface: journalists + friends.
-3. **The Stack is a passage**: film-countdown in, tabs vanish, chapter cards, three native formats
-   (brief / video / article with a "Full story" door), exit ritual ("You're caught up. Nothing is
-   waiting for you here.") with recap, streak, share.
-4. **Format language**: IG-style glyphs + Substack-style cost units ("5 cards" / "0:58" / "11 min
-   read") + paper chrome for articles, applied on every surface.
-5. **North-star check for any future change**: does it make tomorrow's open more likely, the user
-   feel smarter, or the completion moment stronger? If none — cut it.
+| # | Principle (lens) | In app-v3 | Status |
+|---|---|---|---|
+| 1 | Optimize for finished trust, not dwell time (Substack) | Finite Stack, exit ritual "Nothing is waiting for you here" | ✅ |
+| 2 | The person is the product; follow people not topics (Substack) | Following tiles, creator profiles, Wire bylines; headlines navigate, faces attribute | ✅ |
+| 3 | Bounded low-anxiety "inbox" the reader controls (Substack) | 4-story Stack replaces the unread pile; no red dots anywhere | ✅ |
+| 4 | Feed = matchmaking, not outrage (Substack) | Wire is chronological in prototype; **rule for the real build: rank for "who will this reader trust and follow," never engagement** | ⚠️ spec note for Brijesh |
+| 5 | Daily ritual + finish line news never had (Substack) | Film-countdown in, completion moment out, Edition collected | ✅ |
+| 6 | Sell "finished," not "informed" (Bier/Wordle) | "Then you're done for the day" is the promise line; recap = proof | ✅ |
+| 7 | Value in three seconds, no ask before the magic (Bier) | Boots straight to Home + Stack card; no walls in prototype; **real build: no signup before first Stack** | ✅ / spec note |
+| 8 | Capable, never powerless (Bier, Reuters) | Takeaways ("the 4 things you now know"), untracked quizzes, no wrong-state shaming | ✅ |
+| 9 | Ration the firehose; scarcity is the product (Wordle/Oura) | 4 stories is the point; streak + shield; static "tomorrow 7am," no urgency timer | ✅ |
+| 10 | Give the ritual a social edge (Bier) | Share artifact, friend presence ("Maya finished today"), The Wire, Activity without badges | ✅ |
+
+Audit conclusion: app-v3 conforms on 9/10; #4 and the #7 signup rule are carried as explicit
+requirements into the Brijesh build spec, since the prototype has no ranking or auth to implement.
+
+## North-star check for any future change
+
+Does it make tomorrow's open more likely, the reader feel more capable, or the completion moment
+stronger? If none of the three — cut it.
