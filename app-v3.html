@@ -3219,11 +3219,11 @@ function renderHome() {
   // News first, author attached: story art leads, headline captions, face badges attribution.
   // Faces never blind-open content (headline consent).
   const following = [
+    { name:"Sophia Lebowitz", avatar:"https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=300&h=300&fit=crop", head:"The ghost buses of Flatbush", img:"https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=500&h=700&fit=crop", fmt:'brief', cost:'6 cards', tap:'openAuthor()' },
     { name:"Dave", avatar:CREATORS[0].avatar, head:CREATORS[0].posts[0].head, img:CREATORS[0].posts[0].img, fmt:'brief', cost:'6 cards', tap:'v3OpenCreatorFromHome(0)' },
     { name:"Eliza", avatar:CREATORS[1].avatar, head:CREATORS[1].posts[0].head, img:CREATORS[1].posts[0].img, fmt:'brief', cost:'5 cards', tap:'v3OpenCreatorFromHome(1)' },
     { name:"The Atlantic", avatar:CREATORS[2].avatar, head:CREATORS[2].posts[0].head, img:CREATORS[2].posts[0].img, fmt:'read', cost:'11 min read', tap:'v3OpenCreatorFromHome(2)' },
     { name:"Mosheh", avatar:HM_EXTRA_FACES[0].avatar, head:"What the Hormuz escorts mean at the pump", img:"https://images.unsplash.com/photo-1494412651409-8963ce7935a7?w=500&h=700&fit=crop", fmt:'video', cost:'1:24', tap:'' },
-    { name:"Sophia Lebowitz", avatar:"https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=300&h=300&fit=crop", head:"The ghost buses of Flatbush", img:"https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=500&h=700&fit=crop", fmt:'brief', cost:'6 cards', tap:'openAuthor()' },
   ];
   const facesHtml = following.map(f => f.fmt === 'read' ? `
     <button class="hm-flw hm-flw--paper" onclick="${f.tap}">
