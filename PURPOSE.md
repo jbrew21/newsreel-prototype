@@ -1,4 +1,4 @@
-# Newsreel app — purpose (research-derived, July 26 2026)
+# Newsreel app — purpose (research-derived, Aug 6 2026)
 
 Derived from two sourced research passes through the mandated lens — Substack's app designers,
 Nikita Bier, and creators who made hard daily jobs beloved (Wordle, Duolingo, Oura) — then used
