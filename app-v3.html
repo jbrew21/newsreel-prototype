@@ -1109,6 +1109,63 @@
   .hm-strip-frame.paper.done { opacity:0.55; }
   .hm-strip-frame.paper .hm-strip-check { color:var(--nr-red); }
 
+  /* ─── Author page (Sophia) ─── */
+  .author { position:absolute; inset:0; background:#000; z-index:57; transform:translateX(105%); transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1); overflow-y:auto; padding-bottom:120px; }
+  .author.on { transform:translateX(0); }
+  .au-hero { position:relative; height:56vh; }
+  .au-hero-img { width:100%; height:100%; object-fit:cover; filter:grayscale(1) contrast(1.05); }
+  .au-hero-shade { position:absolute; inset:0; background:linear-gradient(to top, #000 4%, rgba(0,0,0,0.35) 30%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.4)); }
+  .au-nav { position:absolute; top:18px; left:16px; width:38px; height:38px; border-radius:50%; background:rgba(0,0,0,0.45); border:none; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(6px); }
+  .au-nav svg { width:19px; height:19px; }
+  .au-nav--share { left:auto; right:16px; }
+  .au-name { position:absolute; left:20px; right:20px; bottom:14px; font-family:var(--font-h); font-size:38px; line-height:1.05; color:#fff; }
+  .au-body { padding:14px 20px 0; }
+  .au-handle { font-family:var(--font-b); font-size:14px; font-weight:700; color:#fff; }
+  .au-org { font-family:var(--font-b); font-size:13px; color:var(--nr-ash); margin:3px 0 14px; }
+  .au-stats { display:flex; align-items:center; gap:14px; font-family:var(--font-b); font-size:12.5px; color:var(--nr-smoke); margin-bottom:16px; flex-wrap:wrap; }
+  .au-stats b { color:#fff; font-size:14px; }
+  .au-follow { margin-left:auto; background:var(--nr-red); color:#000; border:none; border-radius:6px; padding:9px 22px; font-family:var(--font-m); font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; cursor:pointer; }
+  .au-verified { display:flex; align-items:center; gap:12px; width:100%; background:var(--nr-lead); border:1px solid rgba(237,189,31,0.35); border-radius:8px; padding:11px 14px; cursor:pointer; text-align:left; margin-bottom:14px; }
+  .au-seal { position:relative; width:34px; height:34px; flex-shrink:0; overflow:hidden; border-radius:50%; display:flex; align-items:center; justify-content:center; animation:sealPulse 2.8s ease-in-out infinite; }
+  .au-seal svg { width:30px; height:30px; }
+  .au-seal-shine { position:absolute; top:-40%; left:-70%; width:45%; height:180%; background:linear-gradient(105deg, transparent, rgba(255,255,255,0.85), transparent); transform:rotate(12deg); animation:sealShine 2.8s ease-in-out infinite; }
+  @keyframes sealShine { 0%, 55% { left:-70%; } 85%, 100% { left:130%; } }
+  @keyframes sealPulse { 0%, 100% { transform:scale(1); } 50% { transform:scale(1.07); } }
+  .au-seal--big { width:52px; height:52px; margin:0 auto 12px; display:flex; }
+  .au-seal--big svg { width:46px; height:46px; }
+  .au-verified-text b { display:block; font-family:var(--font-b); font-size:13.5px; color:#fff; }
+  .au-verified-text em { font-style:normal; font-family:var(--font-b); font-size:12px; color:var(--nr-yellow,#EDBD1F); }
+  .au-bio { font-family:var(--font-b); font-size:14px; line-height:1.5; color:var(--nr-smoke); margin-bottom:14px; }
+  .au-file-toggle { display:flex; align-items:center; gap:9px; width:100%; background:none; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:11px 14px; cursor:pointer; color:#fff; font-family:var(--font-h); font-size:15px; margin-bottom:0; }
+  .au-file-toggle img { width:22px; height:22px; border-radius:50%; background:#fff; }
+  .au-file-toggle svg { width:15px; height:15px; margin-left:auto; color:var(--nr-ash); transition:transform 0.25s ease; }
+  .au-file-toggle.open svg { transform:rotate(180deg); }
+  .au-file { background:var(--nr-charcoal); border:1px solid rgba(255,255,255,0.08); border-top:none; border-radius:0 0 8px 8px; padding:13px 14px; font-family:var(--font-b); font-size:13.5px; line-height:1.55; color:var(--nr-smoke); }
+  .au-tabs { display:flex; gap:22px; border-bottom:1px solid rgba(255,255,255,0.1); margin:20px 0 14px; }
+  .au-tab { background:none; border:none; padding:0 0 10px; font-family:var(--font-b); font-size:14px; font-weight:500; color:rgba(255,255,255,0.6); cursor:pointer; border-bottom:2px solid transparent; }
+  .au-tab.active { color:#fff; border-bottom-color:var(--nr-red); }
+  .au-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .au-tile { position:relative; aspect-ratio:4/5; border-radius:8px; overflow:hidden; border:none; padding:0; text-align:left; cursor:pointer; background:var(--nr-lead); }
+  .au-tile img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .au-tile--paper { background:#F4EFE6; }
+  .au-tile-body { position:absolute; left:11px; right:11px; bottom:11px; }
+  .au-tile--paper .au-tile-body { top:12px; bottom:auto; }
+  .au-tile-head { display:block; font-family:var(--font-b); font-size:13.5px; font-weight:700; line-height:1.3; color:#fff; margin-bottom:5px; }
+  .au-tile-head--dark { color:#161513; font-family:var(--font-h); font-weight:400; font-size:16px; }
+  .au-tile-cost { font-family:var(--font-m); font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.75); }
+  .vf-scrim { position:absolute; inset:0; background:rgba(0,0,0,0.7); z-index:66; opacity:0; pointer-events:none; transition:opacity 0.25s ease; }
+  .vf-scrim.on { opacity:1; pointer-events:auto; }
+  .vf-modal { position:absolute; left:24px; right:24px; top:50%; transform:translateY(-46%) scale(0.96); background:var(--nr-lead); border:1px solid rgba(237,189,31,0.3); border-radius:8px; padding:24px 20px; z-index:67; opacity:0; pointer-events:none; transition:all 0.28s cubic-bezier(0.2,0.8,0.2,1); text-align:center; }
+  .vf-modal.on { opacity:1; pointer-events:auto; transform:translateY(-50%) scale(1); }
+  .vf-title { font-family:var(--font-h); font-size:23px; color:#fff; margin-bottom:16px; }
+  .vf-row { display:flex; gap:10px; text-align:left; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .vf-row:last-of-type { border-bottom:none; }
+  .vf-check { color:var(--nr-green,#1AAD17); font-weight:700; flex-shrink:0; }
+  .vf-row-text { font-family:var(--font-b); font-size:12.5px; line-height:1.45; color:var(--nr-smoke); }
+  .vf-row-text b { display:block; color:#fff; font-size:13px; }
+  .vf-foot { font-family:var(--font-b); font-size:11.5px; color:var(--nr-ash); margin:12px 0 16px; line-height:1.45; }
+  .vf-close { background:var(--nr-red); color:#000; border:none; border-radius:6px; padding:12px 30px; font-family:var(--font-m); font-size:12px; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; }
+
   /* Social presence */
   .hm-stack-social { display:flex; align-items:center; gap:8px; margin-top:13px; font-family:var(--font-b); font-size:12px; color:var(--nr-ash); }
   .hm-ss-faces { display:flex; flex-shrink:0; }
@@ -1196,6 +1253,11 @@
 
   <!-- v3 long-form reader -->
   <div class="reader" id="reader"></div>
+
+  <!-- v3 author page (Sophia Lebowitz) -->
+  <div class="author" id="author"></div>
+  <div class="vf-scrim" id="vfScrim" onclick="closeVerify()"></div>
+  <div class="vf-modal" id="vfModal"></div>
 
   <!-- v3 gesture coach (first Stack entry only) -->
   <div class="coach" id="gestureCoach" onclick="coachDismiss()">
@@ -3161,7 +3223,7 @@ function renderHome() {
     { name:"Eliza", avatar:CREATORS[1].avatar, head:CREATORS[1].posts[0].head, img:CREATORS[1].posts[0].img, fmt:'brief', cost:'5 cards', tap:'v3OpenCreatorFromHome(1)' },
     { name:"The Atlantic", avatar:CREATORS[2].avatar, head:CREATORS[2].posts[0].head, img:CREATORS[2].posts[0].img, fmt:'read', cost:'11 min read', tap:'v3OpenCreatorFromHome(2)' },
     { name:"Mosheh", avatar:HM_EXTRA_FACES[0].avatar, head:"What the Hormuz escorts mean at the pump", img:"https://images.unsplash.com/photo-1494412651409-8963ce7935a7?w=500&h=700&fit=crop", fmt:'video', cost:'1:24', tap:'' },
-    { name:"Sophia", avatar:HM_EXTRA_FACES[1].avatar, head:"An energy analyst reads the methane rule", img:"https://images.unsplash.com/photo-1620266757065-5814239881fd?w=500&h=700&fit=crop", fmt:'read', cost:'8 min read', tap:'' },
+    { name:"Sophia Lebowitz", avatar:"https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=300&h=300&fit=crop", head:"The ghost buses of Flatbush", img:"https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=500&h=700&fit=crop", fmt:'brief', cost:'6 cards', tap:'openAuthor()' },
   ];
   const facesHtml = following.map(f => f.fmt === 'read' ? `
     <button class="hm-flw hm-flw--paper" onclick="${f.tap}">
@@ -3404,6 +3466,124 @@ function renderStackDone() {
       <button class="sdone-btn" onclick="hmShare()">Share</button>
       <button class="sdone-btn sdone-btn--ghost" onclick="leaveStack()">Back home</button>
     </div>`;
+}
+
+// ─── Author page: Sophia Isabel Lebowitz (social-media-for-journalists profile) ───
+const SOPHIA = {
+  name:"Sophia Isabel Lebowitz", handle:"sophlebo_",
+  role:"Journalist", org:"Reporter @streetsblognyc",
+  hero:"https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=900&h=1000&fit=crop",
+  posts:470, followers:3347, following:1395,
+  bio:"posting film photos, pics where I look good, and my work | reporter @streetsblognyc | have a tip? signal: sophialebowitz.14",
+  file:"Sophia covers how New York actually moves: buses, bikes, and the daily indignities of the MTA, for Streetsblog NYC. Her ghost-bus series got two Flatbush routes restored. She shoots the city on 35mm film between assignments, which is why her carousels look like that. This file is written by Newsreel, not by Sophia. She can't edit it.",
+  verify:{
+    identity:"Government ID matched to the person behind this account.",
+    bylines:"47 bylines reviewed. Streetsblog NYC (staff reporter, 2024–now), amNewYork, Brooklyn Paper.",
+    record:"Corrections, retractions, litigation, plagiarism: searched July 2026. Clean.",
+    standards:"Signed Newsreel's editorial standards. No marketing content, no fully AI-generated posts.",
+  },
+  carousels:[
+    { head:"The ghost buses of Flatbush", cards:6, img:"https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=500&h=640&fit=crop" },
+    { head:"Who killed the 34th St busway?", cards:5, img:"https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=500&h=640&fit=crop" },
+    { head:"A bike lane dies in Queens", cards:7, img:"https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=500&h=640&fit=crop" },
+    { head:"Dispatch: the city on film, week 31", cards:4, img:"https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=500&h=640&fit=crop" },
+  ],
+  articles:[
+    { head:"The case against parking minimums", min:9 },
+    { head:"Vision Zero's lost decade", min:12 },
+  ],
+  videos:[
+    { head:"60 seconds on the BQE cap", dur:"0:47", img:"https://images.unsplash.com/photo-1522083165195-3424ed129620?w=500&h=640&fit=crop" },
+    { head:"Riding the new M14 at rush hour", dur:"1:12", img:"https://images.unsplash.com/photo-1556122071-e404eaedb77f?w=500&h=640&fit=crop" },
+  ],
+};
+let auTab = 'carousels', auFileOpen = false;
+const authorEl = document.getElementById('author');
+
+function renderAuthor() {
+  const s = SOPHIA;
+  const grid =
+    auTab === 'carousels' ? s.carousels.map(c => `
+      <button class="au-tile">
+        <img src="${c.img}" alt="" onerror="this.style.display='none'">
+        <span class="hm-mo-shade"></span>
+        ${fmtGlyph('brief')}
+        <span class="au-tile-body"><span class="au-tile-head">${c.head}</span><span class="au-tile-cost">${c.cards} cards</span></span>
+      </button>`).join('')
+    : auTab === 'articles' ? s.articles.map(a => `
+      <button class="au-tile au-tile--paper">
+        ${fmtGlyph('read', 'fmt-glyph--dark')}
+        <span class="au-tile-body">
+          <span class="au-tile-head au-tile-head--dark">${a.head}</span>
+          <span class="hm-flw-cost">${a.min} min read</span>
+        </span>
+      </button>`).join('')
+    : s.videos.map(v => `
+      <button class="au-tile">
+        <img src="${v.img}" alt="" onerror="this.style.display='none'">
+        <span class="hm-mo-shade"></span>
+        ${fmtGlyph('video')}
+        <span class="fmt-dur">${v.dur}</span>
+        <span class="au-tile-body"><span class="au-tile-head">${v.head}</span></span>
+      </button>`).join('');
+
+  authorEl.innerHTML = `
+    <div class="au-hero">
+      <img class="au-hero-img" src="${s.hero}" alt="">
+      <div class="au-hero-shade"></div>
+      <button class="au-nav" onclick="closeAuthor()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/></svg></button>
+      <button class="au-nav au-nav--share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
+      <h1 class="au-name">${s.name}</h1>
+    </div>
+
+    <div class="au-body">
+      <div class="au-handle">@${s.handle} · ${s.role}</div>
+      <div class="au-org">${s.org}</div>
+
+      <div class="au-stats">
+        <span><b>${s.posts}</b> posts</span>
+        <span><b>${s.followers.toLocaleString()}</b> followers</span>
+        <span><b>${s.following.toLocaleString()}</b> following</span>
+        <button class="au-follow">Follow</button>
+      </div>
+
+      <button class="au-verified" onclick="openVerify()">
+        <span class="au-seal"><span class="au-seal-shine"></span><svg viewBox="0 0 24 24" fill="#EDBD1F" stroke="#000" stroke-width="1.6"><path d="M12 2l2.4 2 3.1-.4 1 3 2.9 1.2-.9 3L22 13l-2 2.4.4 3.1-3 1L16.2 22l-3-.9L10.8 22l-1.2-2.9-3-1 .4-3.1L5 12.8l1.5-2.6-1-3L8.5 6l1-3 3.1.4z"/><polyline points="8.5 12 11 14.5 15.5 9.5" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="au-verified-text"><b>Verified by Newsreel</b><em>See why we verified her →</em></span>
+      </button>
+
+      <p class="au-bio">${s.bio}</p>
+
+      <button class="au-file-toggle ${auFileOpen ? 'open' : ''}" onclick="auFileOpen=!auFileOpen; renderAuthor()">
+        <img src="assets/benny/benny-head.png" alt="">
+        <span>The Newsreel File</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      ${auFileOpen ? `<div class="au-file">${s.file}</div>` : ''}
+
+      <div class="au-tabs">
+        ${['carousels','articles','videos'].map(t => `<button class="au-tab ${auTab === t ? 'active' : ''}" onclick="auTab='${t}'; renderAuthor()">${t[0].toUpperCase() + t.slice(1)}</button>`).join('')}
+      </div>
+      <div class="au-grid">${grid}</div>
+    </div>`;
+}
+function openAuthor() { renderAuthor(); authorEl.classList.add('on'); authorEl.scrollTop = 0; }
+function closeAuthor() { authorEl.classList.remove('on'); closeVerify(); }
+function openVerify() {
+  const v = SOPHIA.verify;
+  document.getElementById('vfModal').innerHTML = `
+    <span class="au-seal au-seal--big"><span class="au-seal-shine"></span><svg viewBox="0 0 24 24" fill="#EDBD1F" stroke="#000" stroke-width="1.6"><path d="M12 2l2.4 2 3.1-.4 1 3 2.9 1.2-.9 3L22 13l-2 2.4.4 3.1-3 1L16.2 22l-3-.9L10.8 22l-1.2-2.9-3-1 .4-3.1L5 12.8l1.5-2.6-1-3L8.5 6l1-3 3.1.4z"/><polyline points="8.5 12 11 14.5 15.5 9.5" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <h2 class="vf-title">Why we verified Sophia</h2>
+    ${[['Identity verified', v.identity], ['Publication history reviewed', v.bylines], ['Record checked', v.record], ['Standards signed', v.standards]].map(([k, t]) => `
+      <div class="vf-row"><span class="vf-check">✓</span><span class="vf-row-text"><b>${k}</b>${t}</span></div>`).join('')}
+    <div class="vf-foot">Verification means we checked who she is and how she works. It does not mean Newsreel endorses her views.</div>
+    <button class="vf-close" onclick="closeVerify()">Got it</button>`;
+  document.getElementById('vfScrim').classList.add('on');
+  document.getElementById('vfModal').classList.add('on');
+}
+function closeVerify() {
+  document.getElementById('vfScrim').classList.remove('on');
+  document.getElementById('vfModal').classList.remove('on');
 }
 
 // Home chatbox → hands the question to the Benny tab's chat (cited replies)
