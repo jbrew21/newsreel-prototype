@@ -3707,6 +3707,8 @@ function closeBennyOverlay() {
 
 // v3 boot: Home is the homescreen
 v3Home();
+// Deep link: #sophia opens the author page directly
+if (location.hash === '#sophia') setTimeout(openAuthor, 150);
 </script>
 </body>
 </html>
